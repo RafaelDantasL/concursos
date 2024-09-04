@@ -1,104 +1,29 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editar Curso</title>
-    <style>
-        .container { width: 90%; margin: 20px auto; }
-        label, input, textarea, select, button { display: block; width: 100%; margin: 10px 0; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Editar Curso</h1>
-        <label for="nome">Nome do Curso:</label>
-        <input type="text" id="nome">
+document.getElementById('salvar').addEventListener('click', function() {
+    const courseId = new URLSearchParams(window.location.search).get('id') || Date.now().toString();
+    const courseData = {
+        nome: document.getElementById('nome').value,
+        imagemUrl: document.getElementById('imagem-url').value,
+        descricao: document.getElementById('descricao').value,
+        preco: document.getElementById('preco').value,
+        promocao: document.getElementById('promocao').value,
+        parcelamento: document.getElementById('parcelamento').value,
+        valorParcelamento: document.getElementById('valor-parcelamento').value,
+        show: true
+    };
 
-        <label for="imagem-url">URL da Imagem do Curso:</label>
-        <input type="url" id="imagem-url">
+    fetch(`${firebaseConfig.databaseURL}/cursos/${courseId}.json`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(courseData)
+    }).then(response => response.json())
+      .then(data => {
+          alert('Curso salvo com sucesso!');
+          // Opcional: Redirecionar ou atualizar a página
+      });
+});
 
-        <label for="descricao">Descrição:</label>
-        <textarea id="descricao"></textarea>
-
-        <label for="preco">Preço:</label>
-        <input type="text" id="preco">
-
-        <label for="promocao">Promoção:</label>
-        <input type="text" id="promocao">
-
-        <label for="parcelamento">Parcelamento:</label>
-        <select id="parcelamento">
-            <option value="1">1x</option>
-            <option value="2">2x</option>
-            <option value="3">3x</option>
-            <option value="4">4x</option>
-            <option value="5">5x</option>
-            <option value="6">6x</option>
-            <option value="7">7x</option>
-            <option value="8">8x</option>
-            <option value="9">9x</option>
-            <option value="10">10x</option>
-            <option value="11">11x</option>
-            <option value="12">12x</option>
-        </select>
-
-        <label for="valor-parcelamento">Valor do Parcelamento:</label>
-        <input type="text" id="valor-parcelamento">
-
-        <button id="salvar">Salvar</button>
-        <button id="criar-pagina-vendas">Criar Página de Vendas</button>
-    </div>
-
-    <script>
-        document.getElementById('preco').addEventListener('input', function (e) {
-            e.target.value = formatCurrency(e.target.value);
-        });
-
-        document.getElementById('promocao').addEventListener('input', function (e) {
-            e.target.value = formatCurrency(e.target.value);
-        });
-
-        document.getElementById('valor-parcelamento').addEventListener('input', function (e) {
-            e.target.value = formatCurrency(e.target.value);
-        });
-
-        function formatCurrency(value) {
-            value = value.replace(/\D/g, '');
-            return 'R$ ' + (value / 100).toFixed(2).replace('.', ',');
-        }
-
-        document.getElementById('salvar').addEventListener('click', function() {
-            const courseId = new URLSearchParams(window.location.search).get('id');
-            const courseData = {
-                nome: document.getElementById('nome').value,
-                imagem: document.getElementById('imagem-url').value,
-                descricao: document.getElementById('descricao').value,
-                preco: document.getElementById('preco').value,
-                promocao: document.getElementById('promocao').value,
-                parcelamento: document.getElementById('parcelamento').value + 'x de ' + document.getElementById('valor-parcelamento').value
-            };
-
-            const method = courseId ? 'PATCH' : 'POST';
-            const url = courseId
-                ? `${firebaseConfig.databaseURL}/cursos/${courseId}.json`
-                : `${firebaseConfig.databaseURL}/cursos.json`;
-
-            fetch(url, {
-                method: method,
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(courseData)
-            }).then(() => {
-                window.location.href = 'ctrl.html';
-            });
-        });
-
-        document.getElementById('criar-pagina-vendas').addEventListener('click', function() {
-            const courseId = new URLSearchParams(window.location.search).get('id');
-            window.location.href = `purchase_page.html?id=${courseId}`;
-        });
-    </script>
-</body>
-</html>
+document.getElementById('criar-pagina-vendas').addEventListener('click', function() {
+    window.location.href = `purchase_page.html?id=${courseId}`;
+});
