@@ -1,108 +1,102 @@
-/* Estilo básico */
+/* Estilos gerais */
 body {
     font-family: Arial, sans-serif;
-    background-color: #1f2a36; /* Cor de fundo do tema escuro do ChatGPT */
-    color: #ffffff;
-    margin: 0;
-    padding: 0;
 }
 
-header {
-    text-align: center;
-    padding: 20px;
-}
-
-.logo-nome {
+/* Menu e responsividade */
+nav {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    justify-content: center;
-}
-
-.logo {
-    width: 50px;
-    height: 50px;
-    margin-right: 15px;
 }
 
 .menu {
     display: flex;
-    justify-content: center;
-    padding: 10px;
-    background-color: #333;
-}
-
-.menu li {
     list-style: none;
-    margin: 0 10px;
 }
 
-.menu a {
-    color: #ffffff;
+.menu li a {
     text-decoration: none;
+    color: black;
+    padding: 10px 20px;
+    transition: background-color 0.3s;
 }
 
-.barra-pesquisa {
-    display: flex;
-    justify-content: center;
-    margin: 20px;
+.menu li a:hover {
+    background-color: #f0f0f0;
 }
 
-#pesquisa {
-    width: 300px;
-    padding: 8px;
-}
-
-button {
-    padding: 8px 15px;
-    margin-left: 10px;
-    background-color: #5a9;
-    color: #ffffff;
-    border: none;
+/* Estilos do menu hamburguer */
+.menu-hamburguer {
+    display: none;
+    flex-direction: column;
     cursor: pointer;
 }
 
-button:hover {
-    background-color: #468;
+.menu-hamburguer span {
+    height: 3px;
+    width: 25px;
+    background-color: black;
+    margin: 4px 0;
 }
 
+/* Estilos responsivos */
+@media (max-width: 768px) {
+    .menu {
+        display: none;
+        flex-direction: column;
+        width: 100%;
+        background-color: white;
+        position: absolute;
+        top: 60px;
+        left: 0;
+    }
+
+    .menu-ativo {
+        display: flex;
+    }
+
+    .menu-hamburguer {
+        display: flex;
+    }
+
+    .menu li a {
+        padding: 10px 0;
+        text-align: center;
+        width: 100%;
+    }
+}
+
+/* Estilo para os cursos */
 .cursos-container {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
-    gap: 20px;
-    padding: 20px;
+    justify-content: space-around;
 }
 
 .curso {
-    background-color: #28333f;
-    border-radius: 10px;
-    padding: 20px;
-    width: 200px;
+    width: 30%;
+    margin-bottom: 20px;
     text-align: center;
-    cursor: pointer;
 }
 
 .curso-imagem {
     width: 100%;
     height: auto;
-    border-radius: 10px;
 }
 
+/* Estilo para paginação */
 .paginacao-container {
     text-align: center;
-    margin: 20px;
+    margin-top: 20px;
 }
 
 .pagina-button {
-    padding: 10px 15px;
     margin: 0 5px;
-    background-color: #5a9;
-    color: #ffffff;
-    border: none;
+    padding: 10px 15px;
     cursor: pointer;
 }
 
-.pagina-button:hover,
 .pagina-ativa {
-    background-color: #468;
+    background-color: #f0f0f0;
 }
