@@ -27,7 +27,6 @@
 <body>
     <h1>Adicionar/Editar Curso</h1>
     <form id="courseForm">
-        <!-- Form Fields -->
         <label for="titulo">Nome do curso:</label>
         <input type="text" id="titulo" name="titulo" maxlength="40" required>
 
@@ -110,31 +109,20 @@
                 courseData.imagem = imageUrl;
             }
 
-            if (courseId) {
-                // Update existing course
-                fetch(`${firebaseConfig.databaseURL}/cursos/${courseId}.json`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(courseData)
-                }).then(() => {
-                    alert('Curso atualizado com sucesso!');
-                    window.location.href = 'ctrl.html';
-                });
-            } else {
-                // Add new course
-                fetch(`${firebaseConfig.databaseURL}/cursos.json`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(courseData)
-                }).then(() => {
-                    alert('Curso adicionado com sucesso!');
-                    window.location.href = 'ctrl.html';
-                });
-            }
+            const method = courseId ? 'PATCH' : 'POST';
+            const url = courseId
+                ? `${firebaseConfig.databaseURL}/cursos/${courseId}.json`
+                : `${firebaseConfig.databaseURL}/cursos.json`;
+
+            fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(courseData)
+            }).then(() => {
+                window.location.href = 'ctrl.html';
+            });
         });
 
         async function uploadImageToGitHub(file) {
@@ -142,40 +130,31 @@
             reader.readAsDataURL(file);
 
             return new Promise((resolve, reject) => {
-                reader.onload = () => {
-                    const base64Image = reader.result.split(',')[1];
-                    const filePath = `img-cursos/${file.name}`;
+                reader.onload = async function() {
+                    const base64Content = reader.result.split(',')[1];
+                    const imagePath = `img-cursos/${file.name}`;
 
-                    fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${filePath}`, {
+                    const response = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${imagePath}`, {
                         method: 'PUT',
                         headers: {
                             'Authorization': `Bearer ${GITHUB_TOKEN}`,
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({
-                            message: `Adicionando imagem ${file.name}`,
-                            content: base64Image
+                            message: `Upload de imagem ${file.name}`,
+                            content: base64Content
                         })
-                    })
-                    .then(response => response.json())
-                    .then(data => resolve(data.content.download_url))
-                    .catch(error => reject(error));
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        resolve(data.content.download_url);
+                    } else {
+                        reject(new Error('Erro ao fazer upload da imagem para o GitHub'));
+                    }
                 };
             });
         }
-
-        // Helper function to format currency fields
-        function formatCurrencyField(field) {
-            field.addEventListener('input', () => {
-                let value = field.value.replace(/[^\d]/g, '');
-                value = (value / 100).toFixed(2);
-                field.value = 'R$ ' + value.replace('.', ',');
-            });
-        }
-
-        formatCurrencyField(document.getElementById('preco'));
-        formatCurrencyField(document.getElementById('promocao'));
-        formatCurrencyField(document.getElementById('valorParcelamento'));
     </script>
 </body>
 </html>
