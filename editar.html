@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adicionar/Editar Curso</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        form {
+            margin-top: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+        }
+        input[type="text"], input[type="file"], select {
+            width: 100%;
+            margin-bottom: 12px;
+        }
+        input[type="submit"] {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Adicionar/Editar Curso</h1>
+    <form id="courseForm">
+        <label for="titulo">Nome do curso:</label>
+        <input type="text" id="titulo" name="titulo" maxlength="40" required>
+
+        <label for="descricao">Descrição:</label>
+        <input type="text" id="descricao" name="descricao" maxlength="100" required>
+
+        <label for="imagem">Imagem:</label>
+        <input type="file" id="imagem" name="imagem" accept="image/*">
+
+        <label for="preco">Preço:</label>
+        <input type="text" id="preco" name="preco" required>
+
+        <label for="promocao">Promoção:</label>
+        <input type="text" id="promocao" name="promocao">
+
+        <label for="parcelamento">Parcelamento:</label>
+        <select id="parcelamento" name="parcelamento">
+            <option value="1x">1x</option>
+            <option value="2x">2x</option>
+            <!-- Adicionar outras opções conforme necessário -->
+        </select>
+        <input type="text" id="valorParcelamento" name="valorParcelamento" required>
+
+        <label for="link">Link externo:</label>
+        <input type="text" id="link" name="link" required>
+
+        <input type="submit" value="Salvar Curso">
+    </form>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyC-STt5EnVQA5oJEF1Vie3rHk1qOW9TqMw",
+            authDomain: "cursos-preparatorios.firebaseapp.com",
+            databaseURL: "https://cursos-preparatorios-default-rtdb.firebaseio.com",
+            projectId: "cursos-preparatorios",
+            storageBucket: "cursos-preparatorios.appspot.com",
+            messagingSenderId: "121871815126",
+            appId: "1:121871815126:web:1ea3e4630b3b4de6569477"
+        };
+
+        document.getElementById('courseForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const formData = new FormData(event.target);
+            const courseData = Object.fromEntries(formData.entries());
+            const courseId = new URLSearchParams(window.location.search).get('id');
+
+            if (courseId) {
+                // Update existing course
+                fetch(`${firebaseConfig.databaseURL}/cursos/${courseId}.json`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(courseData)
+                }).then(() => {
+                    alert('Curso atualizado com sucesso!');
+                    window.location.href = 'ctrl.html';
+                });
+            } else {
+                // Add new course
+                fetch(`${firebaseConfig.databaseURL}/cursos.json`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(courseData)
+                }).then(() => {
+                    alert('Curso adicionado com sucesso!');
+                    window.location.href = 'ctrl.html';
+                });
+            }
+        });
+
+        // Helper function to format currency fields
+        function formatCurrencyField(field) {
+            field.addEventListener('input', () => {
+                let value = field.value.replace(/[^\d]/g, '');
+                value = (value / 100).toFixed(2);
+                field.value = 'R$ ' + value.replace('.', ',');
+            });
+        }
+
+        formatCurrencyField(document.getElementById('preco'));
+        formatCurrencyField(document.getElementById('promocao'));
+        formatCurrencyField(document.getElementById('valorParcelamento'));
+
+        // Load course data if editing
+        const courseId = new URLSearchParams(window.location.search).get('id');
+        if (courseId) {
+            fetch(`${firebaseConfig.databaseURL}/cursos/${courseId}.json`)
+                .then(response => response.json())
+                .then(data => {
+                    for (let key in data) {
+                        if (document.getElementById(key)) {
+                            document.getElementById(key).value = data[key];
+                        }
+                    }
+                });
+        }
+    </script>
+</body>
+</html>
