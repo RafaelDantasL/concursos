@@ -1,65 +1,73 @@
-document.addEventListener("DOMContentLoaded", function () {
-    const cursosBtn = document.getElementById("cursos-btn");
-    const cursosSection = document.getElementById("cursos-section");
-    const cursosContainer = document.getElementById("cursos-container");
-    const pagination = document.getElementById("pagination");
+const cursosPorPagina = 12;
+let paginaAtual = 1;
+let cursosTotais = [];
 
-    let cursos = [];
-    const cursosPorPagina = 12;
-    let paginaAtual = 1;
-
-    // Carrega os cursos a partir do banco de dados (JSON)
-    async function carregarCursos() {
-        const response = await fetch("cursos.json");
-        cursos = await response.json();
-        mostrarCursos();
-        criarPaginacao();
-    }
-
-    // Mostra os cursos na página
-    function mostrarCursos() {
-        cursosContainer.innerHTML = "";
-        const inicio = (paginaAtual - 1) * cursosPorPagina;
-        const fim = inicio + cursosPorPagina;
-        const cursosExibidos = cursos.slice(inicio, fim);
-
-        cursosExibidos.forEach(curso => {
-            const cursoCard = document.createElement("div");
-            cursoCard.classList.add("curso-card");
-            cursoCard.innerHTML = `
-                <img src="${curso.imagem}" alt="${curso.nome}">
-                <h3>${curso.nome}</h3>
-                <p>${curso.descricao}</p>
-                <p><strong>${curso.precoPromo ? `<s>${curso.preco}</s> ${curso.precoPromo}` : curso.preco}</strong></p>
-                <p style="color:green;">${curso.parcelas}x de ${curso.valorParcela}</p>
-            `;
-            cursoCard.addEventListener("click", function () {
-                window.location.href = `curso/${curso.id}.html`;
-            });
-            cursosContainer.appendChild(cursoCard);
+function carregarCursos() {
+    firebase.database().ref('cursos').once('value', snapshot => {
+        cursosTotais = [];
+        snapshot.forEach(childSnapshot => {
+            cursosTotais.push(childSnapshot.val());
         });
-    }
-
-    // Cria a navegação da paginação
-    function criarPaginacao() {
-        const totalPaginas = Math.ceil(cursos.length / cursosPorPagina);
-        pagination.innerHTML = "";
-
-        for (let i = 1; i <= totalPaginas; i++) {
-            const pagLink = document.createElement("a");
-            pagLink.href = "#";
-            pagLink.textContent = i;
-            pagLink.addEventListener("click", function (e) {
-                e.preventDefault();
-                paginaAtual = i;
-                mostrarCursos();
-            });
-            pagination.appendChild(pagLink);
-        }
-    }
-
-    cursosBtn.addEventListener("click", function () {
-        cursosSection.classList.remove("hidden");
-        carregarCursos();
+        exibirCursos();
+        gerarPaginacao();
     });
-});
+}
+
+function exibirCursos() {
+    const cursosContainer = document.getElementById('cursos-container');
+    cursosContainer.innerHTML = '';
+    const inicio = (paginaAtual - 1) * cursosPorPagina;
+    const fim = inicio + cursosPorPagina;
+    const cursosPagina = cursosTotais.slice(inicio, fim);
+    
+    cursosPagina.forEach(curso => {
+        cursosContainer.innerHTML += `
+            <div class="curso" onclick="location.href='${curso.link}'">
+                <h3>${curso.titulo}</h3>
+                <img src="${curso.imagem}" alt="${curso.titulo}">
+                <p>${curso.descricao}</p>
+                <p><strong>R$ ${curso.preco}</strong></p>
+                ${curso.promocao ? `<p><strong>Promoção: R$ ${curso.promocao}</strong></p>` : ''}
+                ${curso.parcelamento ? `<p><strong>Parcelamento: ${curso.parcelamento}</strong></p>` : ''}
+            </div>
+        `;
+    });
+}
+
+function gerarPaginacao() {
+    const paginacaoContainer = document.getElementById('paginacao');
+    paginacaoContainer.innerHTML = '';
+    const totalPaginas = Math.ceil(cursosTotais.length / cursosPorPagina);
+
+    for (let i = 1; i <= totalPaginas; i++) {
+        paginacaoContainer.innerHTML += `
+            <button onclick="mudarPagina(${i})">${i}</button>
+        `;
+    }
+}
+
+function mudarPagina(pagina) {
+    paginaAtual = pagina;
+    exibirCursos();
+}
+
+function buscarCursos() {
+    const pesquisa = document.getElementById('pesquisa').value.toLowerCase();
+    const cursosContainer = document.getElementById('cursos-container');
+    cursosContainer.innerHTML = '';
+
+    firebase.database().ref('cursos').once('value', snapshot => {
+        cursosTotais = [];
+        snapshot.forEach(childSnapshot => {
+            const curso = childSnapshot.val();
+            if (curso.titulo.toLowerCase().includes(pesquisa)) {
+                cursosTotais.push(curso);
+            }
+        });
+        paginaAtual = 1;
+        exibirCursos();
+        gerarPaginacao();
+    });
+}
+
+window.onload = carregarCursos;
