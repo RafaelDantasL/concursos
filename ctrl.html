@@ -82,24 +82,30 @@
 
         async function deleteCourse(courseId, imageUrl) {
             if (confirm('Tem certeza que deseja excluir este curso?')) {
-                const imagePath = imageUrl.split('/').pop();
-                const sha = await getFileSha(`img-cursos/${imagePath}`);
+                if (imageUrl) {
+                    const imagePath = imageUrl.split('/').pop();
+                    const sha = await getFileSha(`img-cursos/${imagePath}`);
 
-                fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/img-cursos/${imagePath}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Authorization': `Bearer ${GITHUB_TOKEN}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        message: `Removendo imagem ${imagePath}`,
-                        sha: sha
-                    })
-                }).then(() => {
+                    fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/img-cursos/${imagePath}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${GITHUB_TOKEN}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            message: `Removendo imagem ${imagePath}`,
+                            sha: sha
+                        })
+                    }).then(() => {
+                        fetch(`${firebaseConfig.databaseURL}/cursos/${courseId}.json`, {
+                            method: 'DELETE'
+                        }).then(() => loadCourses());
+                    }).catch(error => console.error('Erro ao excluir a imagem:', error));
+                } else {
                     fetch(`${firebaseConfig.databaseURL}/cursos/${courseId}.json`, {
                         method: 'DELETE'
                     }).then(() => loadCourses());
-                }).catch(error => console.error('Erro ao excluir a imagem:', error));
+                }
             }
         }
 
