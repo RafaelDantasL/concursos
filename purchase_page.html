@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Página de Vendas</title>
+    <style>
+        .container { width: 90%; margin: 20px auto; }
+        label, input, textarea, select, button { display: block; width: 100%; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Editar Página de Vendas</h1>
+        <label for="nome">Nome do Curso:</label>
+        <input type="text" id="nome">
+
+        <label for="sobre">Sobre:</label>
+        <textarea id="sobre"></textarea>
+
+        <label for="checkout-link">Botão do Checkout (URL externa):</label>
+        <input type="url" id="checkout-link">
+
+        <label for="checkout-code">Código do Botão do Checkout:</label>
+        <textarea id="checkout-code"></textarea>
+
+        <label for="sumario">Sumário (opcional):</label>
+        <textarea id="sumario"></textarea>
+
+        <label for="vantagens">Vantagens:</label>
+        <div id="vantagens-container">
+            ${[...Array(15)].map((_, i) => `<input type="text" placeholder="Vantagem ${i + 1}">`).join('')}
+        </div>
+
+        <button id="publicar">Publicar</button>
+    </div>
+
+    <script>
+        document.getElementById('publicar').addEventListener('click', function() {
+            const courseId = new URLSearchParams(window.location.search).get('id');
+            const courseData = {
+                nome: document.getElementById('nome').value,
+                sobre: document.getElementById('sobre').value,
+                checkoutLink: document.getElementById('checkout-link').value,
+                checkoutCode: document.getElementById('checkout-code').value,
+                sumario: document.getElementById('sumario').value,
+                vantagens: [...document.querySelectorAll('#vantagens-container input')].map(input => input.value).filter(Boolean)
+            };
+
+            const content = `
+                <html lang="pt-BR">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>${courseData.nome}</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: auto; }
+                        img { max-width: 100%; }
+                        .preco { text-decoration: line-through; font-size: 0.9em; }
+                        .promocao { font-size: 1.2em; color: red; }
+                        .parcelamento { font-size: 1.5em; color: green; }
+                    </style>
+                </head>
+                <body>
+                    <h1>${courseData.nome}</h1>
+                    <img src="${document.getElementById('imagem-url').value}" alt="${courseData.nome}">
+                    <p>${courseData.sobre}</p>
+                    ${courseData.sumario ? `<h2>Sumário:</h2><ul>${courseData.sumario.split(';').map(item => `<li>${item}</li>`).join('')}</ul>` : ''}
+                    ${courseData.vantagens.length ? `<h2>Vantagens:</h2><ul>${courseData.vantagens.map(vantagem => `<li>${vantagem}</li>`).join('')}</ul>` : ''}
+                    <p class="preco">${document.getElementById('preco').value}</p>
+                    <p class="promocao">${document.getElementById('promocao').value}</p>
+                    <p class="parcelamento">${document.getElementById('parcelamento').value} de ${document.getElementById('valor-parcelamento').value}</p>
+                    ${courseData.checkoutCode ? `<div>${courseData.checkoutCode}</div>` : `<a href="${courseData.checkoutLink}" class="checkout-button">Comprar</a>`}
+                </body>
+                </html>
+            `;
+
+            const fileName = `cursos/${courseId}.html`;
+
+            fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${fileName}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${GITHUB_TOKEN}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    message: `Publicando página de vendas para ${courseData.nome}`,
+                    content: btoa(unescape(encodeURIComponent(content))),
+                    sha: courseData.sha || ''
+                })
+            }).then(response => response.json()).then(data => {
+                if (data.commit) {
+                    alert('Página publicada com sucesso!');
+                } else {
+                    alert('Erro ao publicar a página.');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
