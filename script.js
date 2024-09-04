@@ -13,54 +13,32 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
-const cursosPorPagina = 12;
-let paginaAtual = 1;
-let totalCursos = 0;
+let todosCursos = [];  // Array para armazenar todos os cursos
 
 // Função para carregar cursos do Firebase
-function carregarCursos(pagina) {
+function carregarCursos(pagina = 1) {
+    const cursosPorPagina = 9;
+    const inicio = (pagina - 1) * cursosPorPagina;
+    const fim = inicio + cursosPorPagina;
+
     const cursosContainer = document.getElementById('cursos-container');
-    const paginacaoContainer = document.getElementById('paginacao-container');
     cursosContainer.innerHTML = '';
-    paginacaoContainer.innerHTML = '';
 
-    firebase.database().ref('cursos').once('value', snapshot => {
-        const cursos = [];
-        snapshot.forEach(childSnapshot => {
-            cursos.push(childSnapshot.val());
-        });
-
-        totalCursos = cursos.length;
-        const totalPaginas = Math.ceil(totalCursos / cursosPorPagina);
-        const start = (pagina - 1) * cursosPorPagina;
-        const end = start + cursosPorPagina;
-
-        cursos.slice(start, end).forEach(curso => {
-            cursosContainer.innerHTML += 
-                <div class="curso" onclick="location.href='${curso.link}'">
-                    <h3>${curso.titulo}</h3>
-                    <img src="${curso.imagem}" alt="${curso.titulo}" class="curso-imagem">
-                    <p>${curso.descricao}</p>
-                    <p><strong>R$ ${curso.preco}</strong></p>
-                </div>
-            ;
-        });
-
-        // Criar os botões de paginação
-        for (let i = 1; i <= totalPaginas; i++) {
-            const paginaButton = document.createElement('button');
-            paginaButton.textContent = i;
-            paginaButton.classList.add('pagina-button');
-            if (i === pagina) {
-                paginaButton.classList.add('pagina-ativa');
-            }
-            paginaButton.onclick = () => {
-                paginaAtual = i;
-                carregarCursos(paginaAtual);
-            };
-            paginacaoContainer.appendChild(paginaButton);
-        }
+    // Filtrar e paginar os cursos
+    const cursosPaginados = todosCursos.slice(inicio, fim);
+    
+    cursosPaginados.forEach(curso => {
+        cursosContainer.innerHTML += `
+            <div class="curso" onclick="location.href='${curso.link}'">
+                <h3>${curso.titulo}</h3>
+                <img src="${curso.imagem}" alt="${curso.titulo}" class="imagem-curso">
+                <p>${curso.descricao}</p>
+                <p><strong>R$ ${curso.preco}</strong></p>
+            </div>
+        `;
     });
+
+    gerarPaginacao(pagina);
 }
 
 // Função para buscar cursos
@@ -69,32 +47,49 @@ function buscarCursos() {
     const cursosContainer = document.getElementById('cursos-container');
     cursosContainer.innerHTML = '';
 
-    firebase.database().ref('cursos').once('value', snapshot => {
-        const cursos = [];
-        snapshot.forEach(childSnapshot => {
-            const curso = childSnapshot.val();
-            if (curso.titulo.toLowerCase().includes(pesquisa)) {
-                cursos.push(curso);
-            }
-        });
+    const cursosFiltrados = todosCursos.filter(curso => 
+        curso.titulo.toLowerCase().includes(pesquisa) && curso.show === true
+    );
 
-        totalCursos = cursos.length;
-        const totalPaginas = Math.ceil(totalCursos / cursosPorPagina);
-        const start = (paginaAtual - 1) * cursosPorPagina;
-        const end = start + cursosPorPagina;
-
-        cursos.slice(start, end).forEach(curso => {
-            cursosContainer.innerHTML += 
-                <div class="curso" onclick="location.href='${curso.link}'">
-                    <h3>${curso.titulo}</h3>
-                    <img src="${curso.imagem}" alt="${curso.titulo}" class="curso-imagem">
-                    <p>${curso.descricao}</p>
-                    <p><strong>R$ ${curso.preco}</strong></p>
-                </div>
-            ;
-        });
+    cursosFiltrados.forEach(curso => {
+        cursosContainer.innerHTML += `
+            <div class="curso" onclick="location.href='${curso.link}'">
+                <h3>${curso.titulo}</h3>
+                <img src="${curso.imagem}" alt="${curso.titulo}" class="imagem-curso">
+                <p>${curso.descricao}</p>
+                <p><strong>R$ ${curso.preco}</strong></p>
+            </div>
+        `;
     });
 }
 
+// Função para gerar a paginação
+function gerarPaginacao(paginaAtual) {
+    const cursosPorPagina = 9;
+    const totalPaginas = Math.ceil(todosCursos.length / cursosPorPagina);
+
+    const paginacaoContainer = document.getElementById('paginacao');
+    paginacaoContainer.innerHTML = '';
+
+    for (let i = 1; i <= totalPaginas; i++) {
+        paginacaoContainer.innerHTML += `
+            <div class="pagina ${i === paginaAtual ? 'ativa' : ''}" onclick="carregarCursos(${i})">
+                ${i}
+            </div>
+        `;
+    }
+}
+
+// Carregar todos os cursos na inicialização
+firebase.database().ref('cursos').once('value', snapshot => {
+    snapshot.forEach(childSnapshot => {
+        const curso = childSnapshot.val();
+        if (curso.show === true) {
+            todosCursos.push(curso);
+        }
+    });
+    carregarCursos();  // Carregar a primeira página de cursos
+});
+
 // Carregar cursos ao carregar a página
-window.onload = () => carregarCursos(paginaAtual);
+window.onload = () => carregarCursos();
