@@ -1,60 +1,65 @@
-// Configuração do Firebase
-const firebaseConfig = {
-    apiKey: "AIzaSyC-STt5EnVQA5oJEF1Vie3rHk1qOW9TqMw",
-    authDomain: "cursos-preparatorios.firebaseapp.com",
-    databaseURL: "https://cursos-preparatorios-default-rtdb.firebaseio.com",
-    projectId: "cursos-preparatorios",
-    storageBucket: "cursos-preparatorios.appspot.com",
-    messagingSenderId: "121871815126",
-    appId: "1:121871815126:web:1ea3e4630b3b4de6569477"
-};
+document.addEventListener("DOMContentLoaded", function () {
+    const cursosBtn = document.getElementById("cursos-btn");
+    const cursosSection = document.getElementById("cursos-section");
+    const cursosContainer = document.getElementById("cursos-container");
+    const pagination = document.getElementById("pagination");
 
-// Inicializar Firebase
-firebase.initializeApp(firebaseConfig);
-const database = firebase.database();
+    let cursos = [];
+    const cursosPorPagina = 12;
+    let paginaAtual = 1;
 
-// Função para carregar cursos do Firebase
-function carregarCursos() {
-    const cursosContainer = document.getElementById('cursos-container');
-    cursosContainer.innerHTML = '';
+    // Carrega os cursos a partir do banco de dados (JSON)
+    async function carregarCursos() {
+        const response = await fetch("cursos.json");
+        cursos = await response.json();
+        mostrarCursos();
+        criarPaginacao();
+    }
 
-    firebase.database().ref('cursos').once('value', snapshot => {
-        snapshot.forEach(childSnapshot => {
-            const curso = childSnapshot.val();
-            cursosContainer.innerHTML += `
-                <div class="curso" onclick="location.href='${curso.link}'">
-                    <h3>${curso.titulo}</h3>
-                    <img src="${curso.imagem}" alt="${curso.titulo}">
-                    <p>${curso.descricao}</p>
-                    <p><strong>R$ ${curso.preco}</strong></p>
-                </div>
+    // Mostra os cursos na página
+    function mostrarCursos() {
+        cursosContainer.innerHTML = "";
+        const inicio = (paginaAtual - 1) * cursosPorPagina;
+        const fim = inicio + cursosPorPagina;
+        const cursosExibidos = cursos.slice(inicio, fim);
+
+        cursosExibidos.forEach(curso => {
+            const cursoCard = document.createElement("div");
+            cursoCard.classList.add("curso-card");
+            cursoCard.innerHTML = `
+                <img src="${curso.imagem}" alt="${curso.nome}">
+                <h3>${curso.nome}</h3>
+                <p>${curso.descricao}</p>
+                <p><strong>${curso.precoPromo ? `<s>${curso.preco}</s> ${curso.precoPromo}` : curso.preco}</strong></p>
+                <p style="color:green;">${curso.parcelas}x de ${curso.valorParcela}</p>
             `;
+            cursoCard.addEventListener("click", function () {
+                window.location.href = `curso/${curso.id}.html`;
+            });
+            cursosContainer.appendChild(cursoCard);
         });
+    }
+
+    // Cria a navegação da paginação
+    function criarPaginacao() {
+        const totalPaginas = Math.ceil(cursos.length / cursosPorPagina);
+        pagination.innerHTML = "";
+
+        for (let i = 1; i <= totalPaginas; i++) {
+            const pagLink = document.createElement("a");
+            pagLink.href = "#";
+            pagLink.textContent = i;
+            pagLink.addEventListener("click", function (e) {
+                e.preventDefault();
+                paginaAtual = i;
+                mostrarCursos();
+            });
+            pagination.appendChild(pagLink);
+        }
+    }
+
+    cursosBtn.addEventListener("click", function () {
+        cursosSection.classList.remove("hidden");
+        carregarCursos();
     });
-}
-
-// Função para buscar cursos
-function buscarCursos() {
-    const pesquisa = document.getElementById('pesquisa').value.toLowerCase();
-    const cursosContainer = document.getElementById('cursos-container');
-    cursosContainer.innerHTML = '';
-
-    firebase.database().ref('cursos').once('value', snapshot => {
-        snapshot.forEach(childSnapshot => {
-            const curso = childSnapshot.val();
-            if (curso.titulo.toLowerCase().includes(pesquisa)) {
-                cursosContainer.innerHTML += `
-                    <div class="curso" onclick="location.href='${curso.link}'">
-                        <h3>${curso.titulo}</h3>
-                        <img src="${curso.imagem}" alt="${curso.titulo}">
-                        <p>${curso.descricao}</p>
-                        <p><strong>R$ ${curso.preco}</strong></p>
-                    </div>
-                `;
-            }
-        });
-    });
-}
-
-// Carregar cursos ao carregar a página
-window.onload = carregarCursos;
+});
