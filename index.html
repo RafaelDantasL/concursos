@@ -3,27 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Página Principal</title>
+    <title>Minha Empresa</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
+    <script src="script.js" defer></script>
 </head>
 <body>
     <header>
-        <nav>
-            <ul>
-                <li><a href="#" id="cursos-btn">Cursos</a></li>
-                <!-- Outros botões do menu -->
-            </ul>
-        </nav>
+        <div class="logo-nome">
+            <img src="logo.png" alt="Logo" class="logo">
+            <h1>Nome da Empresa</h1>
+        </div>
     </header>
 
-    <main>
-        <section id="cursos-section" class="hidden">
-            <div id="cursos-container"></div>
-            <div id="pagination"></div>
-        </section>
-        <!-- Outras seções de conteúdo -->
-    </main>
+    <nav>
+        <ul class="menu">
+            <li><a href="#">Home</a></li>
+            <li><a href="#">Cursos</a></li>
+            <li><a href="#">Sobre</a></li>
+            <li><a href="#">Contato</a></li>
+        </ul>
+        <div class="menu-hamburguer">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </nav>
 
-    <script src="scripts.js"></script>
+    <main>
+        <div class="barra-pesquisa">
+            <input type="text" id="pesquisa" placeholder="Pesquisar cursos...">
+            <button onclick="buscarCursos()">Buscar</button>
+        </div>
+        <div id="cursos-container" class="cursos-container">
+            <!-- Cursos carregados dinamicamente aqui -->
+        </div>
+        <div id="paginacao" class="paginacao">
+            <!-- Paginação será gerada dinamicamente -->
+        </div>
+    </main>
 </body>
 </html>
