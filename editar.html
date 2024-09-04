@@ -15,7 +15,7 @@
             display: block;
             margin-bottom: 8px;
         }
-        input[type="text"], input[type="file"], select {
+        input[type="text"], input[type="url"], select {
             width: 100%;
             margin-bottom: 12px;
         }
@@ -34,8 +34,8 @@
         <label for="descricao">Descrição:</label>
         <input type="text" id="descricao" name="descricao" maxlength="100" required>
 
-        <label for="imagem">Imagem:</label>
-        <input type="file" id="imagem" name="imagem" accept="image/*">
+        <label for="imagem">URL da Imagem:</label>
+        <input type="url" id="imagem" name="imagem" placeholder="https://exemplo.com/imagem.jpg" required>
 
         <label for="preco">Preço:</label>
         <input type="text" id="preco" name="preco" required>
@@ -45,11 +45,14 @@
 
         <label for="parcelamento">Parcelamento:</label>
         <select id="parcelamento" name="parcelamento">
-            <option value="1x">1x</option>
-            <option value="2x">2x</option>
-            <!-- Adicionar outras opções conforme necessário -->
+            <!-- Gerar opções de 1x a 12x -->
+            <script>
+                for (let i = 1; i <= 12; i++) {
+                    document.write(`<option value="${i}x">${i}x</option>`);
+                }
+            </script>
         </select>
-        <input type="text" id="valorParcelamento" name="valorParcelamento" required>
+        <input type="text" id="valorParcelamento" name="valorParcelamento" placeholder="Valor da Parcela" required>
 
         <label for="link">Link externo:</label>
         <input type="text" id="link" name="link" required>
@@ -74,9 +77,6 @@
             appId: "1:121871815126:web:1ea3e4630b3b4de6569477"
         };
 
-        const GITHUB_REPO = "RafaelDantasL/concursos";
-        const GITHUB_TOKEN = "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";
-
         const courseId = new URLSearchParams(window.location.search).get('id');
 
         if (courseId) {
@@ -87,49 +87,34 @@
                     if (data) {
                         document.getElementById('titulo').value = data.titulo;
                         document.getElementById('descricao').value = data.descricao;
-                        document.getElementById('preco').value = data.preco;
-                        document.getElementById('promocao').value = data.promocao;
+                        document.getElementById('imagem').value = data.imagem;
+                        document.getElementById('preco').value = formatCurrency(data.preco);
+                        document.getElementById('promocao').value = formatCurrency(data.promocao);
                         document.getElementById('parcelamento').value = data.parcelamento;
-                        document.getElementById('valorParcelamento').value = data.valorParcelamento;
+                        document.getElementById('valorParcelamento').value = formatCurrency(data.valorParcelamento);
                         document.getElementById('link').value = data.link;
                         document.getElementById('show').value = data.show;
                     }
                 });
         }
 
-        document.getElementById('courseForm').addEventListener('submit', async function(event) {
+        document.getElementById('preco').addEventListener('input', function() {
+            this.value = formatCurrency(this.value);
+        });
+
+        document.getElementById('promocao').addEventListener('input', function() {
+            this.value = formatCurrency(this.value);
+        });
+
+        document.getElementById('valorParcelamento').addEventListener('input', function() {
+            this.value = formatCurrency(this.value);
+        });
+
+        document.getElementById('courseForm').addEventListener('submit', function(event) {
             event.preventDefault();
 
             const formData = new FormData(event.target);
             const courseData = Object.fromEntries(formData.entries());
-
-            // Upload da imagem para o GitHub, se uma nova imagem foi escolhida
-            const imageFile = document.getElementById('imagem').files[0];
-            let imageUrl = '';
-
-            if (imageFile) {
-                const base64Image = await toBase64(imageFile);
-                const imagePath = `img-cursos/${imageFile.name}`;
-
-                const response = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${imagePath}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Authorization': `Bearer ${GITHUB_TOKEN}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        message: `Adicionando imagem ${imageFile.name}`,
-                        content: base64Image.replace(/^data:image\/(png|jpeg);base64,/, '')
-                    })
-                });
-
-                const responseData = await response.json();
-                imageUrl = responseData.content.download_url;
-            }
-
-            if (imageUrl) {
-                courseData.imagem = imageUrl;
-            }
 
             fetch(`${firebaseConfig.databaseURL}/cursos/${courseId ? courseId : ''}.json`, {
                 method: courseId ? 'PATCH' : 'POST',
@@ -143,13 +128,9 @@
             }).catch(error => console.error('Erro ao salvar o curso:', error));
         });
 
-        function toBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = error => reject(error);
-            });
+        function formatCurrency(value) {
+            value = value.replace(/\D/g, '');
+            return `R$ ${(value / 100).toFixed(2).replace('.', ',')}`;
         }
     </script>
 </body>
