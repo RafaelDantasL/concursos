@@ -13,7 +13,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
-const cursosPorPagina = 15; // Atualizado para 15
+const cursosPorPagina = 12;
 let paginaAtual = 1;
 let totalCursos = 0;
 
@@ -27,10 +27,7 @@ function carregarCursos(pagina) {
     firebase.database().ref('cursos').once('value', snapshot => {
         const cursos = [];
         snapshot.forEach(childSnapshot => {
-            const curso = childSnapshot.val();
-            if (curso.show === true) { // Verifica se o curso deve ser exibido
-                cursos.push(curso);
-            }
+            cursos.push(childSnapshot.val());
         });
 
         totalCursos = cursos.length;
@@ -39,14 +36,14 @@ function carregarCursos(pagina) {
         const end = start + cursosPorPagina;
 
         cursos.slice(start, end).forEach(curso => {
-            cursosContainer.innerHTML += `
+            cursosContainer.innerHTML += 
                 <div class="curso" onclick="location.href='${curso.link}'">
                     <h3>${curso.titulo}</h3>
                     <img src="${curso.imagem}" alt="${curso.titulo}" class="curso-imagem">
                     <p>${curso.descricao}</p>
                     <p><strong>R$ ${curso.preco}</strong></p>
                 </div>
-            `;
+            ;
         });
 
         // Criar os botões de paginação
@@ -76,7 +73,7 @@ function buscarCursos() {
         const cursos = [];
         snapshot.forEach(childSnapshot => {
             const curso = childSnapshot.val();
-            if (curso.show === true && curso.titulo.toLowerCase().includes(pesquisa)) {
+            if (curso.titulo.toLowerCase().includes(pesquisa)) {
                 cursos.push(curso);
             }
         });
@@ -87,22 +84,16 @@ function buscarCursos() {
         const end = start + cursosPorPagina;
 
         cursos.slice(start, end).forEach(curso => {
-            cursosContainer.innerHTML += `
+            cursosContainer.innerHTML += 
                 <div class="curso" onclick="location.href='${curso.link}'">
                     <h3>${curso.titulo}</h3>
                     <img src="${curso.imagem}" alt="${curso.titulo}" class="curso-imagem">
                     <p>${curso.descricao}</p>
                     <p><strong>R$ ${curso.preco}</strong></p>
                 </div>
-            `;
+            ;
         });
     });
-}
-
-// Função para alternar a exibição do menu no mobile
-function toggleMenu() {
-    const menu = document.querySelector('.menu');
-    menu.classList.toggle('menu-ativo');
 }
 
 // Carregar cursos ao carregar a página
