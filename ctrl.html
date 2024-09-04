@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Cursos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .course-list {
+            margin-top: 20px;
+        }
+        .course-item {
+            margin-bottom: 10px;
+        }
+        .course-item button {
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Controle de Cursos</h1>
+    <button id="addCourseBtn">Adicionar Novo Curso</button>
+    <div class="course-list" id="courseList"></div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyC-STt5EnVQA5oJEF1Vie3rHk1qOW9TqMw",
+            authDomain: "cursos-preparatorios.firebaseapp.com",
+            databaseURL: "https://cursos-preparatorios-default-rtdb.firebaseio.com",
+            projectId: "cursos-preparatorios",
+            storageBucket: "cursos-preparatorios.appspot.com",
+            messagingSenderId: "121871815126",
+            appId: "1:121871815126:web:1ea3e4630b3b4de6569477"
+        };
+
+        function loadCourses() {
+            fetch(`${firebaseConfig.databaseURL}/cursos.json`)
+                .then(response => response.json())
+                .then(data => {
+                    const courseList = document.getElementById('courseList');
+                    courseList.innerHTML = '';
+                    for (let id in data) {
+                        const course = data[id];
+                        const courseItem = document.createElement('div');
+                        courseItem.className = 'course-item';
+                        courseItem.innerHTML = `
+                            ${course.titulo}
+                            <button onclick="editCourse('${id}')">Editar</button>
+                            <button onclick="toggleCourseVisibility('${id}')">Exibir/Ocultar</button>
+                            <button onclick="confirmDeleteCourse('${id}')">Excluir</button>
+                        `;
+                        courseList.appendChild(courseItem);
+                    }
+                });
+        }
+
+        function addCourse() {
+            window.location.href = 'editar.html';
+        }
+
+        function editCourse(courseId) {
+            window.location.href = `editar.html?id=${courseId}`;
+        }
+
+        function toggleCourseVisibility(courseId) {
+            // Função para exibir ou ocultar um curso - lógica depende de como você deseja implementar
+        }
+
+        function confirmDeleteCourse(courseId) {
+            if (confirm('Tem certeza que deseja excluir este curso?')) {
+                deleteCourse(courseId);
+            }
+        }
+
+        function deleteCourse(courseId) {
+            fetch(`${firebaseConfig.databaseURL}/cursos/${courseId}.json`, {
+                method: 'DELETE'
+            }).then(() => loadCourses());
+        }
+
+        document.getElementById('addCourseBtn').addEventListener('click', addCourse);
+
+        window.onload = loadCourses;
+    </script>
+</body>
+</html>
