@@ -1,0 +1,126 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+}
+
+.logo {
+    height: 50px;
+    margin-right: 10px;
+}
+
+nav {
+    background-color: darkorange;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 20px;
+}
+
+.menu {
+    list-style: none;
+    display: flex;
+    gap: 15px;
+}
+
+.menu li {
+    margin: 0;
+}
+
+.menu a {
+    text-decoration: none;
+    color: white;
+    padding: 10px 15px;
+    display: block;
+    transition: background-color 0.3s ease;
+}
+
+.menu a:hover {
+    background-color: orange;
+}
+
+.menu-hamburguer {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+}
+
+.menu-hamburguer span {
+    height: 3px;
+    background-color: white;
+    margin: 5px 0;
+    width: 25px;
+}
+
+.paginacao {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.paginacao button {
+    background-color: darkorange;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    margin: 0 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.paginacao button:hover {
+    background-color: orange;
+}
+
+@media (max-width: 768px) {
+    .menu {
+        display: none;
+    }
+
+    .menu-hamburguer {
+        display: flex;
+    }
+}
+
+.barra-pesquisa {
+    margin: 20px;
+    text-align: center;
+}
+
+#pesquisa {
+    padding: 10px;
+    width: 70%;
+    max-width: 500px;
+}
+
+.cursos-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    padding: 20px;
+}
+
+.curso {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 300px;
+    text-align: center;
+    padding: 20px;
+    transition: transform 0.3s ease;
+}
+
+.curso img {
+    width: 100%;
+    border-radius: 10px;
+}
+
+.curso:hover {
+    transform: translateY(-5px);
+}
