@@ -1,101 +1,68 @@
+/* Estilo básico */
 body {
     font-family: Arial, sans-serif;
+    background-color: #1f2a36; /* Cor de fundo do tema escuro do ChatGPT */
+    color: #ffffff;
     margin: 0;
     padding: 0;
 }
 
 header {
+    text-align: center;
+    padding: 20px;
+}
+
+.logo-nome {
     display: flex;
     align-items: center;
-    padding: 10px 20px;
+    justify-content: center;
 }
 
 .logo {
+    width: 50px;
     height: 50px;
-    margin-right: 10px;
-}
-
-nav {
-    background-color: darkorange;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-    display: flex;
-    justify-content: space-between;
-    padding: 10px 20px;
+    margin-right: 15px;
 }
 
 .menu {
-    list-style: none;
     display: flex;
-    gap: 15px;
+    justify-content: center;
+    padding: 10px;
+    background-color: #333;
 }
 
 .menu li {
-    margin: 0;
+    list-style: none;
+    margin: 0 10px;
 }
 
 .menu a {
+    color: #ffffff;
     text-decoration: none;
-    color: white;
-    padding: 10px 15px;
-    display: block;
-    transition: background-color 0.3s ease;
-}
-
-.menu a:hover {
-    background-color: orange;
-}
-
-.menu-hamburguer {
-    display: none;
-    flex-direction: column;
-    cursor: pointer;
-}
-
-.menu-hamburguer span {
-    height: 3px;
-    background-color: white;
-    margin: 5px 0;
-    width: 25px;
-}
-
-.paginacao {
-    text-align: center;
-    margin: 20px 0;
-}
-
-.paginacao button {
-    background-color: darkorange;
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    margin: 0 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.paginacao button:hover {
-    background-color: orange;
-}
-
-@media (max-width: 768px) {
-    .menu {
-        display: none;
-    }
-
-    .menu-hamburguer {
-        display: flex;
-    }
 }
 
 .barra-pesquisa {
+    display: flex;
+    justify-content: center;
     margin: 20px;
-    text-align: center;
 }
 
 #pesquisa {
-    padding: 10px;
-    width: 70%;
-    max-width: 500px;
+    width: 300px;
+    padding: 8px;
+}
+
+button {
+    padding: 8px 15px;
+    margin-left: 10px;
+    background-color: #5a9;
+    color: #ffffff;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #468;
 }
 
 .cursos-container {
@@ -107,20 +74,35 @@ nav {
 }
 
 .curso {
-    background-color: white;
+    background-color: #28333f;
     border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    width: 300px;
-    text-align: center;
     padding: 20px;
-    transition: transform 0.3s ease;
+    width: 200px;
+    text-align: center;
+    cursor: pointer;
 }
 
-.curso img {
+.curso-imagem {
     width: 100%;
+    height: auto;
     border-radius: 10px;
 }
 
-.curso:hover {
-    transform: translateY(-5px);
+.paginacao-container {
+    text-align: center;
+    margin: 20px;
+}
+
+.pagina-button {
+    padding: 10px 15px;
+    margin: 0 5px;
+    background-color: #5a9;
+    color: #ffffff;
+    border: none;
+    cursor: pointer;
+}
+
+.pagina-button:hover,
+.pagina-ativa {
+    background-color: #468;
 }
