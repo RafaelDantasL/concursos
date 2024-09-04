@@ -13,7 +13,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
-const cursosPorPagina = 12;
+const cursosPorPagina = 15; // Atualizado para 15
 let paginaAtual = 1;
 let totalCursos = 0;
 
@@ -27,7 +27,10 @@ function carregarCursos(pagina) {
     firebase.database().ref('cursos').once('value', snapshot => {
         const cursos = [];
         snapshot.forEach(childSnapshot => {
-            cursos.push(childSnapshot.val());
+            const curso = childSnapshot.val();
+            if (curso.show === true) { // Verifica se o curso deve ser exibido
+                cursos.push(curso);
+            }
         });
 
         totalCursos = cursos.length;
@@ -73,7 +76,7 @@ function buscarCursos() {
         const cursos = [];
         snapshot.forEach(childSnapshot => {
             const curso = childSnapshot.val();
-            if (curso.titulo.toLowerCase().includes(pesquisa)) {
+            if (curso.show === true && curso.titulo.toLowerCase().includes(pesquisa)) {
                 cursos.push(curso);
             }
         });
@@ -94,6 +97,12 @@ function buscarCursos() {
             `;
         });
     });
+}
+
+// Função para alternar a exibição do menu no mobile
+function toggleMenu() {
+    const menu = document.querySelector('.menu');
+    menu.classList.toggle('menu-ativo');
 }
 
 // Carregar cursos ao carregar a página
