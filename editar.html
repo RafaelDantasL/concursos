@@ -15,7 +15,7 @@
             display: block;
             margin-bottom: 8px;
         }
-        input[type="text"], input[type="url"], select {
+        input[type="text"], input[type="url"], textarea, select {
             width: 100%;
             margin-bottom: 12px;
         }
@@ -34,6 +34,9 @@
         <label for="descricao">Descrição:</label>
         <input type="text" id="descricao" name="descricao" maxlength="100" required>
 
+        <label for="sobre">Sobre:</label>
+        <textarea id="sobre" name="sobre" maxlength="500" rows="4"></textarea>
+
         <label for="imagem">URL da Imagem:</label>
         <input type="url" id="imagem" name="imagem" placeholder="https://exemplo.com/imagem.jpg" required>
 
@@ -45,7 +48,6 @@
 
         <label for="parcelamento">Parcelamento:</label>
         <select id="parcelamento" name="parcelamento">
-            <!-- Gerar opções de 1x a 12x -->
             <script>
                 for (let i = 1; i <= 12; i++) {
                     document.write(`<option value="${i}x">${i}x</option>`);
@@ -55,7 +57,13 @@
         <input type="text" id="valorParcelamento" name="valorParcelamento" placeholder="Valor da Parcela" required>
 
         <label for="link">Link externo:</label>
-        <input type="text" id="link" name="link" required>
+        <input type="url" id="link" name="link" required>
+
+        <label for="checkout">Link do checkout:</label>
+        <input type="url" id="checkout" name="checkout" required>
+
+        <label for="widget">Widget do checkout (opcional):</label>
+        <textarea id="widget" name="widget" placeholder="<script>...</script>" rows="4"></textarea>
 
         <label for="show">Exibir Curso:</label>
         <select id="show" name="show" required>
@@ -80,66 +88,83 @@
         const courseId = new URLSearchParams(window.location.search).get('id');
 
         if (courseId) {
-            // Carregar dados do curso existente
             fetch(`${firebaseConfig.databaseURL}/cursos/${courseId}.json`)
                 .then(response => response.json())
                 .then(data => {
                     if (data) {
                         document.getElementById('titulo').value = data.titulo;
                         document.getElementById('descricao').value = data.descricao;
+                        document.getElementById('sobre').value = data.sobre;
                         document.getElementById('imagem').value = data.imagem;
                         document.getElementById('preco').value = formatCurrency(data.preco);
                         document.getElementById('promocao').value = formatCurrency(data.promocao);
                         document.getElementById('parcelamento').value = data.parcelamento;
                         document.getElementById('valorParcelamento').value = formatCurrency(data.valorParcelamento);
                         document.getElementById('link').value = data.link;
+                        document.getElementById('checkout').value = data.checkout;
+                        document.getElementById('widget').value = data.widget;
                         document.getElementById('show').value = data.show;
                     }
                 });
         }
 
-        document.getElementById('preco').addEventListener('input', function() {
-            this.value = formatCurrency(this.value);
-        });
-
-        document.getElementById('promocao').addEventListener('input', function() {
-            this.value = formatCurrency(this.value);
-        });
-
-        document.getElementById('valorParcelamento').addEventListener('input', function() {
-            this.value = formatCurrency(this.value);
-        });
-
-        document.getElementById('courseForm').addEventListener('submit', function(event) {
+        document.getElementById('courseForm').addEventListener('submit', async function(event) {
             event.preventDefault();
 
             const formData = new FormData(event.target);
             const courseData = Object.fromEntries(formData.entries());
 
-            // Remover prefixo "R$" antes de gravar os valores no banco de dados
-            courseData.preco = removeCurrencyFormat(courseData.preco);
-            courseData.promocao = removeCurrencyFormat(courseData.promocao);
-            courseData.valorParcelamento = removeCurrencyFormat(courseData.valorParcelamento);
+            // Remove R$ from preco, promocao, valorParcelamento before saving
+            courseData.preco = courseData.preco.replace(/[^\d]/g, '');
+            courseData.promocao = courseData.promocao.replace(/[^\d]/g, '');
+            courseData.valorParcelamento = courseData.valorParcelamento.replace(/[^\d]/g, '');
 
-            fetch(`${firebaseConfig.databaseURL}/cursos/${courseId ? courseId : ''}.json`, {
+            // Salvar no Firebase
+            const response = await fetch(`${firebaseConfig.databaseURL}/cursos/${courseId ? courseId : ''}.json`, {
                 method: courseId ? 'PATCH' : 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(courseData)
-            }).then(() => {
-                alert('Curso salvo com sucesso!');
+            });
+
+            if (response.ok) {
+                const newCourseId = courseId || (await response.json()).name;
+
+                // Criar arquivo HTML no GitHub
+                const githubApiToken = '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'; // Nova chave API do GitHub
+                const fileName = `curso_${newCourseId}.html`;
+                const filePath = `curso/${fileName}`;
+                const fileContent = btoa(`<html><body><h1>${courseData.titulo}</h1><p>${courseData.descricao}</p></body></html>`);
+
+                await fetch(`https://api.github.com/repos/RafaelDantasL/concursos/contents/${filePath}`, {
+                    method: 'PUT',
+                    headers: {
+                        Authorization: `token ${githubApiToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: `Adicionando arquivo do curso ${newCourseId}`,
+                        content: fileContent
+                    })
+                });
+
+                // Salvar o link da página no Firebase
+                const pageLink = `https://rafaeldantasl.github.io/concursos/${filePath}`;
+                await fetch(`${firebaseConfig.databaseURL}/cursos/${newCourseId}.json`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ page: pageLink })
+                });
+
+                alert('Curso publicado com sucesso!');
                 window.location.href = 'ctrl.html';
-            }).catch(error => console.error('Erro ao salvar o curso:', error));
+            } else {
+                console.error('Erro ao salvar o curso:', response.statusText);
+            }
         });
 
         function formatCurrency(value) {
             value = value.replace(/\D/g, '');
             return `R$ ${(value / 100).toFixed(2).replace('.', ',')}`;
-        }
-
-        function removeCurrencyFormat(value) {
-            return value.replace(/[^\d,]/g, '').replace(',', '.');
         }
     </script>
 </body>
