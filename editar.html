@@ -130,7 +130,7 @@
                 const newCourseId = courseId || (await response.json()).name;
 
                 // Criar arquivo HTML no GitHub
-                const githubApiToken = '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'; // Nova chave API do GitHub
+                const githubApiToken = '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'; // Nova chave API do GitHub
                 const fileName = `curso_${newCourseId}.html`;
                 const filePath = `cursos/${fileName}`; // Agora dentro da pasta 'cursos'
                 const fileContent = btoa(`<html><body><h1>${courseData.titulo}</h1><p>${courseData.descricao}</p></body></html>`);
