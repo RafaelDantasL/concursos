@@ -1,8 +1,3 @@
----
-layout: default
-title: About
----
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -135,15 +130,15 @@ title: About
                 const newCourseId = courseId || (await response.json()).name;
 
                 // Criar arquivo HTML no GitHub
-                const githubApiToken = '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'; // Nova chave API do GitHub
+                const githubApiToken = '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';
                 const fileName = `curso_${newCourseId}.html`;
-                const filePath = `cursos/${fileName}`; // Agora dentro da pasta 'cursos'
+                const filePath = `cursos/${fileName}`; // Diretório específico 'cursos'
                 const fileContent = btoa(`<html><body><h1>${courseData.titulo}</h1><p>${courseData.descricao}</p></body></html>`);
 
                 await fetch(`https://api.github.com/repos/RafaelDantasL/concursos/contents/${filePath}`, {
                     method: 'PUT',
                     headers: {
-                        Authorization: `token ${githubApiToken}`,
+                        Authorization: `Bearer ${githubApiToken}`,
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
@@ -157,7 +152,7 @@ title: About
                 await fetch(`${firebaseConfig.databaseURL}/cursos/${newCourseId}.json`, {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ page: pageLink })
+                    body: JSON.stringify({ link: pageLink })
                 });
 
                 alert('Curso publicado com sucesso!');
