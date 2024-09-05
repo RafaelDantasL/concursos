@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formulário para Criar/Editar Página HTML</title>
+    <title>GitHub HTML Editor</title>
 </head>
 <body>
-    <h1>Criar ou Editar Página HTML</h1>
+    <h1>Criar ou Editar Página HTML no GitHub</h1>
     <form id="htmlForm">
         <label for="filename">Nome do Arquivo (com .html):</label><br>
         <input type="text" id="filename" name="filename"><br><br>
@@ -27,17 +27,45 @@
             const content = document.getElementById('content').value;
             const encodedContent = btoa(content); // Codifica o conteúdo em base64
 
-            const token = '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'; // Insira seu token de acesso pessoal do GitHub
-            const owner = 'RafaelDantasL'; // Seu nome de usuário ou organização no GitHub
-            const repo = 'concursos'; // Nome do seu repositório
-            const branch = 'main'; // Nome da branch
+            const token = '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'; // Insira seu token
+            const owner = 'RafaelDantasL';
+            const repo = 'concursos';
+            const branch = 'main';
 
             const url = `https://api.github.com/repos/${owner}/${repo}/contents/${filename}`;
 
+            // Função para obter o SHA do arquivo existente (se existir)
+            async function getFileSha() {
+                try {
+                    const response = await fetch(url, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `token ${token}`,
+                            'Accept': 'application/vnd.github.v3+json'
+                        }
+                    });
+
+                    if (response.ok) {
+                        const fileData = await response.json();
+                        return fileData.sha;
+                    } else if (response.status === 404) {
+                        return null; // Arquivo não existe, será criado
+                    } else {
+                        throw new Error(`Erro ao obter o SHA: ${response.statusText}`);
+                    }
+                } catch (error) {
+                    console.error('Erro ao obter o SHA:', error);
+                    return null;
+                }
+            }
+
+            const sha = await getFileSha(); // Obter o SHA do arquivo existente
+
             const requestBody = {
-                message: `Criando ou editando o arquivo ${filename} via formulário HTML`,
+                message: sha ? `Editando ${filename}` : `Criando ${filename}`,
                 content: encodedContent,
-                branch: branch
+                branch: branch,
+                ...(sha && { sha: sha }) // Incluir SHA se o arquivo já existir
             };
 
             try {
