@@ -1,39 +1,64 @@
-document.getElementById('htmlForm').onsubmit = async function(event) {
-    event.preventDefault();
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulário para Criar/Editar Página HTML</title>
+</head>
+<body>
+    <h1>Criar ou Editar Página HTML</h1>
+    <form id="htmlForm">
+        <label for="filename">Nome do Arquivo (com .html):</label><br>
+        <input type="text" id="filename" name="filename"><br><br>
 
-    const filename = document.getElementById('filename').value;
-    const content = document.getElementById('content').value;
-    const encodedContent = btoa(content);
+        <label for="content">Conteúdo HTML:</label><br>
+        <textarea id="content" name="content" rows="10" cols="50"></textarea><br><br>
 
-    const token = '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'; // Insira seu novo token
-    const owner = 'RafaelDantasL';
-    const repo = 'concursos';
-    const branch = 'main';
+        <input type="submit" value="Salvar">
+    </form>
 
-    const url = `https://api.github.com/repos/${owner}/${repo}/contents/${filename}`;
+    <p id="responseMessage"></p>
 
-    const requestBody = {
-        message: `Criando ou editando o arquivo ${filename} via formulário HTML`,
-        content: encodedContent,
-        branch: branch
-    };
+    <script>
+        document.getElementById('htmlForm').onsubmit = async function(event) {
+            event.preventDefault();
 
-    try {
-        const response = await fetch(url, {
-            method: 'PUT',
-            headers: {
-                'Authorization': `token ${token}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(requestBody)
-        });
+            const filename = document.getElementById('filename').value;
+            const content = document.getElementById('content').value;
+            const encodedContent = btoa(content); // Codifica o conteúdo em base64
 
-        if (response.ok) {
-            document.getElementById('responseMessage').innerText = 'Arquivo criado/editado com sucesso!';
-        } else {
-            document.getElementById('responseMessage').innerText = `Erro: ${response.status} - ${response.statusText}`;
-        }
-    } catch (error) {
-        document.getElementById('responseMessage').innerText = `Erro na requisição: ${error}`;
-    }
-};
+            const token = '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'; // Insira seu token de acesso pessoal do GitHub
+            const owner = 'RafaelDantasL'; // Seu nome de usuário ou organização no GitHub
+            const repo = 'concursos'; // Nome do seu repositório
+            const branch = 'main'; // Nome da branch
+
+            const url = `https://api.github.com/repos/${owner}/${repo}/contents/${filename}`;
+
+            const requestBody = {
+                message: `Criando ou editando o arquivo ${filename} via formulário HTML`,
+                content: encodedContent,
+                branch: branch
+            };
+
+            try {
+                const response = await fetch(url, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+
+                if (response.ok) {
+                    document.getElementById('responseMessage').innerText = 'Arquivo criado/editado com sucesso!';
+                } else {
+                    document.getElementById('responseMessage').innerText = `Erro: ${response.status} - ${response.statusText}`;
+                }
+            } catch (error) {
+                document.getElementById('responseMessage').innerText = `Erro na requisição: ${error}`;
+            }
+        };
+    </script>
+</body>
+</html>
