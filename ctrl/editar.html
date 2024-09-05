@@ -19,8 +19,12 @@
             width: 100%;
             margin-bottom: 12px;
         }
-        input[type="submit"] {
+        input[type="submit"], #cancelButton {
             margin-top: 20px;
+            display: inline-block;
+        }
+        #cancelButton {
+            margin-left: 10px;
         }
     </style>
 </head>
@@ -71,7 +75,8 @@
             <option value="false">Não</option>
         </select>
 
-        <input type="submit" value="Publicar">
+        <input type="submit" id="publishButton" value="Publicar">
+        <button type="button" id="cancelButton">Cancelar</button>
     </form>
 
     <script>
@@ -86,12 +91,14 @@
         };
 
         const courseId = new URLSearchParams(window.location.search).get('id');
+        let initialData = {};
 
         if (courseId) {
             fetch(`${firebaseConfig.databaseURL}/cursos/${courseId}.json`)
                 .then(response => response.json())
                 .then(data => {
                     if (data) {
+                        initialData = data; // Save initial data for comparison
                         document.getElementById('titulo').value = data.titulo;
                         document.getElementById('descricao').value = data.descricao;
                         document.getElementById('sobre').value = data.sobre;
@@ -107,6 +114,16 @@
                     }
                 });
         }
+
+        document.getElementById('courseForm').addEventListener('input', function() {
+            const currentData = new FormData(this);
+            const isModified = !isEqual(Object.fromEntries(currentData.entries()), initialData);
+            document.getElementById('publishButton').value = isModified ? 'Publicar' : 'Cancelar';
+        });
+
+        document.getElementById('cancelButton').addEventListener('click', function() {
+            window.location.href = '../ctrl';
+        });
 
         document.getElementById('courseForm').addEventListener('submit', async function(event) {
             event.preventDefault();
@@ -156,7 +173,7 @@
                 });
 
                 alert('Curso publicado com sucesso!');
-                window.location.href = 'ctrl.html';
+                window.location.href = '../ctrl'; // Redirect to ctrl.html without .html extension
             } else {
                 console.error('Erro ao salvar o curso:', response.statusText);
             }
@@ -165,6 +182,10 @@
         function formatCurrency(value) {
             value = value.replace(/\D/g, '');
             return `R$ ${(value / 100).toFixed(2).replace('.', ',')}`;
+        }
+
+        function isEqual(obj1, obj2) {
+            return JSON.stringify(obj1) === JSON.stringify(obj2);
         }
     </script>
 </body>
