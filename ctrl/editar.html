@@ -1,9 +1,14 @@
+---
+layout: default
+title: About
+---
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Adicionar/Editar Curso 2222222222222</title>
+    <title>Adicionar/Editar Curso</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -19,12 +24,8 @@
             width: 100%;
             margin-bottom: 12px;
         }
-        input[type="submit"], #cancelButton {
+        input[type="submit"] {
             margin-top: 20px;
-            display: inline-block;
-        }
-        #cancelButton {
-            margin-left: 10px;
         }
     </style>
 </head>
@@ -75,8 +76,7 @@
             <option value="false">Não</option>
         </select>
 
-        <input type="submit" id="publishButton" value="Publicar">
-        <button type="button" id="cancelButton">Cancelar</button>
+        <input type="submit" value="Publicar">
     </form>
 
     <script>
@@ -91,14 +91,12 @@
         };
 
         const courseId = new URLSearchParams(window.location.search).get('id');
-        let initialData = {};
 
         if (courseId) {
             fetch(`${firebaseConfig.databaseURL}/cursos/${courseId}.json`)
                 .then(response => response.json())
                 .then(data => {
                     if (data) {
-                        initialData = data; // Save initial data for comparison
                         document.getElementById('titulo').value = data.titulo;
                         document.getElementById('descricao').value = data.descricao;
                         document.getElementById('sobre').value = data.sobre;
@@ -138,15 +136,24 @@
 
                 // Criar arquivo HTML no GitHub
                 const githubApiToken = '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';
-                const dirPath = `cs`;
                 const fileName = `curso_${newCourseId}.html`;
-                const filePath = `${dirPath}/${fileName}`;
-                const fileContent = generateHtmlContent(courseData);
+                const filePath = `cursos/${fileName}`; // Diretório específico 'cursos'
+                const fileContent = btoa(`<html><body><h1>${courseData.titulo}</h1><p>${courseData.descricao}</p></body></html>`);
 
-                await createFileOnGitHub(githubApiToken, 'RafaelDantasL', 'concursos', 'main', filePath, fileContent);
+                await fetch(`https://api.github.com/repos/RafaelDantasL/concursos/contents/${filePath}`, {
+                    method: 'PUT',
+                    headers: {
+                        Authorization: `Bearer ${githubApiToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: `Adicionando arquivo do curso ${newCourseId}`,
+                        content: fileContent
+                    })
+                });
 
                 // Salvar o link da página no Firebase
-                const pageLink = `https://rafaeldantasl.github.io/concursos/${filePath}`;
+                const pageLink = `https://rafaeldantasl.github.io/concursos/cursos/${fileName}`;
                 await fetch(`${firebaseConfig.databaseURL}/cursos/${newCourseId}.json`, {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
@@ -154,71 +161,15 @@
                 });
 
                 alert('Curso publicado com sucesso!');
-                window.location.href = '../ctrl'; // Redirect to ctrl.html without .html extension
+                window.location.href = 'ctrl.html';
             } else {
                 console.error('Erro ao salvar o curso:', response.statusText);
             }
         });
 
-        function generateHtmlContent(courseData) {
-            const preco = formatCurrency(courseData.preco);
-            const promocao = courseData.promocao ? `por ${formatCurrency(courseData.promocao)}` : '';
-            const parcelamento = courseData.parcelamento ? `Ou ${courseData.parcelamento} de ${formatCurrency(courseData.valorParcelamento)}` : '';
-            const checkoutButton = courseData.widget || `<a href="${courseData.checkout}" style="display: inline-block; padding: 10px 20px; background-color: #28a745; color: white; text-decoration: none;">Comprar</a>`;
-
-            return `
-            <!DOCTYPE html>
-            <html lang="pt-BR">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>${courseData.titulo}</title>
-                <style>
-                    body { font-family: Arial, sans-serif; padding: 20px; text-align: center; }
-                    img { max-width: 100%; height: auto; }
-                    h1 { margin-top: 20px; }
-                    p { margin: 20px 0; font-size: 18px; }
-                    .price { margin: 20px 0; font-size: 22px; color: #d9534f; }
-                </style>
-            </head>
-            <body>
-                <img src="${courseData.imagem}" alt="${courseData.titulo}">
-                <h1>${courseData.titulo}</h1>
-                <p>${courseData.sobre}</p>
-                <div class="price">De ${preco} ${promocao} ${parcelamento}</div>
-                <div>${checkoutButton}</div>
-            </body>
-            </html>`;
-        }
-
-        async function createFileOnGitHub(token, repoOwner, repoName, branch, filePath, fileContent) {
-            const apiUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`;
-            const headers = {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            };
-            const fileContentBase64 = btoa(unescape(encodeURIComponent(fileContent)));
-
-            const fileBody = {
-                "message": `Criando ou atualizando o arquivo ${filePath}`,
-                "content": fileContentBase64,
-                "branch": branch
-            };
-
-            const options = {
-                method: 'PUT',
-                headers: headers,
-                body: JSON.stringify(fileBody)
-            };
-
-            const response = await fetch(apiUrl, options);
-            if (!response.ok) {
-                console.error('Erro ao criar/atualizar o arquivo no GitHub:', response.statusText);
-            }
-        }
-
         function formatCurrency(value) {
-            return `R$ ${parseFloat(value).toFixed(2).replace('.', ',')}`;
+            value = value.replace(/\D/g, '');
+            return `R$ ${(value / 100).toFixed(2).replace('.', ',')}`;
         }
     </script>
 </body>
