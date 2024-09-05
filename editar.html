@@ -63,7 +63,7 @@
             <option value="false">Não</option>
         </select>
 
-        <input type="submit" value="Salvar Curso">
+        <input type="submit" value="Publicar">
     </form>
 
     <script>
@@ -116,6 +116,11 @@
             const formData = new FormData(event.target);
             const courseData = Object.fromEntries(formData.entries());
 
+            // Remover prefixo "R$" antes de gravar os valores no banco de dados
+            courseData.preco = removeCurrencyFormat(courseData.preco);
+            courseData.promocao = removeCurrencyFormat(courseData.promocao);
+            courseData.valorParcelamento = removeCurrencyFormat(courseData.valorParcelamento);
+
             fetch(`${firebaseConfig.databaseURL}/cursos/${courseId ? courseId : ''}.json`, {
                 method: courseId ? 'PATCH' : 'POST',
                 headers: {
@@ -131,6 +136,10 @@
         function formatCurrency(value) {
             value = value.replace(/\D/g, '');
             return `R$ ${(value / 100).toFixed(2).replace('.', ',')}`;
+        }
+
+        function removeCurrencyFormat(value) {
+            return value.replace(/[^\d,]/g, '').replace(',', '.');
         }
     </script>
 </body>
