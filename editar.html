@@ -132,7 +132,7 @@
                 // Criar arquivo HTML no GitHub
                 const githubApiToken = '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'; // Nova chave API do GitHub
                 const fileName = `curso_${newCourseId}.html`;
-                const filePath = `curso/${fileName}`;
+                const filePath = `cursos/${fileName}`; // Agora dentro da pasta 'cursos'
                 const fileContent = btoa(`<html><body><h1>${courseData.titulo}</h1><p>${courseData.descricao}</p></body></html>`);
 
                 await fetch(`https://api.github.com/repos/RafaelDantasL/concursos/contents/${filePath}`, {
@@ -148,7 +148,7 @@
                 });
 
                 // Salvar o link da página no Firebase
-                const pageLink = `https://rafaeldantasl.github.io/concursos/${filePath}`;
+                const pageLink = `https://rafaeldantasl.github.io/concursos/cursos/${fileName}`;
                 await fetch(`${firebaseConfig.databaseURL}/cursos/${newCourseId}.json`, {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
