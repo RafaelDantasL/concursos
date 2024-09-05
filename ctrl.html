@@ -44,7 +44,7 @@ title: About
         const GITHUB_TOKEN = "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";
 
         document.getElementById('addCourseBtn').addEventListener('click', () => {
-            window.location.href = 'editar';
+            window.location.href = 'editar/';
         });
 
         function loadCourses() {
@@ -71,7 +71,7 @@ title: About
         }
 
         function editCourse(courseId) {
-            window.location.href = `editar?id=${courseId}`;
+            window.location.href = `editar/?id=${courseId}`;
         }
 
         function toggleCourseVisibility(courseId, currentVisibility) {
