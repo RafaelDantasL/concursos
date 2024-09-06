@@ -158,12 +158,12 @@
 
             if (response.ok) {
                 // Chamar o Google Apps Script para criar a página de vendas
-                const appsScriptResponse = await fetch(`${googleAppsScriptUrl}?id=${currentCourseId}`);
+                const appsScriptResponse = await fetch(`${googleAppsScriptUrl}?id=${courseId}`);
                 if (appsScriptResponse.ok) {
                     // Obter a URL gerada e salvar no Firebase
-                    const pageUrl = `https://rafaeldantasl.github.io/concursos/cs/${currentCourseId}`;
+                    const pageUrl = `https://rafaeldantasl.github.io/concursos/cs/${courseId}`;
 
-                    await fetch(`${firebaseConfig.databaseURL}/cursos/${currentCourseId}.json`, {
+                    await fetch(`${firebaseConfig.databaseURL}/cursos/${courseId}.json`, {
                         method: 'PATCH',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ link: pageUrl })
