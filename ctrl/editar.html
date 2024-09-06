@@ -31,7 +31,7 @@
 <body>
     <h1>Adicionar/Editar Curso</h1>
     <form id="courseForm">
-        <!-- Campos do Formulário -->
+        <!-- Form Fields -->
         <label for="titulo">Nome do curso:</label>
         <input type="text" id="titulo" name="titulo" maxlength="40" required>
 
@@ -59,6 +59,9 @@
             </script>
         </select>
         <input type="text" id="valorParcelamento" name="valorParcelamento" placeholder="Valor da Parcela" required>
+
+        <label for="link">Link externo:</label>
+        <input type="url" id="link" name="link" required>
 
         <label for="checkout">Link do checkout:</label>
         <input type="url" id="checkout" name="checkout" required>
@@ -104,6 +107,7 @@
                         document.getElementById('promocao').value = formatCurrency(data.promocao);
                         document.getElementById('parcelamento').value = data.parcelamento;
                         document.getElementById('valorParcelamento').value = formatCurrency(data.valorParcelamento);
+                        document.getElementById('link').value = data.link;
                         document.getElementById('checkout').value = data.checkout;
                         document.getElementById('widget').value = data.widget;
                         document.getElementById('show').value = data.show;
@@ -111,68 +115,51 @@
                 });
         }
 
-        document.getElementById('preco').addEventListener('input', function() {
-            this.value = formatCurrency(this.value);
-        });
-
-        document.getElementById('promocao').addEventListener('input', function() {
-            this.value = formatCurrency(this.value);
-        });
-
-        document.getElementById('valorParcelamento').addEventListener('input', function() {
-            this.value = formatCurrency(this.value);
+        document.getElementById('courseForm').addEventListener('input', function() {
+            const currentData = new FormData(this);
+            const isModified = !isEqual(Object.fromEntries(currentData.entries()), initialData);
+            document.getElementById('publishButton').value = isModified ? 'Publicar' : 'Cancelar';
         });
 
         document.getElementById('cancelButton').addEventListener('click', function() {
-            window.location.href = '/ctrl';
+            window.location.href = '../ctrl';
         });
 
         document.getElementById('courseForm').addEventListener('submit', async function(event) {
-    event.preventDefault();
+            event.preventDefault();
 
-    const formData = new FormData(event.target);
-    const courseData = Object.fromEntries(formData.entries());
+            const formData = new FormData(event.target);
+            const courseData = Object.fromEntries(formData.entries());
 
-    // Remover R$ dos valores antes de salvar no banco
-    courseData.preco = courseData.preco.replace(/[^\d]/g, '');
-    courseData.promocao = courseData.promocao.replace(/[^\d]/g, '');
-    courseData.valorParcelamento = courseData.valorParcelamento.replace(/[^\d]/g, '');
+            // Remove R$ from preco, promocao, valorParcelamento before saving
+            courseData.preco = courseData.preco.replace(/[^\d]/g, '');
+            courseData.promocao = courseData.promocao.replace(/[^\d]/g, '');
+            courseData.valorParcelamento = courseData.valorParcelamento.replace(/[^\d]/g, '');
 
-    // Salvar no Firebase
-    const response = await fetch(`${firebaseConfig.databaseURL}/cursos/${courseId ? courseId : ''}.json`, {
-        method: courseId ? 'PATCH' : 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(courseData)
-    });
+            // Save to Firebase
+            const response = await fetch(`${firebaseConfig.databaseURL}/cursos/${courseId ? courseId : ''}.json`, {
+                method: courseId ? 'PATCH' : 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(courseData)
+            });
 
-    if (response.ok) {
-        const newCourseId = courseId || (await response.json()).name;
+            if (response.ok) {
+                const newCourseId = courseId || (await response.json()).name;
 
-        // Preparar dados para enviar ao Google Apps Script
-        const pageContent = `<html><body><h1>${courseData.titulo}</h1><p>${courseData.descricao}</p></body></html>`;
-        const nomeArquivo = `curso_${newCourseId}`;
+                // Send data to Google App Script to create the sales page
+                const scriptUrl = 'https://script.google.com/macros/s/AKfycbw1D00ZwYgamELnCmyF-Xs9uE6qB8O307eUmPnP3aNozM_ZAMNayRPv_hGmVziNzrA/exec';
+                await fetch(scriptUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ courseId: newCourseId })
+                });
 
-        // Chamar o Google Apps Script
-        const scriptResponse = await fetch('https://script.google.com/macros/s/SEU_SCRIPT_ID/exec', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ nomeArquivo: nomeArquivo, conteudo: pageContent })
+                alert('Curso publicado com sucesso!');
+                window.location.href = '../ctrl'; // Redirect to ctrl.html without .html extension
+            } else {
+                console.error('Erro ao salvar o curso:', response.statusText);
+            }
         });
-
-        const scriptResult = await scriptResponse.json();
-        if (scriptResult.status === 'success') {
-            alert('Curso publicado com sucesso!');
-            window.location.href = '/ctrl';
-        } else {
-            console.error('Erro ao criar página no GitHub:', scriptResult.message);
-        }
-    } else {
-        console.error('Erro ao salvar o curso:', response.statusText);
-    }
-});
-
 
         function formatCurrency(value) {
             value = value.replace(/\D/g, '');
