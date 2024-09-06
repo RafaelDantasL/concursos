@@ -6,7 +6,7 @@
     <title>Criar Página no GitHub</title>
 </head>
 <body>
-    <button id="criarPagina">Criar Nova Página HTML 22222222222222222222222222222</button>
+    <button id="criarPagina">Criar Nova Página HTML</button>
 
     <script>
         document.getElementById('criarPagina').addEventListener('click', function() {
@@ -30,7 +30,7 @@
             const conteudoBase64 = btoa(conteudo);
 
             // Configurações da requisição
-            const token = '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';  // Token de Acesso Pessoal fornecido
+            const token = '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';  // Token de Acesso Pessoal fornecido
             const repo = 'RafaelDantasL/concursos';  // Nome do usuário e repositório
             const path = 'nova_pagina.html';  // Caminho onde o arquivo será criado
 
@@ -50,16 +50,22 @@
                 body: JSON.stringify(data)
             })
             .then(response => {
+                console.log(response.status);  // Exibe o status HTTP
                 if (response.ok) {
                     return response.json();
                 }
-                throw new Error('Erro ao criar arquivo no GitHub');
+                return response.json().then(err => {
+                    console.error('Erro da API GitHub:', err);  // Exibe o erro da API
+                    throw new Error('Erro ao criar arquivo no GitHub');
+                });
             })
             .then(data => {
+                console.log('Resposta da API GitHub:', data);  // Exibe a resposta da API
                 alert('Página criada com sucesso!');
             })
             .catch(error => {
                 console.error('Erro:', error);
+                alert('Erro ao criar a página: ' + error.message);
             });
         });
     </script>
