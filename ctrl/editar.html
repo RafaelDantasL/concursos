@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Adicionar/Editar Curso teste 2313213131313</title>
+    <title>Adicionar/Editar Curso</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -31,7 +31,7 @@
 <body>
     <h1>Adicionar/Editar Curso</h1>
     <form id="courseForm">
-        <!-- Campos do formulário -->
+        <!-- Form Fields -->
         <label for="titulo">Nome do curso:</label>
         <input type="text" id="titulo" name="titulo" maxlength="40" required>
 
@@ -90,15 +90,15 @@
             appId: "1:121871815126:web:1ea3e4630b3b4de6569477"
         };
 
-        // Obter a chave do curso a partir da URL (similar a 'id')
         const courseId = new URLSearchParams(window.location.search).get('id');
+        let initialData = {};
 
-        // Carregar dados do curso se existir
         if (courseId) {
             fetch(`${firebaseConfig.databaseURL}/cursos/${courseId}.json`)
                 .then(response => response.json())
                 .then(data => {
                     if (data) {
+                        initialData = data; // Save initial data for comparison
                         document.getElementById('titulo').value = data.titulo;
                         document.getElementById('descricao').value = data.descricao;
                         document.getElementById('sobre').value = data.sobre;
@@ -115,47 +115,54 @@
                 });
         }
 
-        // Botão "Cancelar" para voltar ao controle de cursos
-        document.getElementById('cancelButton').addEventListener('click', function() {
-            window.location.href = '../ctrl';  // Redireciona sem a extensão .html
+        document.getElementById('courseForm').addEventListener('input', function() {
+            const currentData = new FormData(this);
+            const isModified = !isEqual(Object.fromEntries(currentData.entries()), initialData);
+            document.getElementById('publishButton').value = isModified ? 'Publicar' : 'Cancelar';
         });
 
-        // Botão "Publicar" para salvar as alterações e criar/atualizar a página de vendas
+        document.getElementById('cancelButton').addEventListener('click', function() {
+            window.location.href = '../ctrl';
+        });
+
         document.getElementById('courseForm').addEventListener('submit', async function(event) {
             event.preventDefault();
 
-            // Criar ou atualizar a página de vendas no GitHub via Google Apps Script
-            const appScriptUrl = 'https://script.google.com/macros/s/AKfycbw1D00ZwYgamELnCmyF-Xs9uE6qB8O307eUmPnP3aNozM_ZAMNayRPv_hGmVziNzrA/exec';  // Substitua pelo seu URL de execução do App Script
-            const scriptResponse = await fetch(appScriptUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ courseId: courseId })
+            const formData = new FormData(event.target);
+            const courseData = Object.fromEntries(formData.entries());
+
+            // Remove R$ from preco, promocao, valorParcelamento before saving
+            courseData.preco = courseData.preco.replace(/[^\d]/g, '');
+            courseData.promocao = courseData.promocao.replace(/[^\d]/g, '');
+            courseData.valorParcelamento = courseData.valorParcelamento.replace(/[^\d]/g, '');
+
+            // Salvar no Firebase
+            const response = await fetch(`${firebaseConfig.databaseURL}/cursos/${courseId ? courseId : ''}.json`, {
+                method: courseId ? 'PATCH' : 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(courseData)
             });
 
-            if (scriptResponse.ok) {
-                const scriptData = await scriptResponse.json();
-                const pageLink = scriptData.link;
+            if (response.ok) {
+                const newCourseId = courseId || (await response.json()).name;
 
-                // Salvar o link da página de vendas no Firebase
-                await fetch(`${firebaseConfig.databaseURL}/cursos/${courseId}.json`, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ link: pageLink })
-                });
+                // Fazer requisição para o Script 1 criar a página de vendas
+                google.script.run.createCoursePage(newCourseId);
 
                 alert('Curso publicado com sucesso!');
-                window.location.href = '../ctrl';  // Redireciona sem a extensão .html após salvar
+                window.location.href = '../ctrl'; // Redirect to control page
             } else {
-                console.error('Erro ao criar/atualizar a página de vendas:', scriptResponse.statusText);
+                console.error('Erro ao salvar o curso:', response.statusText);
             }
         });
 
-        // Função para formatar valores de moeda
         function formatCurrency(value) {
             value = value.replace(/\D/g, '');
             return `R$ ${(value / 100).toFixed(2).replace('.', ',')}`;
+        }
+
+        function isEqual(obj1, obj2) {
+            return JSON.stringify(obj1) === JSON.stringify(obj2);
         }
     </script>
 </body>
