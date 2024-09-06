@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Formulário de HTML</title>
+</head>
+<body>
+  <h1>Criar Página HTML</h1>
+  <form id="htmlForm">
+    <label for="fileName">Nome do Arquivo:</label>
+    <input type="text" id="fileName" name="fileName" required><br><br>
+    
+    <label for="fileContent">Conteúdo do Arquivo:</label><br>
+    <textarea id="fileContent" name="fileContent" rows="10" cols="50" required></textarea><br><br>
+    
+    <input type="submit" value="Criar Página">
+  </form>
+  
+  <script>
+    document.getElementById('htmlForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+      
+      var fileName = document.getElementById('fileName').value;
+      var fileContent = document.getElementById('fileContent').value;
+
+      fetch('https://script.google.com/macros/s/AKfycbw1D00ZwYgamELnCmyF-Xs9uE6qB8O307eUmPnP3aNozM_ZAMNayRPv_hGmVziNzrA/exec', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          fileName: fileName,
+          fileContent: fileContent
+        })
+      })
+      .then(response => response.json())
+      .then(data => alert('Página criada com sucesso!'))
+      .catch(error => console.error('Erro:', error));
+    });
+  </script>
+</body>
+</html>
