@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Adicionar/Editar Curso</title>
+    <title>Adicionar/Editar Curso teste 2</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -116,45 +116,47 @@
         window.location.href = '../ctrl';
     });
 
-    document.getElementById('courseForm').addEventListener('submit', async function(event) {
-        event.preventDefault();
+document.getElementById('courseForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
 
-        const formData = new FormData(event.target);
-        const courseData = Object.fromEntries(formData.entries());
+    const formData = new FormData(event.target);
+    const courseData = Object.fromEntries(formData.entries());
 
-        // Removendo a formatação de moeda antes de salvar
-        courseData.preco = removeCurrencyFormat(courseData.preco);
-        courseData.promocao = removeCurrencyFormat(courseData.promocao);
-        courseData.valorParcelamento = removeCurrencyFormat(courseData.valorParcelamento);
+    // Removendo a formatação de moeda antes de salvar
+    courseData.preco = removeCurrencyFormat(courseData.preco);
+    courseData.promocao = removeCurrencyFormat(courseData.promocao);
+    courseData.valorParcelamento = removeCurrencyFormat(courseData.valorParcelamento);
 
-        // Salvar no Firebase
-        const response = await fetch(`${firebaseConfig.databaseURL}/cursos/${courseId ? courseId : ''}.json`, {
-            method: courseId ? 'PATCH' : 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(courseData)
+    // Salvar no Firebase
+    const response = await fetch(`${firebaseConfig.databaseURL}/cursos/${courseId ? courseId : ''}.json`, {
+        method: courseId ? 'PATCH' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(courseData)
+    });
+
+    if (response.ok) {
+        const courseResponseData = await response.json();
+        const savedCourseId = courseId || courseResponseData.name;
+
+        // Chamar o Google Apps Script para criar a página de vendas
+        const scriptResponse = await fetch(`${googleAppScriptURL}?id=${savedCourseId}`, {
+            method: 'GET',
+            credentials: 'include' // Incluir as credenciais do usuário logado
         });
 
-        if (response.ok) {
-            const courseResponseData = await response.json();
-            const savedCourseId = courseId || courseResponseData.name;
-
-            // Chamar o Google Apps Script para criar a página de vendas
-            const scriptResponse = await fetch(`${googleAppScriptURL}?id=${savedCourseId}`, {
-                method: 'GET',
-                credentials: 'include' // Incluir as credenciais do usuário logado
-            });
-
-            if (scriptResponse.ok) {
-                alert('Curso publicado e página de vendas criada com sucesso!');
-                window.location.href = '../ctrl';
-            } else {
-                alert('Curso salvo, mas houve um problema ao criar a página de vendas.');
-                console.error('Erro ao chamar Google Apps Script:', scriptResponse.statusText);
-            }
+        if (scriptResponse.ok) {
+            alert('Curso publicado e página de vendas criada com sucesso!');
+            // Redirecionar para a página de controle após criar a página de vendas
+            window.location.href = 'ctrl.html';
         } else {
-            console.error('Erro ao salvar o curso:', response.statusText);
+            alert('Curso salvo, mas houve um problema ao criar a página de vendas.');
+            console.error('Erro ao chamar Google Apps Script:', scriptResponse.statusText);
         }
-    });
+    } else {
+        console.error('Erro ao salvar o curso:', response.statusText);
+    }
+});
+
 </script>
 
     
