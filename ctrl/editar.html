@@ -1,7 +1,3 @@
----
-layout: default
-title: About
----
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -35,7 +31,7 @@ title: About
 <body>
     <h1>Adicionar/Editar Curso</h1>
     <form id="courseForm">
-        <!-- Form Fields -->
+        <!-- Campos do Formulário -->
         <label for="titulo">Nome do curso:</label>
         <input type="text" id="titulo" name="titulo" maxlength="40" required>
 
@@ -63,10 +59,6 @@ title: About
             </script>
         </select>
         <input type="text" id="valorParcelamento" name="valorParcelamento" placeholder="Valor da Parcela" required>
-
-        <!-- Remover o campo "Link externo" -->
-        <!-- <label for="link">Link externo:</label>
-        <input type="url" id="link" name="link" required> -->
 
         <label for="checkout">Link do checkout:</label>
         <input type="url" id="checkout" name="checkout" required>
@@ -103,7 +95,7 @@ title: About
                 .then(response => response.json())
                 .then(data => {
                     if (data) {
-                        initialData = data;
+                        initialData = data; // Save initial data for comparison
                         document.getElementById('titulo').value = data.titulo;
                         document.getElementById('descricao').value = data.descricao;
                         document.getElementById('sobre').value = data.sobre;
@@ -119,16 +111,34 @@ title: About
                 });
         }
 
+        document.getElementById('preco').addEventListener('input', function() {
+            this.value = formatCurrency(this.value);
+        });
+
+        document.getElementById('promocao').addEventListener('input', function() {
+            this.value = formatCurrency(this.value);
+        });
+
+        document.getElementById('valorParcelamento').addEventListener('input', function() {
+            this.value = formatCurrency(this.value);
+        });
+
+        document.getElementById('cancelButton').addEventListener('click', function() {
+            window.location.href = '/ctrl';
+        });
+
         document.getElementById('courseForm').addEventListener('submit', async function(event) {
             event.preventDefault();
 
             const formData = new FormData(event.target);
             const courseData = Object.fromEntries(formData.entries());
 
+            // Remover R$ dos valores antes de salvar no banco
             courseData.preco = courseData.preco.replace(/[^\d]/g, '');
             courseData.promocao = courseData.promocao.replace(/[^\d]/g, '');
             courseData.valorParcelamento = courseData.valorParcelamento.replace(/[^\d]/g, '');
 
+            // Salvar no Firebase
             const response = await fetch(`${firebaseConfig.databaseURL}/cursos/${courseId ? courseId : ''}.json`, {
                 method: courseId ? 'PATCH' : 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -138,25 +148,26 @@ title: About
             if (response.ok) {
                 const newCourseId = courseId || (await response.json()).name;
 
-                // Chamar o Google App Script para criar a página no GitHub
-                const gasUrl = 'https://script.google.com/macros/s/AKfycbw1D00ZwYgamELnCmyF-Xs9uE6qB8O307eUmPnP3aNozM_ZAMNayRPv_hGmVziNzrA/exec';
-                const githubResponse = await fetch(gasUrl, {
+                // Preparar dados para enviar ao Google Apps Script
+                const pageContent = `<html><body><h1>${courseData.titulo}</h1><p>${courseData.descricao}</p></body></html>`;
+                const nomeArquivo = `curso_${newCourseId}`;
+
+                // Chamar o Google Apps Script
+                const scriptResponse = await fetch('https://script.google.com/macros/s/AKfycbw1D00ZwYgamELnCmyF-Xs9uE6qB8O307eUmPnP3aNozM_ZAMNayRPv_hGmVziNzrA/exec', {
                     method: 'POST',
-                    body: JSON.stringify({ id: newCourseId, ...courseData })
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ nomeArquivo: nomeArquivo, conteudo: pageContent })
                 });
 
-                const githubResult = await githubResponse.json();
-
-                // Atualizar o link da página no Firebase
-                const pageLink = githubResult.pageUrl;
-                await fetch(`${firebaseConfig.databaseURL}/cursos/${newCourseId}.json`, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ link: pageLink })
-                });
-
-                alert('Curso publicado com sucesso!');
-                window.location.href = '../ctrl';
+                const scriptResult = await scriptResponse.json();
+                if (scriptResult.status === 'success') {
+                    alert('Curso publicado com sucesso!');
+                    window.location.href = '/ctrl';
+                } else {
+                    console.error('Erro ao criar página no GitHub:', scriptResult.message);
+                }
             } else {
                 console.error('Erro ao salvar o curso:', response.statusText);
             }
@@ -165,6 +176,10 @@ title: About
         function formatCurrency(value) {
             value = value.replace(/\D/g, '');
             return `R$ ${(value / 100).toFixed(2).replace('.', ',')}`;
+        }
+
+        function isEqual(obj1, obj2) {
+            return JSON.stringify(obj1) === JSON.stringify(obj2);
         }
     </script>
 </body>
