@@ -73,113 +73,90 @@
         <button type="button" id="cancelButton">Cancelar</button>
     </form>
 
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyC-STt5EnVQA5oJEF1Vie3rHk1qOW9TqMw",
-            authDomain: "cursos-preparatorios.firebaseapp.com",
-            databaseURL: "https://cursos-preparatorios-default-rtdb.firebaseio.com",
-            projectId: "cursos-preparatorios",
-            storageBucket: "cursos-preparatorios.appspot.com",
-            messagingSenderId: "121871815126",
-            appId: "1:121871815126:web:1ea3e4630b3b4de6569477"
-        };
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyC-STt5EnVQA5oJEF1Vie3rHk1qOW9TqMw",
+        authDomain: "cursos-preparatorios.firebaseapp.com",
+        databaseURL: "https://cursos-preparatorios-default-rtdb.firebaseio.com",
+        projectId: "cursos-preparatorios",
+        storageBucket: "cursos-preparatorios.appspot.com",
+        messagingSenderId: "121871815126",
+        appId: "1:121871815126:web:1ea3e4630b3b4de6569477"
+    };
 
-        const courseId = new URLSearchParams(window.location.search).get('id');
-        const googleAppsScriptUrl = 'https://script.google.com/macros/s/AKfycbw1D00ZwYgamELnCmyF-Xs9uE6qB8O307eUmPnP3aNozM_ZAMNayRPv_hGmVziNzrA/exec';
+    const courseId = new URLSearchParams(window.location.search).get('id');
+    const googleAppScriptURL = 'https://script.google.com/macros/s/AKfycbw1D00ZwYgamELnCmyF-Xs9uE6qB8O307eUmPnP3aNozM_ZAMNayRPv_hGmVziNzrA/exec';
 
-        if (courseId) {
-            fetch(`${firebaseConfig.databaseURL}/cursos/${courseId}.json`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data) {
-                        document.getElementById('titulo').value = data.titulo;
-                        document.getElementById('descricao').value = data.descricao;
-                        document.getElementById('sobre').value = data.sobre;
-                        document.getElementById('imagem').value = data.imagem;
-                        document.getElementById('preco').value = data.preco;
-                        document.getElementById('promocao').value = data.promocao;
-                        document.getElementById('parcelamento').value = data.parcelamento;
-                        document.getElementById('valorParcelamento').value = data.valorParcelamento;
-                        document.getElementById('link').value = data.link;
-                        document.getElementById('checkout').value = data.checkout;
-                        document.getElementById('widget').value = data.widget;
-                    }
-                });
-        }
+    if (courseId) {
+        fetch(`${firebaseConfig.databaseURL}/cursos/${courseId}.json`)
+            .then(response => response.json())
+            .then(data => {
+                if (data) {
+                    document.getElementById('titulo').value = data.titulo;
+                    document.getElementById('descricao').value = data.descricao;
+                    document.getElementById('sobre').value = data.sobre;
+                    document.getElementById('imagem').value = data.imagem;
+                    document.getElementById('preco').value = data.preco;
+                    document.getElementById('promocao').value = data.promocao;
+                    document.getElementById('parcelamento').value = data.parcelamento;
+                    document.getElementById('valorParcelamento').value = data.valorParcelamento;
+                    document.getElementById('link').value = data.link;
+                    document.getElementById('checkout').value = data.checkout;
+                    document.getElementById('widget').value = data.widget;
+                }
+            });
+    }
 
-        // Função para formatar como moeda
-        function formatCurrency(input) {
-            let value = input.value.replace(/\D/g, '');
-            value = (value / 100).toFixed(2);
-            input.value = `R$ ${value.replace('.', ',')}`;
-        }
+    // Função para remover a formatação de moeda antes de salvar no banco de dados
+    function removeCurrencyFormat(value) {
+        return value.replace(/[^\d,]/g, '').replace(',', '.');
+    }
 
-        // Adicionando evento de formatação
-        document.getElementById('preco').addEventListener('input', function() {
-            formatCurrency(this);
+    document.getElementById('cancelButton').addEventListener('click', function() {
+        window.location.href = '../ctrl';
+    });
+
+    document.getElementById('courseForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+
+        const formData = new FormData(event.target);
+        const courseData = Object.fromEntries(formData.entries());
+
+        // Removendo a formatação de moeda antes de salvar
+        courseData.preco = removeCurrencyFormat(courseData.preco);
+        courseData.promocao = removeCurrencyFormat(courseData.promocao);
+        courseData.valorParcelamento = removeCurrencyFormat(courseData.valorParcelamento);
+
+        // Salvar no Firebase
+        const response = await fetch(`${firebaseConfig.databaseURL}/cursos/${courseId ? courseId : ''}.json`, {
+            method: courseId ? 'PATCH' : 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(courseData)
         });
-        document.getElementById('promocao').addEventListener('input', function() {
-            formatCurrency(this);
-        });
-        document.getElementById('valorParcelamento').addEventListener('input', function() {
-            formatCurrency(this);
-        });
 
-        // Função para remover a formatação antes de salvar no banco de dados
-        function removeCurrencyFormat(value) {
-            return value.replace(/[^\d,]/g, '').replace(',', '.');
-        }
+        if (response.ok) {
+            const courseResponseData = await response.json();
+            const savedCourseId = courseId || courseResponseData.name;
 
-        document.getElementById('cancelButton').addEventListener('click', function() {
-            window.location.href = '../ctrl';
-        });
-
-        document.getElementById('courseForm').addEventListener('submit', async function(event) {
-            event.preventDefault();
-
-            const formData = new FormData(event.target);
-            const courseData = Object.fromEntries(formData.entries());
-
-            // Removendo a formatação de moeda antes de salvar
-            courseData.preco = removeCurrencyFormat(courseData.preco);
-            courseData.promocao = removeCurrencyFormat(courseData.promocao);
-            courseData.valorParcelamento = removeCurrencyFormat(courseData.valorParcelamento);
-
-            // Salvar no Firebase
-            const method = courseId ? 'PATCH' : 'POST';
-            const response = await fetch(`${firebaseConfig.databaseURL}/cursos/${courseId ? courseId : ''}.json`, {
-                method: method,
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(courseData)
+            // Chamar o Google Apps Script para criar a página de vendas
+            const scriptResponse = await fetch(`${googleAppScriptURL}?id=${savedCourseId}`, {
+                method: 'GET',
+                credentials: 'include' // Incluir as credenciais do usuário logado
             });
 
-            const result = await response.json();
-            const currentCourseId = courseId ? courseId : result.name;
-
-            if (response.ok) {
-                // Chamar o Google Apps Script para criar a página de vendas
-                const appsScriptResponse = await fetch(`${googleAppsScriptUrl}?id=${courseId}`);
-                if (appsScriptResponse.ok) {
-                    // Obter a URL gerada e salvar no Firebase
-                    const pageUrl = `https://rafaeldantasl.github.io/concursos/cs/${courseId}`;
-
-                    await fetch(`${firebaseConfig.databaseURL}/cursos/${courseId}.json`, {
-                        method: 'PATCH',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ link: pageUrl })
-                    });
-
-                    alert('Curso e página de vendas publicados com sucesso!');
-                    window.location.href = '../ctrl';
-                } else {
-                    console.error('Erro ao criar a página de vendas:', appsScriptResponse.statusText);
-                    alert('Erro ao criar a página de vendas.');
-                }
+            if (scriptResponse.ok) {
+                alert('Curso publicado e página de vendas criada com sucesso!');
+                window.location.href = '../ctrl';
             } else {
-                console.error('Erro ao salvar o curso:', response.statusText);
-                alert('Erro ao salvar o curso.');
+                alert('Curso salvo, mas houve um problema ao criar a página de vendas.');
+                console.error('Erro ao chamar Google Apps Script:', scriptResponse.statusText);
             }
-        });
-    </script>
+        } else {
+            console.error('Erro ao salvar o curso:', response.statusText);
+        }
+    });
+</script>
+
+    
 </body>
 </html>
