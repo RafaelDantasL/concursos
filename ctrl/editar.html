@@ -24,8 +24,12 @@ title: About
             width: 100%;
             margin-bottom: 12px;
         }
-        input[type="submit"] {
+        input[type="submit"], #cancelButton {
             margin-top: 20px;
+            display: inline-block;
+        }
+        #cancelButton {
+            margin-left: 10px;
         }
     </style>
 </head>
@@ -76,7 +80,8 @@ title: About
             <option value="false">Não</option>
         </select>
 
-        <input type="submit" value="Publicar">
+        <input type="submit" id="publishButton" value="Publicar">
+        <button type="button" id="cancelButton">Cancelar</button>
     </form>
 
     <script>
@@ -91,12 +96,14 @@ title: About
         };
 
         const courseId = new URLSearchParams(window.location.search).get('id');
+        let initialData = {};
 
         if (courseId) {
             fetch(`${firebaseConfig.databaseURL}/cursos/${courseId}.json`)
                 .then(response => response.json())
                 .then(data => {
                     if (data) {
+                        initialData = data; // Save initial data for comparison
                         document.getElementById('titulo').value = data.titulo;
                         document.getElementById('descricao').value = data.descricao;
                         document.getElementById('sobre').value = data.sobre;
@@ -112,6 +119,10 @@ title: About
                     }
                 });
         }
+
+        document.getElementById('cancelButton').addEventListener('click', function() {
+            window.location.href = '../ctrl';
+        });
 
         document.getElementById('courseForm').addEventListener('submit', async function(event) {
             event.preventDefault();
@@ -135,12 +146,14 @@ title: About
                 const newCourseId = courseId || (await response.json()).name;
 
                 // Criar arquivo HTML no GitHub
-                const githubApiToken = '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';
+                const githubApiToken = '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';  // Seu token do GitHub
+                const repoOwner = 'RafaelDantasL';  // Seu nome de usuário
+                const repoName = 'concursos';  // Nome do repositório
                 const fileName = `curso_${newCourseId}.html`;
-                const filePath = `cursos/${fileName}`; // Diretório específico 'cursos'
+                const filePath = `cursos/${fileName}`;  // Diretório específico 'cursos'
                 const fileContent = btoa(`<html><body><h1>${courseData.titulo}</h1><p>${courseData.descricao}</p></body></html>`);
 
-                await fetch(`https://api.github.com/repos/RafaelDantasL/concursos/contents/${filePath}`, {
+                await fetch(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`, {
                     method: 'PUT',
                     headers: {
                         Authorization: `Bearer ${githubApiToken}`,
@@ -153,7 +166,7 @@ title: About
                 });
 
                 // Salvar o link da página no Firebase
-                const pageLink = `https://rafaeldantasl.github.io/concursos/cursos/${fileName}`;
+                const pageLink = `https://rafaeldantasl.github.io/${repoName}/cursos/${fileName}`;
                 await fetch(`${firebaseConfig.databaseURL}/cursos/${newCourseId}.json`, {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
@@ -161,7 +174,7 @@ title: About
                 });
 
                 alert('Curso publicado com sucesso!');
-                window.location.href = 'ctrl.html';
+                window.location.href = '../ctrl';  // Redirecionar para a página de controle
             } else {
                 console.error('Erro ao salvar o curso:', response.statusText);
             }
@@ -174,3 +187,4 @@ title: About
     </script>
 </body>
 </html>
+
