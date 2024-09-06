@@ -128,50 +128,51 @@
         });
 
         document.getElementById('courseForm').addEventListener('submit', async function(event) {
-            event.preventDefault();
+    event.preventDefault();
 
-            const formData = new FormData(event.target);
-            const courseData = Object.fromEntries(formData.entries());
+    const formData = new FormData(event.target);
+    const courseData = Object.fromEntries(formData.entries());
 
-            // Remover R$ dos valores antes de salvar no banco
-            courseData.preco = courseData.preco.replace(/[^\d]/g, '');
-            courseData.promocao = courseData.promocao.replace(/[^\d]/g, '');
-            courseData.valorParcelamento = courseData.valorParcelamento.replace(/[^\d]/g, '');
+    // Remover R$ dos valores antes de salvar no banco
+    courseData.preco = courseData.preco.replace(/[^\d]/g, '');
+    courseData.promocao = courseData.promocao.replace(/[^\d]/g, '');
+    courseData.valorParcelamento = courseData.valorParcelamento.replace(/[^\d]/g, '');
 
-            // Salvar no Firebase
-            const response = await fetch(`${firebaseConfig.databaseURL}/cursos/${courseId ? courseId : ''}.json`, {
-                method: courseId ? 'PATCH' : 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(courseData)
-            });
+    // Salvar no Firebase
+    const response = await fetch(`${firebaseConfig.databaseURL}/cursos/${courseId ? courseId : ''}.json`, {
+        method: courseId ? 'PATCH' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(courseData)
+    });
 
-            if (response.ok) {
-                const newCourseId = courseId || (await response.json()).name;
+    if (response.ok) {
+        const newCourseId = courseId || (await response.json()).name;
 
-                // Preparar dados para enviar ao Google Apps Script
-                const pageContent = `<html><body><h1>${courseData.titulo}</h1><p>${courseData.descricao}</p></body></html>`;
-                const nomeArquivo = `curso_${newCourseId}`;
+        // Preparar dados para enviar ao Google Apps Script
+        const pageContent = `<html><body><h1>${courseData.titulo}</h1><p>${courseData.descricao}</p></body></html>`;
+        const nomeArquivo = `curso_${newCourseId}`;
 
-                // Chamar o Google Apps Script
-                const scriptResponse = await fetch('https://script.google.com/macros/s/AKfycbw1D00ZwYgamELnCmyF-Xs9uE6qB8O307eUmPnP3aNozM_ZAMNayRPv_hGmVziNzrA/exec', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ nomeArquivo: nomeArquivo, conteudo: pageContent })
-                });
-
-                const scriptResult = await scriptResponse.json();
-                if (scriptResult.status === 'success') {
-                    alert('Curso publicado com sucesso!');
-                    window.location.href = '/ctrl';
-                } else {
-                    console.error('Erro ao criar página no GitHub:', scriptResult.message);
-                }
-            } else {
-                console.error('Erro ao salvar o curso:', response.statusText);
-            }
+        // Chamar o Google Apps Script
+        const scriptResponse = await fetch('https://script.google.com/macros/s/SEU_SCRIPT_ID/exec', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ nomeArquivo: nomeArquivo, conteudo: pageContent })
         });
+
+        const scriptResult = await scriptResponse.json();
+        if (scriptResult.status === 'success') {
+            alert('Curso publicado com sucesso!');
+            window.location.href = '/ctrl';
+        } else {
+            console.error('Erro ao criar página no GitHub:', scriptResult.message);
+        }
+    } else {
+        console.error('Erro ao salvar o curso:', response.statusText);
+    }
+});
+
 
         function formatCurrency(value) {
             value = value.replace(/\D/g, '');
