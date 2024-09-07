@@ -97,21 +97,7 @@
 async function deleteCourse(courseId) {
     if (confirm('Tem certeza que deseja excluir este curso?')) {
         try {
-            // 1. Fazer a solicitação ao Google Apps Script para excluir a página de vendas
-            const googleAppScriptURL = `https://script.google.com/macros/s/AKfycbwXccK6pL1FJGbBT8ATE-xaBk_c5gQHTRhEsZdBNmiPVAO-cW07D4ifQOt0QOZk4An-/exec?id=${courseId}`;
-            
-            const scriptResponse = await fetch(googleAppScriptURL, {
-                method: 'GET',
-                credentials: 'include'
-            });
-
-            if (!scriptResponse.ok) {
-                throw new Error(`Erro ao excluir a página de vendas: ${scriptResponse.statusText}`);
-            }
-
-            console.log('Página de vendas excluída com sucesso!');
-
-            // 2. Excluir o curso do banco de dados Firebase
+            // 1. Excluir o curso do banco de dados Firebase
             const firebaseDeleteResponse = await fetch(`${firebaseConfig.databaseURL}/cursos/${courseId}.json`, {
                 method: 'DELETE'
             });
@@ -120,8 +106,11 @@ async function deleteCourse(courseId) {
                 throw new Error('Erro ao excluir o curso do Firebase.');
             }
 
-            console.log('Curso excluído com sucesso!');
-            loadCourses(); // Atualiza a lista de cursos na página
+            // 2. Salvar o courseId no sessionStorage para realizar a exclusão da página de vendas após o reload
+            sessionStorage.setItem('courseToDelete', courseId);
+
+            // 3. Recarregar a página
+            window.location.reload();
         } catch (error) {
             console.error('Erro ao excluir o curso:', error);
             alert('Ocorreu um erro ao excluir o curso.');
@@ -129,6 +118,31 @@ async function deleteCourse(courseId) {
     }
 }
 
+// Após o carregamento da página, verificar se existe um courseId salvo
+window.onload = function() {
+    const courseId = sessionStorage.getItem('courseToDelete');
+
+    if (courseId) {
+        // Fazer a solicitação para excluir a página de vendas
+        const googleAppScriptURL = `https://script.google.com/macros/s/AKfycbwXccK6pL1FJGbBT8ATE-xaBk_c5gQHTRhEsZdBNmiPVAO-cW07D4ifQOt0QOZk4An-/exec?id=${courseId}`;
+
+        fetch(googleAppScriptURL, {
+            method: 'GET',
+            credentials: 'include'
+        }).then(response => {
+            if (response.ok) {
+                console.log('Página de vendas excluída com sucesso!');
+            } else {
+                console.error('Erro ao excluir a página de vendas:', response.statusText);
+            }
+
+            // Limpar o sessionStorage após a solicitação
+            sessionStorage.removeItem('courseToDelete');
+        }).catch(error => {
+            console.error('Erro ao fazer a solicitação ao Google Apps Script:', error);
+        });
+    }
+};
 
         async function getFileSha(filePath) {
             const response = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${filePath}`, {
