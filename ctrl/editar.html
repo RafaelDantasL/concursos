@@ -49,6 +49,12 @@
             text-decoration: underline;
             cursor: pointer;
         }
+        #imagePreview {
+            max-width: 200px;
+            max-height: 200px;
+            margin-top: 10px;
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -64,8 +70,10 @@
         <label for="sobre">Sobre:</label>
         <textarea id="sobre" name="sobre" maxlength="500" rows="4"></textarea>
 
-        <label for="imagem">URL da Imagem:</label>
-        <input type="url" id="imagem" name="imagem" placeholder="https://exemplo.com/imagem.jpg" required>
+        <!-- Botão de carregar imagem -->
+        <label for="imagem">Carregar Imagem:</label>
+        <input type="file" id="imagem" name="imagem" accept="image/*" required>
+        <img id="imagePreview" alt="Preview da Imagem"/>
 
         <!-- Campos de Preço, Promoção e Parcelamento em uma linha -->
         <div class="inline-fields">
@@ -126,7 +134,6 @@
                         document.getElementById('titulo').value = data.titulo;
                         document.getElementById('descricao').value = data.descricao;
                         document.getElementById('sobre').value = data.sobre;
-                        document.getElementById('imagem').value = data.imagem;
                         document.getElementById('preco').value = formatCurrency(data.preco);
                         document.getElementById('promocao').value = formatCurrency(data.promocao);
                         document.getElementById('parcelamento').value = data.parcelamento;
@@ -165,61 +172,55 @@
             window.location.href = '../ctrl';
         });
 
+        document.getElementById('imagem').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('imagePreview');
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
         document.getElementById('courseForm').addEventListener('submit', async function(event) {
             event.preventDefault();
 
             const formData = new FormData(event.target);
             const courseData = Object.fromEntries(formData.entries());
 
-            // Salvar no Firebase
-            const response = await fetch(`${firebaseConfig.databaseURL}/cursos/${courseId ? courseId : ''}.json`, {
-                method: courseId ? 'PATCH' : 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(courseData)
-            });
+            const imageFile = document.getElementById('imagem').files[0];
+            let imageBase64 = '';
 
-            if (response.ok) {
-                const courseResponseData = await response.json();
-                const savedCourseId = courseId || courseResponseData.name;
-
-                // Salvar o ID no sessionStorage para fazer a solicitação ao Google Apps Script após o reload
-                sessionStorage.setItem('courseToPublish', savedCourseId);
-
-                // Recarregar a página
-                window.location.reload();
+            if (imageFile) {
+                const reader = new FileReader();
+                reader.onloadend = async function () {
+                    imageBase64 = reader.result.split(',')[1];
+                    await sendCourseData(courseData, imageBase64);
+                };
+                reader.readAsDataURL(imageFile);
             } else {
-                console.error('Erro ao salvar o curso:', response.statusText);
+                await sendCourseData(courseData, imageBase64);
             }
         });
 
-        // Após o reload, verificar se existe um curso para publicar
-        window.onload = async function() {
-            const courseToPublish = sessionStorage.getItem('courseToPublish');
-            if (courseToPublish) {
-                const scriptResponse = await fetch(`${googleAppScriptURL}?id=${courseToPublish}`, {
-                    method: 'GET',
-                    credentials: 'include' // Incluir as credenciais do usuário logado
+        async function sendCourseData(courseData, imageBase64) {
+            const response = await fetch(`${firebaseConfig.databaseURL}/cursos/${courseId ? courseId : new Date().getTime()}.json`, {
+                method: courseId ? 'PATCH' : 'POST',
+                body: JSON.stringify({ ...courseData, imagem: imageBase64 }),
+            });
+
+            if (response.ok) {
+                await fetch(googleAppScriptURL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ...courseData, imagem: imageBase64 }),
                 });
-
-                if (scriptResponse.ok) {
-                    const salesLink = `https://rafaeldantasl.github.io/concursos/cs/${courseToPublish}`;
-
-                    // Atualizar o link no Firebase
-                    await fetch(`${firebaseConfig.databaseURL}/cursos/${courseToPublish}.json`, {
-                        method: 'PATCH',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ link: salesLink })
-                    });
-
-                    // Exibir o link clicável
-                    document.getElementById('salesLink').textContent = salesLink;
-                    document.getElementById('salesLink').href = salesLink;
-                    document.getElementById('linkContainer').style.display = 'block';
-
-                    sessionStorage.removeItem('courseToPublish'); // Limpar a sessionStorage
-                } else {
-                    console.error('Erro ao solicitar o Apps Script:', scriptResponse.statusText);
-                }
+                window.location.href = '../ctrl';
+            } else {
+                alert('Erro ao salvar dados do curso.');
             }
         }
     </script>
