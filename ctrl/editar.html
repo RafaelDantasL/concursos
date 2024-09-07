@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Adicionar/Editar Curso 23123123131</title>
+    <title>Adicionar/Editar Curso</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -19,11 +19,17 @@
             width: 100%;
             margin-bottom: 12px;
         }
-        input[type="submit"], #cancelButton {
+        input[type="submit"], #cancelButton, #reloadButton, #authButton {
             margin-top: 20px;
             display: inline-block;
         }
-        #cancelButton {
+        #cancelButton, #reloadButton, #authButton {
+            margin-left: 10px;
+        }
+        #linkContainer {
+            margin-top: 20px;
+        }
+        #copyButton {
             margin-left: 10px;
         }
     </style>
@@ -60,103 +66,141 @@
         </select>
         <input type="text" id="valorParcelamento" name="valorParcelamento" placeholder="Valor da Parcela" required>
 
-        <label for="link">Link externo:</label>
-        <input type="url" id="link" name="link" required>
-
         <label for="checkout">Link do checkout:</label>
         <input type="url" id="checkout" name="checkout" required>
 
         <label for="widget">Widget do checkout (opcional):</label>
         <textarea id="widget" name="widget" placeholder="<script>...</script>" rows="4"></textarea>
 
+        <!-- Link gerado automaticamente -->
+        <div id="linkContainer" style="display:none;">
+            <label>Link da Página de Vendas:</label>
+            <input type="text" id="salesLink" readonly>
+            <button type="button" id="copyButton">Copiar</button>
+        </div>
+
+        <!-- Botões -->
         <input type="submit" id="publishButton" value="Publicar">
         <button type="button" id="cancelButton">Cancelar</button>
+        <button type="button" id="reloadButton">Recarregar</button>
+        <button type="button" id="authButton">Autenticar</button>
     </form>
 
-<script>
-    const firebaseConfig = {
-        apiKey: "AIzaSyC-STt5EnVQA5oJEF1Vie3rHk1qOW9TqMw",
-        authDomain: "cursos-preparatorios.firebaseapp.com",
-        databaseURL: "https://cursos-preparatorios-default-rtdb.firebaseio.com",
-        projectId: "cursos-preparatorios",
-        storageBucket: "cursos-preparatorios.appspot.com",
-        messagingSenderId: "121871815126",
-        appId: "1:121871815126:web:1ea3e4630b3b4de6569477"
-    };
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyC-STt5EnVQA5oJEF1Vie3rHk1qOW9TqMw",
+            authDomain: "cursos-preparatorios.firebaseapp.com",
+            databaseURL: "https://cursos-preparatorios-default-rtdb.firebaseio.com",
+            projectId: "cursos-preparatorios",
+            storageBucket: "cursos-preparatorios.appspot.com",
+            messagingSenderId: "121871815126",
+            appId: "1:121871815126:web:1ea3e4630b3b4de6569477"
+        };
 
-    const courseId = new URLSearchParams(window.location.search).get('id');
-    const googleAppScriptURL = 'https://script.google.com/macros/s/AKfycbw1D00ZwYgamELnCmyF-Xs9uE6qB8O307eUmPnP3aNozM_ZAMNayRPv_hGmVziNzrA/exec';
+        const courseId = new URLSearchParams(window.location.search).get('id');
+        const googleAppScriptURL = 'https://script.google.com/macros/s/AKfycbw1D00ZwYgamELnCmyF-Xs9uE6qB8O307eUmPnP3aNozM_ZAMNayRPv_hGmVziNzrA/exec';
 
-    if (courseId) {
-        fetch(`${firebaseConfig.databaseURL}/cursos/${courseId}.json`)
-            .then(response => response.json())
-            .then(data => {
-                if (data) {
-                    document.getElementById('titulo').value = data.titulo;
-                    document.getElementById('descricao').value = data.descricao;
-                    document.getElementById('sobre').value = data.sobre;
-                    document.getElementById('imagem').value = data.imagem;
-                    document.getElementById('preco').value = data.preco;
-                    document.getElementById('promocao').value = data.promocao;
-                    document.getElementById('parcelamento').value = data.parcelamento;
-                    document.getElementById('valorParcelamento').value = data.valorParcelamento;
-                    document.getElementById('link').value = data.link;
-                    document.getElementById('checkout').value = data.checkout;
-                    document.getElementById('widget').value = data.widget;
-                }
-            });
-    }
+        if (courseId) {
+            fetch(`${firebaseConfig.databaseURL}/cursos/${courseId}.json`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data) {
+                        document.getElementById('titulo').value = data.titulo;
+                        document.getElementById('descricao').value = data.descricao;
+                        document.getElementById('sobre').value = data.sobre;
+                        document.getElementById('imagem').value = data.imagem;
+                        document.getElementById('preco').value = data.preco;
+                        document.getElementById('promocao').value = data.promocao;
+                        document.getElementById('parcelamento').value = data.parcelamento;
+                        document.getElementById('valorParcelamento').value = data.valorParcelamento;
+                        document.getElementById('checkout').value = data.checkout;
+                        document.getElementById('widget').value = data.widget;
 
-    // Função para remover a formatação de moeda antes de salvar no banco de dados
-    function removeCurrencyFormat(value) {
-        return value.replace(/[^\d,]/g, '').replace(',', '.');
-    }
+                        if (data.link) {
+                            document.getElementById('salesLink').value = `https://rafaeldantasl.github.io/concursos/cs/${courseId}`;
+                            document.getElementById('linkContainer').style.display = 'block';
+                        }
+                    }
+                });
+        }
 
-    document.getElementById('cancelButton').addEventListener('click', function() {
-        window.location.href = '../ctrl';
-    });
+        // Função para remover a formatação de moeda antes de salvar no banco de dados
+        function removeCurrencyFormat(value) {
+            return value.replace(/[^\d,]/g, '').replace(',', '.');
+        }
 
-    document.getElementById('courseForm').addEventListener('submit', async function(event) {
-        event.preventDefault();
-
-        const formData = new FormData(event.target);
-        const courseData = Object.fromEntries(formData.entries());
-
-        // Removendo a formatação de moeda antes de salvar
-        courseData.preco = removeCurrencyFormat(courseData.preco);
-        courseData.promocao = removeCurrencyFormat(courseData.promocao);
-        courseData.valorParcelamento = removeCurrencyFormat(courseData.valorParcelamento);
-
-        // Salvar no Firebase
-        const response = await fetch(`${firebaseConfig.databaseURL}/cursos/${courseId ? courseId : ''}.json`, {
-            method: courseId ? 'PATCH' : 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(courseData)
+        document.getElementById('cancelButton').addEventListener('click', function() {
+            window.location.href = '../ctrl';
         });
 
-        if (response.ok) {
-            const courseResponseData = await response.json();
-            const savedCourseId = courseId || courseResponseData.name;
+        document.getElementById('reloadButton').addEventListener('click', function() {
+            window.location.reload();
+        });
 
-            // Chamar o Google Apps Script para criar a página de vendas
-            const scriptResponse = await fetch(`${googleAppScriptURL}?id=${savedCourseId}`, {
-                method: 'GET',
-                credentials: 'include' // Incluir as credenciais do usuário logado
+        document.getElementById('authButton').addEventListener('click', function() {
+            window.open(googleAppScriptURL, '_blank');
+        });
+
+        document.getElementById('copyButton').addEventListener('click', function() {
+            const salesLink = document.getElementById('salesLink');
+            salesLink.select();
+            salesLink.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(salesLink.value);
+            alert('Link copiado para a área de transferência!');
+        });
+
+        document.getElementById('courseForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const formData = new FormData(event.target);
+            const courseData = Object.fromEntries(formData.entries());
+
+            // Removendo a formatação de moeda antes de salvar
+            courseData.preco = removeCurrencyFormat(courseData.preco);
+            courseData.promocao = removeCurrencyFormat(courseData.promocao);
+            courseData.valorParcelamento = removeCurrencyFormat(courseData.valorParcelamento);
+
+            // Salvar no Firebase
+            const response = await fetch(`${firebaseConfig.databaseURL}/cursos/${courseId ? courseId : ''}.json`, {
+                method: courseId ? 'PATCH' : 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(courseData)
             });
 
-            if (scriptResponse.ok) {
-                alert('Curso publicado e página de vendas criada com sucesso!');
-                window.location.href = '../ctrl';
-            } else {
-                alert('Curso salvo, mas houve um problema ao criar a página de vendas.');
-                console.error('Erro ao chamar Google Apps Script:', scriptResponse.statusText);
-            }
-        } else {
-            console.error('Erro ao salvar o curso:', response.statusText);
-        }
-    });
-</script>
+            if (response.ok) {
+                const courseResponseData = await response.json();
+                const savedCourseId = courseId || courseResponseData.name;
 
-    
+                // Chamar o Google Apps Script para criar a página de vendas
+                const scriptResponse = await fetch(`${googleAppScriptURL}?id=${savedCourseId}`, {
+                    method: 'GET',
+                    credentials: 'include' // Incluir as credenciais do usuário logado
+                });
+
+                if (scriptResponse.ok) {
+                    const salesLink = `https://rafaeldantasl.github.io/concursos/cs/${savedCourseId}`;
+                    
+                    // Atualizar o link no Firebase
+                    await fetch(`${firebaseConfig.databaseURL}/cursos/${savedCourseId}.json`, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ link: salesLink })
+                    });
+
+                    // Exibir o link e permitir cópia
+                    document.getElementById('salesLink').value = salesLink;
+                    document.getElementById('linkContainer').style.display = 'block';
+
+                    alert('Curso publicado e página de vendas criada com sucesso!');
+                    window.location.href = '../ctrl';
+                } else {
+                    alert('Curso salvo, mas houve um problema ao criar a página de vendas.');
+                    console.error('Erro ao chamar Google Apps Script:', scriptResponse.statusText);
+                }
+            } else {
+                console.error('Erro ao salvar o curso:', response.statusText);
+            }
+        });
+    </script>
 </body>
 </html>
