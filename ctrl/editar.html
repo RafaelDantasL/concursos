@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Adicionar/Editar Curso</title>
+    <title>Adicionar/Editar Curso (teste)</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -19,18 +19,20 @@
             width: 100%;
             margin-bottom: 12px;
         }
-        input[type="submit"], #cancelButton, #reloadButton, #authButton {
+        input[type="submit"], #cancelButton {
             margin-top: 20px;
             display: inline-block;
         }
-        #cancelButton, #reloadButton, #authButton {
+        #cancelButton {
             margin-left: 10px;
         }
         #linkContainer {
             margin-top: 20px;
         }
-        #copyButton {
-            margin-left: 10px;
+        #salesLink {
+            cursor: pointer;
+            color: blue;
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -75,15 +77,12 @@
         <!-- Link gerado automaticamente -->
         <div id="linkContainer" style="display:none;">
             <label>Link da Página de Vendas:</label>
-            <input type="text" id="salesLink" readonly>
-            <button type="button" id="copyButton">Copiar</button>
+            <a href="#" id="salesLink" target="_blank"></a>
         </div>
 
         <!-- Botões -->
         <input type="submit" id="publishButton" value="Publicar">
         <button type="button" id="cancelButton">Cancelar</button>
-        <button type="button" id="reloadButton">Recarregar</button>
-        <button type="button" id="authButton">Autenticar</button>
     </form>
 
     <script>
@@ -100,62 +99,27 @@
         const courseId = new URLSearchParams(window.location.search).get('id');
         const googleAppScriptURL = 'https://script.google.com/macros/s/AKfycbw1D00ZwYgamELnCmyF-Xs9uE6qB8O307eUmPnP3aNozM_ZAMNayRPv_hGmVziNzrA/exec';
 
-        if (courseId) {
-            fetch(`${firebaseConfig.databaseURL}/cursos/${courseId}.json`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data) {
-                        document.getElementById('titulo').value = data.titulo;
-                        document.getElementById('descricao').value = data.descricao;
-                        document.getElementById('sobre').value = data.sobre;
-                        document.getElementById('imagem').value = data.imagem;
-                        document.getElementById('preco').value = data.preco;
-                        document.getElementById('promocao').value = data.promocao;
-                        document.getElementById('parcelamento').value = data.parcelamento;
-                        document.getElementById('valorParcelamento').value = data.valorParcelamento;
-                        document.getElementById('checkout').value = data.checkout;
-                        document.getElementById('widget').value = data.widget;
-
-                        if (data.link) {
-                            document.getElementById('salesLink').value = `https://rafaeldantasl.github.io/concursos/cs/${courseId}`;
-                            document.getElementById('linkContainer').style.display = 'block';
-                        }
-                    }
-                });
-        }
-
-        // Função para remover a formatação de moeda antes de salvar no banco de dados
+        // Função para remover a formatação de moeda
         function removeCurrencyFormat(value) {
             return value.replace(/[^\d,]/g, '').replace(',', '.');
         }
 
-        document.getElementById('cancelButton').addEventListener('click', function() {
-            window.location.href = '../ctrl';
-        });
+        // Função para formatar os valores como moeda
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+            }).format(value.replace(/[^\d,]/g, '').replace(',', '.'));
+        }
 
-        document.getElementById('reloadButton').addEventListener('click', function() {
-            window.location.reload();
-        });
-
-        document.getElementById('authButton').addEventListener('click', function() {
-            window.open(googleAppScriptURL, '_blank');
-        });
-
-        document.getElementById('copyButton').addEventListener('click', function() {
-            const salesLink = document.getElementById('salesLink');
-            salesLink.select();
-            salesLink.setSelectionRange(0, 99999);
-            navigator.clipboard.writeText(salesLink.value);
-            alert('Link copiado para a área de transferência!');
-        });
-
+        // Função para salvar o curso e criar a página de vendas
         document.getElementById('courseForm').addEventListener('submit', async function(event) {
             event.preventDefault();
 
             const formData = new FormData(event.target);
             const courseData = Object.fromEntries(formData.entries());
 
-            // Removendo a formatação de moeda antes de salvar
+            // Remover formatação de moeda antes de salvar
             courseData.preco = removeCurrencyFormat(courseData.preco);
             courseData.promocao = removeCurrencyFormat(courseData.promocao);
             courseData.valorParcelamento = removeCurrencyFormat(courseData.valorParcelamento);
@@ -171,15 +135,31 @@
                 const courseResponseData = await response.json();
                 const savedCourseId = courseId || courseResponseData.name;
 
-                // Chamar o Google Apps Script para criar a página de vendas
+                // Salvar o ID do curso no sessionStorage para usar após o redirecionamento
+                sessionStorage.setItem('savedCourseId', savedCourseId);
+
+                // Redirecionar para a página de controle
+                window.location.href = '../ctrl';
+            } else {
+                console.error('Erro ao salvar o curso:', response.statusText);
+            }
+        });
+
+        // Função para fazer a solicitação HTTP após recarregar a página
+        window.onload = async function() {
+            const savedCourseId = sessionStorage.getItem('savedCourseId');
+            if (savedCourseId) {
+                sessionStorage.removeItem('savedCourseId'); // Limpar o sessionStorage após usar
+
+                // Fazer a solicitação HTTP para criar a página de vendas
                 const scriptResponse = await fetch(`${googleAppScriptURL}?id=${savedCourseId}`, {
                     method: 'GET',
-                    credentials: 'include' // Incluir as credenciais do usuário logado
+                    credentials: 'include'
                 });
 
                 if (scriptResponse.ok) {
                     const salesLink = `https://rafaeldantasl.github.io/concursos/cs/${savedCourseId}`;
-                    
+
                     // Atualizar o link no Firebase
                     await fetch(`${firebaseConfig.databaseURL}/cursos/${savedCourseId}.json`, {
                         method: 'PATCH',
@@ -187,19 +167,37 @@
                         body: JSON.stringify({ link: salesLink })
                     });
 
-                    // Exibir o link e permitir cópia
-                    document.getElementById('salesLink').value = salesLink;
+                    // Exibir o link de vendas na página
+                    const linkElement = document.getElementById('salesLink');
+                    linkElement.href = salesLink;
+                    linkElement.innerText = salesLink;
                     document.getElementById('linkContainer').style.display = 'block';
-
-                    alert('Curso publicado e página de vendas criada com sucesso!');
-                    window.location.href = '../ctrl';
                 } else {
-                    alert('Curso salvo, mas houve um problema ao criar a página de vendas.');
                     console.error('Erro ao chamar Google Apps Script:', scriptResponse.statusText);
                 }
-            } else {
-                console.error('Erro ao salvar o curso:', response.statusText);
             }
+        };
+
+        // Adicionando formatação de moeda nos campos de preço e promoção
+        const precoInput = document.getElementById('preco');
+        const promocaoInput = document.getElementById('promocao');
+        const valorParcelamentoInput = document.getElementById('valorParcelamento');
+
+        function addCurrencyFormatting(input) {
+            input.addEventListener('input', (e) => {
+                const value = e.target.value.replace(/[^\d]/g, '');
+                if (value) {
+                    e.target.value = formatCurrency(value / 100);
+                }
+            });
+        }
+
+        addCurrencyFormatting(precoInput);
+        addCurrencyFormatting(promocaoInput);
+        addCurrencyFormatting(valorParcelamentoInput);
+
+        document.getElementById('cancelButton').addEventListener('click', function() {
+            window.location.href = '../ctrl';
         });
     </script>
 </body>
