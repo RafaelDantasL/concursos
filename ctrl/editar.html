@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Adicionar/Editar Curso ()())()</title>
+    <title>Adicionar/Editar Curso</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -136,7 +136,7 @@
         const courseId = new URLSearchParams(window.location.search).get('id');
         const googleAppScriptURL = 'https://script.google.com/macros/s/AKfycbw1D00ZwYgamELnCmyF-Xs9uE6qB8O307eUmPnP3aNozM_ZAMNayRPv_hGmVziNzrA/exec';
 
-        let uploadedImageUrl = '';
+        let uploadedImagePath = '';  // Caminho completo do arquivo no sistema local
 
         const imagePreviewDiv = document.getElementById('imagePreview');
         const uploadImageInput = document.getElementById('uploadImage');
@@ -146,7 +146,7 @@
             uploadImageInput.click();
         });
 
-        // Quando a imagem for selecionada, exibir a prévia e armazenar o caminho
+        // Quando a imagem for selecionada, exibir a prévia e armazenar o caminho completo
         uploadImageInput.addEventListener('change', function(event) {
             const file = event.target.files[0];
 
@@ -155,7 +155,7 @@
                 
                 reader.onload = function(e) {
                     imagePreviewDiv.innerHTML = `<img src="${e.target.result}">`;
-                    uploadedImageUrl = file.name;  // Aqui, estamos armazenando o nome do arquivo
+                    uploadedImagePath = file.path || file.webkitRelativePath || file.name;  // Salvar o caminho completo do arquivo
                 };
                 
                 reader.readAsDataURL(file);  // Ler o conteúdo do arquivo e exibir a prévia
@@ -214,13 +214,8 @@
             const formData = new FormData(event.target);
             const courseData = Object.fromEntries(formData.entries());
 
-            // Adicionar a chave 'local' com o caminho da imagem
-            courseData.local = uploadedImageUrl;
-
-            // Adicionar também a chave 'imagem' se aplicável
-            if (!courseData.imagem) {
-                courseData.imagem = 'https://exemplo.com/imagem-padrao.jpg';  // Valor padrão ou lógica específica
-            }
+            // Adicionar a chave 'local' com o caminho do arquivo carregado
+            courseData.local = uploadedImagePath;
 
             // Salvar no Firebase
             const response = await fetch(`${firebaseConfig.databaseURL}/cursos/${courseId ? courseId : ''}.json`, {
