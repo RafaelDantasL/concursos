@@ -6,57 +6,55 @@
     <title>🤳🏼📲Adicionar/Editar Curso</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f7;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: #2c3e50;
         }
         form {
-            margin-top: 20px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
         label {
-            display: block;
+            font-weight: bold;
+            color: #2c3e50;
             margin-bottom: 8px;
+            display: block;
         }
-        input[type="text"], input[type="url"], textarea, select {
+        input, textarea, select {
             width: 100%;
-            margin-bottom: 12px;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
         }
-        .inline-fields {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-        .inline-fields label {
-            margin-bottom: 0;
-        }
-        .inline-fields input[type="text"] {
-            width: auto;
-            flex: 1;
-        }
-        input[type="submit"], #cancelButton, #backButton {
-            margin-top: 20px;
-            display: inline-block;
-        }
-        #cancelButton, #backButton {
-            margin-left: 10px;
-        }
-        #linkContainer {
-            margin-top: 20px;
-        }
-        #salesLink {
-            width: 100%;
-            background: none;
+        input[type="submit"], button {
+            background-color: #3498db;
+            color: #fff;
             border: none;
-            color: blue;
-            text-decoration: underline;
+            padding: 10px 20px;
+            border-radius: 5px;
             cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        input[type="submit"]:hover, button:hover {
+            background-color: #2980b9;
         }
         #imagePreview {
+            border: 2px dashed #ccc;
+            border-radius: 5px;
+            padding: 10px;
             width: 150px;
             height: 150px;
-            border: 2px dashed #ccc;
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-bottom: 12px;
+            margin-bottom: 15px;
             overflow: hidden;
         }
         #imagePreview img {
