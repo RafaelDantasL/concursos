@@ -122,6 +122,10 @@
         <button type="button" id="backButton">Voltar</button>
     </form>
 
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-storage.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
+
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyC-STt5EnVQA5oJEF1Vie3rHk1qOW9TqMw",
@@ -132,6 +136,8 @@
             messagingSenderId: "121871815126",
             appId: "1:121871815126:web:1ea3e4630b3b4de6569477"
         };
+
+        firebase.initializeApp(firebaseConfig);
 
         const courseId = new URLSearchParams(window.location.search).get('id');
         const googleAppScriptURL = 'https://script.google.com/macros/s/AKfycbw1D00ZwYgamELnCmyF-Xs9uE6qB8O307eUmPnP3aNozM_ZAMNayRPv_hGmVziNzrA/exec';
@@ -150,6 +156,53 @@
             } else {
                 imagePreview.innerHTML = '<span>Preview da Imagem</span>';
             }
+        });
+
+        if (courseId) {
+            fetch(`${firebaseConfig.databaseURL}/cursos/${courseId}.json`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data) {
+                        document.getElementById('titulo').value = data.titulo;
+                        document.getElementById('descricao').value = data.descricao;
+                        document.getElementById('sobre').value = data.sobre;
+                        document.getElementById('preco').value = formatCurrency(data.preco);
+                        document.getElementById('promocao').value = formatCurrency(data.promocao);
+                        document.getElementById('parcelamento').value = data.parcelamento;
+                        document.getElementById('valorParcelamento').value = formatCurrency(data.valorParcelamento);
+                        document.getElementById('checkout').value = data.checkout;
+                        document.getElementById('widget').value = data.widget;
+                        imagePreview.innerHTML = `<img src="${data.imagem}" alt="Imagem Atual">`;
+
+                        if (data.link) {
+                            document.getElementById('salesLink').textContent = `https://rafaeldantasl.github.io/concursos/cs/${courseId}`;
+                            document.getElementById('salesLink').href = `https://rafaeldantasl.github.io/concursos/cs/${courseId}`;
+                            document.getElementById('linkContainer').style.display = 'block';
+                        }
+                    }
+                });
+        }
+
+        function formatCurrency(value) {
+            value = value.replace(/\D/g, '');
+            value = (value / 100).toFixed(2);
+            return 'R$ ' + value.replace('.', ',');
+        }
+
+        function handleCurrencyInput(event) {
+            event.target.value = formatCurrency(event.target.value);
+        }
+
+        document.getElementById('preco').addEventListener('input', handleCurrencyInput);
+        document.getElementById('promocao').addEventListener('input', handleCurrencyInput);
+        document.getElementById('valorParcelamento').addEventListener('input', handleCurrencyInput);
+
+        document.getElementById('cancelButton').addEventListener('click', function() {
+            window.location.href = '../ctrl';
+        });
+
+        document.getElementById('backButton').addEventListener('click', function() {
+            window.location.href = '../ctrl';
         });
 
         document.getElementById('courseForm').addEventListener('submit', async function(event) {
