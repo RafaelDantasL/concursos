@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Adicionar/Editar Curso</title>
+    <title>🤳🏼📲Adicionar/Editar Curso</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -83,7 +83,7 @@
         <div id="imagePreview">
             <span>Preview da Imagem</span>
         </div>
-        <input type="file" id="imagemUpload" name="imagemUpload" accept="image/*" required>
+        <input type="file" id="imagemUpload" name="imagemUpload" accept="image/*">
 
         <!-- Campos de Preço, Promoção e Parcelamento em uma linha -->
         <div class="inline-fields">
@@ -141,6 +141,7 @@
 
         const courseId = new URLSearchParams(window.location.search).get('id');
         const googleAppScriptURL = 'https://script.google.com/macros/s/AKfycbw1D00ZwYgamELnCmyF-Xs9uE6qB8O307eUmPnP3aNozM_ZAMNayRPv_hGmVziNzrA/exec';
+        let currentImageUrl = null;
 
         // Mostrar prévia da imagem
         const imagePreview = document.getElementById('imagePreview');
@@ -173,6 +174,8 @@
                         document.getElementById('checkout').value = data.checkout;
                         document.getElementById('widget').value = data.widget;
                         imagePreview.innerHTML = `<img src="${data.imagem}" alt="Imagem Atual">`;
+
+                        currentImageUrl = data.imagem;
 
                         if (data.link) {
                             document.getElementById('salesLink').textContent = `https://rafaeldantasl.github.io/concursos/cs/${courseId}`;
@@ -211,13 +214,23 @@
             const formData = new FormData(event.target);
             const courseData = Object.fromEntries(formData.entries());
 
-            // Upload da imagem para o Firebase Storage
-            const file = formData.get('imagemUpload');
-            const storageRef = firebase.storage().ref();
-            const imageRef = storageRef.child(`images/${Date.now()}_${file.name}`);
-            await imageRef.put(file);
-            const imageUrl = await imageRef.getDownloadURL();
-            courseData.imagem = imageUrl;
+            if (imageUpload.files.length > 0) {
+                // Se houver uma nova imagem, deletar a antiga
+                if (currentImageUrl) {
+                    const oldImageRef = firebase.storage().refFromURL(currentImageUrl);
+                    await oldImageRef.delete();
+                }
+
+                // Upload da nova imagem para o Firebase Storage
+                const file = formData.get('imagemUpload');
+                const storageRef = firebase.storage().ref();
+                const imageRef = storageRef.child(`images/${Date.now()}_${file.name}`);
+                await imageRef.put(file);
+                const imageUrl = await imageRef.getDownloadURL();
+                courseData.imagem = imageUrl;
+            } else {
+                courseData.imagem = currentImageUrl; // Mantém a URL da imagem antiga se não houver nova imagem
+            }
 
             // Salvar no Firebase
             const response = await fetch(`${firebaseConfig.databaseURL}/cursos/${courseId ? courseId : ''}.json`, {
