@@ -19,19 +19,6 @@
         </div>
     </header>
 
-    <nav>
-        <ul class="menu">
-            <li><a href="#">Home</a></li>
-            <li><a href="#">Cursos</a></li>
-            <li><a href="#">Sobre</a></li>
-            <li><a href="#">Contato</a></li>
-        </ul>
-        <div class="menu-hamburguer" onclick="toggleMenu()">
-            <span></span>
-            <span></span>
-            <span></span>
-        </div>
-    </nav>
 
     <main>
         <div class="barra-pesquisa">
@@ -45,5 +32,23 @@
             <!-- Paginação gerada dinamicamente aqui -->
         </div>
     </main>
+
+
+<script>
+    function incluirMenu() {
+        fetch('menu.html')
+            .then(response => response.text())
+            .then(data => {
+                document.querySelector('nav').innerHTML = data;
+            })
+            .catch(error => console.error('Erro ao carregar o menu:', error));
+    }
+
+    incluirMenu(); // Chama a função para carregar o menu
+</script>
+
+
+
+
 </body>
 </html>
