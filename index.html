@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minha Empresa 2</title>
+    <title>Minha Empresa</title>
     <link rel="stylesheet" href="styles.css">
     <!-- Carregar as bibliotecas Firebase -->
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
@@ -35,19 +35,16 @@
         </div>
     </main>
 
-
-<script>
-    function incluirMenu() {
-        fetch('menu.html')
-            .then(response => response.text())
-            .then(data => {
-                document.querySelector('nav').innerHTML = data;
-            })
-            .catch(error => console.error('Erro ao carregar o menu:', error));
-    }
-
-    incluirMenu(); // Chama a função para carregar o menu
-</script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            fetch('menu.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('menu-placeholder').innerHTML = data;
+                })
+                .catch(error => console.error('Erro ao carregar o menu:', error));
+        });
+    </script>
 
 </body>
 </html>
