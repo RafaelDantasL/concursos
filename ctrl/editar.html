@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Adicionar/Editar Curso firebase</title>
+    <title>📲Adicionar/Editar Curso</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -15,7 +15,7 @@
             display: block;
             margin-bottom: 8px;
         }
-        input[type="text"], input[type="url"], textarea, select {
+        input[type="text"], input[type="file"], textarea, select {
             width: 100%;
             margin-bottom: 12px;
         }
@@ -50,18 +50,12 @@
             cursor: pointer;
         }
         #imagePreview {
-            width: 200px;
-            height: 200px;
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            display: block;
+            margin-top: 10px;
             border: 1px solid #ccc;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 12px;
-            cursor: pointer;
-        }
-        #imagePreview img {
-            max-width: 100%;
-            max-height: 100%;
         }
     </style>
 </head>
@@ -78,12 +72,9 @@
         <label for="sobre">Sobre:</label>
         <textarea id="sobre" name="sobre" maxlength="500" rows="4"></textarea>
 
-        <!-- Campo de upload da imagem com prévia -->
-        <label for="uploadImage">Imagem do Curso:</label>
-        <div id="imagePreview">
-            <span>Carregar Imagem</span>
-        </div>
-        <input type="file" id="uploadImage" name="uploadImage" accept="image/*" style="display: none;">
+        <label for="imagem">Imagem do Curso:</label>
+        <input type="file" id="imagem" name="imagem" accept="image/*">
+        <img id="imagePreview" src="" alt="Pré-visualização da Imagem">
 
         <!-- Campos de Preço, Promoção e Parcelamento em uma linha -->
         <div class="inline-fields">
@@ -122,10 +113,9 @@
         <button type="button" id="backButton">Voltar</button>
     </form>
 
-    <script src="https://www.gstatic.com/firebasejs/9.6.8/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.8/firebase-storage.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.8/firebase-database.js"></script>
-
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyC-STt5EnVQA5oJEF1Vie3rHk1qOW9TqMw",
@@ -137,43 +127,45 @@
             appId: "1:121871815126:web:1ea3e4630b3b4de6569477"
         };
 
-        // Inicializar o Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const storage = firebase.storage();
-        const database = firebase.database();
+        firebase.initializeApp(firebaseConfig);
+        const storageRef = firebase.storage().ref('Cursos');
+        const databaseRef = firebase.database().ref('cursos');
 
         const courseId = new URLSearchParams(window.location.search).get('id');
-        const googleAppScriptURL = 'https://script.google.com/macros/s/AKfycbw1D00ZwYgamELnCmyF-Xs9uE6qB8O307eUmPnP3aNozM_ZAMNayRPv_hGmVziNzrA/exec';
 
-        let uploadedImageUrl = '';  // URL da imagem armazenada no Firebase
+        if (courseId) {
+            databaseRef.child(courseId).once('value', snapshot => {
+                const data = snapshot.val();
+                if (data) {
+                    document.getElementById('titulo').value = data.titulo;
+                    document.getElementById('descricao').value = data.descricao;
+                    document.getElementById('sobre').value = data.sobre;
+                    document.getElementById('preco').value = formatCurrency(data.preco);
+                    document.getElementById('promocao').value = formatCurrency(data.promocao);
+                    document.getElementById('parcelamento').value = data.parcelamento;
+                    document.getElementById('valorParcelamento').value = formatCurrency(data.valorParcelamento);
+                    document.getElementById('checkout').value = data.checkout;
+                    document.getElementById('widget').value = data.widget;
+                    if (data.imagem) {
+                        document.getElementById('imagePreview').src = data.imagem;
+                    }
+                    if (data.link) {
+                        document.getElementById('salesLink').textContent = data.link;
+                        document.getElementById('salesLink').href = data.link;
+                        document.getElementById('linkContainer').style.display = 'block';
+                    }
+                }
+            });
+        }
 
-        const imagePreviewDiv = document.getElementById('imagePreview');
-        const uploadImageInput = document.getElementById('uploadImage');
-
-        // Quando clicar no quadrado, abrir o seletor de arquivos
-        imagePreviewDiv.addEventListener('click', () => {
-            uploadImageInput.click();
-        });
-
-        // Quando a imagem for selecionada, exibir a prévia e armazenar o caminho completo
-        uploadImageInput.addEventListener('change', async function(event) {
+        document.getElementById('imagem').addEventListener('change', function(event) {
             const file = event.target.files[0];
-
             if (file) {
                 const reader = new FileReader();
-
                 reader.onload = function(e) {
-                    imagePreviewDiv.innerHTML = `<img src="${e.target.result}">`;
+                    document.getElementById('imagePreview').src = e.target.result;
                 };
-                reader.readAsDataURL(file);  // Ler o conteúdo do arquivo e exibir a prévia
-
-                // Upload da imagem para o Firebase Storage
-                const storageRef = storage.ref().child(`imagens/${file.name}`);
-                const snapshot = await storageRef.put(file);
-
-                // Obter a URL de download da imagem
-                uploadedImageUrl = await snapshot.ref.getDownloadURL();
-                console.log("URL da imagem carregada:", uploadedImageUrl);
+                reader.readAsDataURL(file);
             }
         });
 
@@ -182,11 +174,37 @@
 
             const formData = new FormData(event.target);
             const courseData = Object.fromEntries(formData.entries());
+            let imageURL = '';
 
-            // Adicionar a chave 'local' com a URL da imagem armazenada
-            courseData.local = uploadedImageUrl;
+            if (courseId) {
+                const imageFile = formData.get('imagem');
 
-            // Salvar os dados no Firebase Realtime Database
+                if (imageFile.size > 0) {  // Verifica se uma nova imagem foi carregada
+                    // Deletar a imagem antiga antes de carregar a nova
+                    const oldData = (await databaseRef.child(courseId).once('value')).val();
+                    if (oldData && oldData.imagem) {
+                        const oldImageRef = firebase.storage().refFromURL(oldData.imagem);
+                        await oldImageRef.delete();
+                    }
+
+                    // Upload da nova imagem
+                    const imageRef = storageRef.child(`${courseId}.jpg`);
+                    await imageRef.put(imageFile);
+                    imageURL = await imageRef.getDownloadURL();
+                    courseData.imagem = imageURL;
+                }
+            } else {
+                const imageFile = formData.get('imagem');
+
+                if (imageFile.size > 0) {  // Verifica se uma imagem foi carregada para um novo curso
+                    const imageRef = storageRef.child(`${new Date().getTime()}.jpg`);
+                    await imageRef.put(imageFile);
+                    imageURL = await imageRef.getDownloadURL();
+                    courseData.imagem = imageURL;
+                }
+            }
+
+            // Salvar ou atualizar o curso no Firebase Database
             const response = await fetch(`${firebaseConfig.databaseURL}/cursos/${courseId ? courseId : ''}.json`, {
                 method: courseId ? 'PATCH' : 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -202,6 +220,28 @@
             } else {
                 console.error('Erro ao salvar o curso:', response.statusText);
             }
+        });
+
+        function formatCurrency(value) {
+            value = value.replace(/\D/g, '');
+            value = (value / 100).toFixed(2);
+            return 'R$ ' + value.replace('.', ',');
+        }
+
+        document.getElementById('preco').addEventListener('input', handleCurrencyInput);
+        document.getElementById('promocao').addEventListener('input', handleCurrencyInput);
+        document.getElementById('valorParcelamento').addEventListener('input', handleCurrencyInput);
+
+        function handleCurrencyInput(event) {
+            event.target.value = formatCurrency(event.target.value);
+        }
+
+        document.getElementById('cancelButton').addEventListener('click', function() {
+            window.location.href = '../ctrl';
+        });
+
+        document.getElementById('backButton').addEventListener('click', function() {
+            window.location.href = '../ctrl';
         });
     </script>
 </body>
