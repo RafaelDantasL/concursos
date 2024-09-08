@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>(*) Adicionar/Editar Curso (*)</title>
+    <title>Adicionar/Editar Curso</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -49,11 +49,20 @@
             text-decoration: underline;
             cursor: pointer;
         }
-        #previewImagem {
-            margin-top: 10px;
-            width: 200px;
-            height: auto;
-            display: none;
+        #imagePreview {
+            width: 150px;
+            height: 150px;
+            border: 2px dashed #ccc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 12px;
+            overflow: hidden;
+        }
+        #imagePreview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
     </style>
 </head>
@@ -70,9 +79,11 @@
         <label for="sobre">Sobre:</label>
         <textarea id="sobre" name="sobre" maxlength="500" rows="4"></textarea>
 
-        <label for="imagem">Imagem:</label>
-        <input type="file" id="imagem" name="imagem" accept="image/*" required>
-        <img id="previewImagem" src="" alt="Prévia da Imagem">
+        <label for="imagemUpload">Imagem do Curso:</label>
+        <div id="imagePreview">
+            <span>Preview da Imagem</span>
+        </div>
+        <input type="file" id="imagemUpload" name="imagemUpload" accept="image/*" required>
 
         <!-- Campos de Preço, Promoção e Parcelamento em uma linha -->
         <div class="inline-fields">
@@ -112,7 +123,6 @@
     </form>
 
     <script>
-        // Configuração do Firebase e Storage
         const firebaseConfig = {
             apiKey: "AIzaSyC-STt5EnVQA5oJEF1Vie3rHk1qOW9TqMw",
             authDomain: "cursos-preparatorios.firebaseapp.com",
@@ -123,57 +133,40 @@
             appId: "1:121871815126:web:1ea3e4630b3b4de6569477"
         };
 
-        firebase.initializeApp(firebaseConfig);
-        const storage = firebase.storage();
-
         const courseId = new URLSearchParams(window.location.search).get('id');
         const googleAppScriptURL = 'https://script.google.com/macros/s/AKfycbw1D00ZwYgamELnCmyF-Xs9uE6qB8O307eUmPnP3aNozM_ZAMNayRPv_hGmVziNzrA/exec';
 
-        const imagemInput = document.getElementById('imagem');
-        const previewImagem = document.getElementById('previewImagem');
-
-        // Exibir prévia da imagem
-        imagemInput.addEventListener('change', function(event) {
-            const file = event.target.files[0];
+        // Mostrar prévia da imagem
+        const imagePreview = document.getElementById('imagePreview');
+        const imageUpload = document.getElementById('imagemUpload');
+        imageUpload.addEventListener('change', function() {
+            const file = this.files[0];
             if (file) {
                 const reader = new FileReader();
-                reader.onload = function(e) {
-                    previewImagem.src = e.target.result;
-                    previewImagem.style.display = 'block';
+                reader.onload = function(event) {
+                    imagePreview.innerHTML = `<img src="${event.target.result}" alt="Image Preview">`;
                 }
                 reader.readAsDataURL(file);
+            } else {
+                imagePreview.innerHTML = '<span>Preview da Imagem</span>';
             }
         });
 
-        // Função de upload de imagem para o Firebase Storage
-        async function uploadImagem(file) {
-            const storageRef = storage.ref();
-            const imageRef = storageRef.child(`imagens_cursos/${file.name}`);
-            const snapshot = await imageRef.put(file);
-            const downloadURL = await snapshot.ref.getDownloadURL();
-            return downloadURL;
-        }
-
-        // Substituir o envio do formulário para incluir o upload da imagem
         document.getElementById('courseForm').addEventListener('submit', async function(event) {
             event.preventDefault();
 
             const formData = new FormData(event.target);
             const courseData = Object.fromEntries(formData.entries());
 
-            const file = imagemInput.files[0];
+            // Upload da imagem para o Firebase Storage
+            const file = formData.get('imagemUpload');
+            const storageRef = firebase.storage().ref();
+            const imageRef = storageRef.child(`images/${Date.now()}_${file.name}`);
+            await imageRef.put(file);
+            const imageUrl = await imageRef.getDownloadURL();
+            courseData.imagem = imageUrl;
 
-            if (file) {
-                try {
-                    const imageUrl = await uploadImagem(file);
-                    courseData.imagem = imageUrl;  // Salvar a URL da imagem no banco de dados
-                } catch (error) {
-                    console.error('Erro ao fazer upload da imagem:', error);
-                    return;
-                }
-            }
-
-            // Salvar os dados do curso no Firebase Database
+            // Salvar no Firebase
             const response = await fetch(`${firebaseConfig.databaseURL}/cursos/${courseId ? courseId : ''}.json`, {
                 method: courseId ? 'PATCH' : 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -200,7 +193,7 @@
             if (courseToPublish) {
                 const scriptResponse = await fetch(`${googleAppScriptURL}?id=${courseToPublish}`, {
                     method: 'GET',
-                    credentials: 'include'
+                    credentials: 'include' // Incluir as credenciais do usuário logado
                 });
 
                 if (scriptResponse.ok) {
@@ -218,7 +211,7 @@
                     document.getElementById('salesLink').href = salesLink;
                     document.getElementById('linkContainer').style.display = 'block';
 
-                    sessionStorage.removeItem('courseToPublish');
+                    sessionStorage.removeItem('courseToPublish'); // Limpar a sessionStorage
                 } else {
                     console.error('Erro ao solicitar o Apps Script:', scriptResponse.statusText);
                 }
