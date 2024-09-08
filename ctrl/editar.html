@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Adicionar/Editar Curso</title>
+    <title>(*) Adicionar/Editar Curso (*)</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -49,6 +49,12 @@
             text-decoration: underline;
             cursor: pointer;
         }
+        #previewImagem {
+            margin-top: 10px;
+            width: 200px;
+            height: auto;
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -64,8 +70,9 @@
         <label for="sobre">Sobre:</label>
         <textarea id="sobre" name="sobre" maxlength="500" rows="4"></textarea>
 
-        <label for="imagem">URL da Imagem:</label>
-        <input type="url" id="imagem" name="imagem" placeholder="https://exemplo.com/imagem.jpg" required>
+        <label for="imagem">Imagem:</label>
+        <input type="file" id="imagem" name="imagem" accept="image/*" required>
+        <img id="previewImagem" src="" alt="Prévia da Imagem">
 
         <!-- Campos de Preço, Promoção e Parcelamento em uma linha -->
         <div class="inline-fields">
@@ -105,6 +112,7 @@
     </form>
 
     <script>
+        // Configuração do Firebase e Storage
         const firebaseConfig = {
             apiKey: "AIzaSyC-STt5EnVQA5oJEF1Vie3rHk1qOW9TqMw",
             authDomain: "cursos-preparatorios.firebaseapp.com",
@@ -115,63 +123,57 @@
             appId: "1:121871815126:web:1ea3e4630b3b4de6569477"
         };
 
+        firebase.initializeApp(firebaseConfig);
+        const storage = firebase.storage();
+
         const courseId = new URLSearchParams(window.location.search).get('id');
         const googleAppScriptURL = 'https://script.google.com/macros/s/AKfycbw1D00ZwYgamELnCmyF-Xs9uE6qB8O307eUmPnP3aNozM_ZAMNayRPv_hGmVziNzrA/exec';
 
-        if (courseId) {
-            fetch(`${firebaseConfig.databaseURL}/cursos/${courseId}.json`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data) {
-                        document.getElementById('titulo').value = data.titulo;
-                        document.getElementById('descricao').value = data.descricao;
-                        document.getElementById('sobre').value = data.sobre;
-                        document.getElementById('imagem').value = data.imagem;
-                        document.getElementById('preco').value = formatCurrency(data.preco);
-                        document.getElementById('promocao').value = formatCurrency(data.promocao);
-                        document.getElementById('parcelamento').value = data.parcelamento;
-                        document.getElementById('valorParcelamento').value = formatCurrency(data.valorParcelamento);
-                        document.getElementById('checkout').value = data.checkout;
-                        document.getElementById('widget').value = data.widget;
+        const imagemInput = document.getElementById('imagem');
+        const previewImagem = document.getElementById('previewImagem');
 
-                        if (data.link) {
-                            document.getElementById('salesLink').textContent = `https://rafaeldantasl.github.io/concursos/cs/${courseId}`;
-                            document.getElementById('salesLink').href = `https://rafaeldantasl.github.io/concursos/cs/${courseId}`;
-                            document.getElementById('linkContainer').style.display = 'block';
-                        }
-                    }
-                });
-        }
-
-        function formatCurrency(value) {
-            value = value.replace(/\D/g, '');
-            value = (value / 100).toFixed(2);
-            return 'R$ ' + value.replace('.', ',');
-        }
-
-        function handleCurrencyInput(event) {
-            event.target.value = formatCurrency(event.target.value);
-        }
-
-        document.getElementById('preco').addEventListener('input', handleCurrencyInput);
-        document.getElementById('promocao').addEventListener('input', handleCurrencyInput);
-        document.getElementById('valorParcelamento').addEventListener('input', handleCurrencyInput);
-
-        document.getElementById('cancelButton').addEventListener('click', function() {
-            window.location.href = '../ctrl';
+        // Exibir prévia da imagem
+        imagemInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImagem.src = e.target.result;
+                    previewImagem.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            }
         });
 
-        document.getElementById('backButton').addEventListener('click', function() {
-            window.location.href = '../ctrl';
-        });
+        // Função de upload de imagem para o Firebase Storage
+        async function uploadImagem(file) {
+            const storageRef = storage.ref();
+            const imageRef = storageRef.child(`imagens_cursos/${file.name}`);
+            const snapshot = await imageRef.put(file);
+            const downloadURL = await snapshot.ref.getDownloadURL();
+            return downloadURL;
+        }
 
+        // Substituir o envio do formulário para incluir o upload da imagem
         document.getElementById('courseForm').addEventListener('submit', async function(event) {
             event.preventDefault();
 
             const formData = new FormData(event.target);
             const courseData = Object.fromEntries(formData.entries());
 
-            // Salvar no Firebase
+            const file = imagemInput.files[0];
+
+            if (file) {
+                try {
+                    const imageUrl = await uploadImagem(file);
+                    courseData.imagem = imageUrl;  // Salvar a URL da imagem no banco de dados
+                } catch (error) {
+                    console.error('Erro ao fazer upload da imagem:', error);
+                    return;
+                }
+            }
+
+            // Salvar os dados do curso no Firebase Database
             const response = await fetch(`${firebaseConfig.databaseURL}/cursos/${courseId ? courseId : ''}.json`, {
                 method: courseId ? 'PATCH' : 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -198,7 +200,7 @@
             if (courseToPublish) {
                 const scriptResponse = await fetch(`${googleAppScriptURL}?id=${courseToPublish}`, {
                     method: 'GET',
-                    credentials: 'include' // Incluir as credenciais do usuário logado
+                    credentials: 'include'
                 });
 
                 if (scriptResponse.ok) {
@@ -216,7 +218,7 @@
                     document.getElementById('salesLink').href = salesLink;
                     document.getElementById('linkContainer').style.display = 'block';
 
-                    sessionStorage.removeItem('courseToPublish'); // Limpar a sessionStorage
+                    sessionStorage.removeItem('courseToPublish');
                 } else {
                     console.error('Erro ao solicitar o Apps Script:', scriptResponse.statusText);
                 }
