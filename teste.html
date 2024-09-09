@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página Inicial</title>
+</head>
+<body>
+    <!-- Aqui será inserido o menu -->
+    <div id="menu-placeholder"></div>
+
+    <h1>Bem-vindo ao meu site!</h1>
+    <p>Este é o conteúdo principal da página.</p>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            fetch('menu.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('menu-placeholder').innerHTML = data;
+                })
+                .catch(error => console.error('Erro ao carregar o menu:', error));
+        });
+    </script>
+</body>
+</html>
