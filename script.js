@@ -115,42 +115,35 @@ document.addEventListener("DOMContentLoaded", function () {
     fetch('menu.html')
         .then(response => response.text())
         .then(data => {
-            document.getElementById('menu-deslizante').innerHTML = data;
+            document.getElementById('menu-placeholder').innerHTML = data;
         })
         .catch(error => console.error('Erro ao carregar o menu:', error));
 
     const menuHamburguer = document.getElementById('menu-hamburguer');
     const menuDeslizante = document.getElementById('menu-deslizante');
     const menuVoltar = document.getElementById('menu-voltar');
-    const body = document.body;
+    const overlay = document.createElement('div');
+    overlay.classList.add('overlay');
+    document.body.appendChild(overlay);
 
     // Abrir o menu deslizante
     menuHamburguer.addEventListener('click', function () {
         menuDeslizante.classList.add('show');
-        body.classList.add('menu-aberto');
-        document.querySelector('main').classList.add('body-desfocado');
-        document.querySelector('header').classList.add('body-desfocado');
+        overlay.classList.add('show');
     });
 
     // Fechar o menu deslizante ao clicar no botão "Voltar"
     menuVoltar.addEventListener('click', function () {
         menuDeslizante.classList.remove('show');
-        body.classList.remove('menu-aberto');
-        document.querySelector('main').classList.remove('body-desfocado');
-        document.querySelector('header').classList.remove('body-desfocado');
+        overlay.classList.remove('show');
     });
 
     // Fechar o menu deslizante ao clicar fora dele
-    document.addEventListener('click', function (event) {
-        if (!menuDeslizante.contains(event.target) && !menuHamburguer.contains(event.target)) {
-            menuDeslizante.classList.remove('show');
-            body.classList.remove('menu-aberto');
-            document.querySelector('main').classList.remove('body-desfocado');
-            document.querySelector('header').classList.remove('body-desfocado');
-        }
+    overlay.addEventListener('click', function () {
+        menuDeslizante.classList.remove('show');
+        overlay.classList.remove('show');
     });
 });
-
 
 // Carregar cursos ao carregar a página
 window.onload = () => carregarCursos(paginaAtual);
