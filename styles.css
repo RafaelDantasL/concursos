@@ -256,3 +256,30 @@ button:hover {
     border-color: #007bb5; /* Cor da borda no hover */
     color: white; /* Cor do texto no hover */
 }
+
+footer {
+    background-color: #2a2a3c;
+    color: #e0e0e0;
+    padding: 20px;
+    text-align: center;
+    border-top: 1px solid #444;
+}
+
+footer .footer-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+footer .footer-nav a {
+    color: #00acee;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+footer .footer-nav a:hover {
+    color: #007bb5;
+}
