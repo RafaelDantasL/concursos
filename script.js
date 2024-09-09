@@ -80,21 +80,25 @@ function buscarCursos() {
             }
         });
 
-        totalCursos = cursos.length;
-        const totalPaginas = Math.ceil(totalCursos / cursosPorPagina);
-        const start = (paginaAtual - 1) * cursosPorPagina;
-        const end = start + cursosPorPagina;
+        if (cursos.length > 0) {
+            totalCursos = cursos.length;
+            const totalPaginas = Math.ceil(totalCursos / cursosPorPagina);
+            const start = (paginaAtual - 1) * cursosPorPagina;
+            const end = start + cursosPorPagina;
 
-        cursos.slice(start, end).forEach(curso => {
-            cursosContainer.innerHTML += `
-                <div class="curso">
-                    <h3>${curso.titulo}</h3>
-                    <img src="${curso.imagem}" alt="${curso.titulo}" class="curso-imagem">
-                    <p>${curso.descricao}</p>
-                    <button class="ver-detalhes-button" onclick="location.href='${curso.link}'">Ver detalhes do curso</button>
-                </div>
-            `;
-        });
+            cursos.slice(start, end).forEach(curso => {
+                cursosContainer.innerHTML += `
+                    <div class="curso">
+                        <h3>${curso.titulo}</h3>
+                        <img src="${curso.imagem}" alt="${curso.titulo}" class="curso-imagem">
+                        <p>${curso.descricao}</p>
+                        <button class="ver-detalhes-button" onclick="location.href='${curso.link}'">Ver detalhes do curso</button>
+                    </div>
+                `;
+            });
+        } else {
+            cursosContainer.innerHTML = `<p>Nenhum resultado encontrado para a sua pesquisa.</p>`;
+        }
     });
 }
 
