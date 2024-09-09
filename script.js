@@ -13,7 +13,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
-const cursosPorPagina = 8;
+const cursosPorPagina = 4;
 let paginaAtual = 1;
 let totalCursos = 0;
 
