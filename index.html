@@ -16,6 +16,9 @@
         <div class="logo-nome">
             <img src="logo.png" alt="Logo" class="logo">
             <h1>Nome da Empresa</h1>
+                    <button class="menu-hamburguer" id="menu-hamburguer">
+            &#9776;
+        </button>
         </div>
     </header>
 
@@ -44,7 +47,28 @@
                 })
                 .catch(error => console.error('Erro ao carregar o menu:', error));
         });
-    </script>
 
+
+document.addEventListener("DOMContentLoaded", function () {
+    fetch('menu.html')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('menu-placeholder').innerHTML = data;
+        })
+        .catch(error => console.error('Erro ao carregar o menu:', error));
+
+    const menuHamburguer = document.getElementById('menu-hamburguer');
+    const menuPlaceholder = document.getElementById('menu-placeholder');
+
+    menuHamburguer.addEventListener('click', function () {
+        const menu = menuPlaceholder.querySelector('.menu');
+        if (menu) {
+            menu.classList.toggle('menu-deslizante');
+            menu.classList.toggle('show');
+        }
+    });
+});
+      
+    </script>
 </body>
 </html>
