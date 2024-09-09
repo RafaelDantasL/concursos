@@ -143,13 +143,16 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-// Carregar cursos ao carregar a página
-window.onload = () => carregarCursos(paginaAtual);
+window.onload = function() {
+    // Carregar cursos ao carregar a página
+    carregarCursos(paginaAtual);
 
-// Carregar o rodapé
+    // Carregar o rodapé após todos os outros recursos terem sido carregados
     fetch('footer.html')
         .then(response => response.text())
         .then(data => {
             document.getElementById('footer-placeholder').innerHTML = data;
         })
         .catch(error => console.error('Erro ao carregar o rodapé:', error));
+};
+
