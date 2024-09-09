@@ -94,27 +94,6 @@ header {
     left: 0; /* Mostrar menu deslizante */
 }
 
-/* Botão "Voltar" */
-.menu-voltar {
-    background-color: transparent;
-    border: none;
-    color: #e0e0e0;
-    font-size: 18px;
-    padding: 10px;
-    text-align: left;
-    cursor: pointer;
-}
-
-/* Efeito de desfoque */
-body.menu-aberto {
-    overflow: hidden; /* Impedir a rolagem da página */
-}
-
-.body-desfocado {
-    filter: blur(4px); /* Aplicar desfoque na área fora do menu */
-    transition: filter 0.3s ease; /* Transição suave para o efeito de desfoque */
-}
-
 .menu-deslizante ul {
     flex-direction: column;
     align-items: flex-start;
