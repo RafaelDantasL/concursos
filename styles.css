@@ -14,17 +14,15 @@ body {
 }
 
 header {
+    position: fixed; /* Atualizado para que o cabeçalho fique fixo */
+    width: 100%;
+    top: 0; /* Posição inicial do cabeçalho */
+    z-index: 1000;
     text-align: center;
     padding: 20px;
     background-color: #2a2a40; /* Fundo do cabeçalho */
     border-bottom: 1px solid #444; /* Linha sutil na parte inferior */
-
-    position: fixed;
-    width: 100%;
-    top: 0;
-    z-index: 1000;
     transition: top 0.3s ease; /* Transição suave ao esconder ou mostrar */
-
 }
 
 .logo-nome {
