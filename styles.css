@@ -7,6 +7,12 @@ body {
     padding: 0;
 }
 
+/* Classe que aplica o desfoque ao conteúdo fora do menu */
+.body-desfocado {
+    filter: blur(5px); /* Grau de desfoque */
+    pointer-events: none; /* Desabilita cliques fora do menu */
+}
+
 header {
     text-align: center;
     padding: 20px;
