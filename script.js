@@ -98,6 +98,65 @@ function buscarCursos() {
         });
     });
 }
+document.addEventListener("DOMContentLoaded", function () {
+    // Carregar o menu
+    fetch('menu.html')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('menu-placeholder').innerHTML = data;
+            document.getElementById('menu-horizontal').innerHTML = data;
+        })
+        .catch(error => console.error('Erro ao carregar o menu:', error));
 
+    const menuHamburguer = document.getElementById('menu-hamburguer');
+    const menuDeslizante = document.getElementById('menu-deslizante');
+    const menuVoltar = document.getElementById('menu-voltar');
+
+    // Abrir o menu deslizante
+    menuHamburguer.addEventListener('click', function () {
+        menuDeslizante.classList.add('show');
+    });
+
+    // Fechar o menu deslizante ao clicar no botão "Voltar"
+    menuVoltar.addEventListener('click', function () {
+        menuDeslizante.classList.remove('show');
+    });
+
+    // Fechar o menu deslizante ao clicar fora dele
+    document.addEventListener('click', function (event) {
+        if (!menuDeslizante.contains(event.target) && !menuHamburguer.contains(event.target)) {
+            menuDeslizante.classList.remove('show');
+        }
+    });
+});
+document.addEventListener("DOMContentLoaded", function () {
+            fetch('menu.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('menu-placeholder').innerHTML = data;
+                })
+                .catch(error => console.error('Erro ao carregar o menu:', error));
+        });
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    fetch('menu.html')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('menu-placeholder').innerHTML = data;
+        })
+        .catch(error => console.error('Erro ao carregar o menu:', error));
+
+    const menuHamburguer = document.getElementById('menu-hamburguer');
+    const menuPlaceholder = document.getElementById('menu-placeholder');
+
+    menuHamburguer.addEventListener('click', function () {
+        const menu = menuPlaceholder.querySelector('.menu');
+        if (menu) {
+            menu.classList.toggle('menu-deslizante');
+            menu.classList.toggle('show');
+        }
+    });
+});
 // Carregar cursos ao carregar a página
 window.onload = () => carregarCursos(paginaAtual);
