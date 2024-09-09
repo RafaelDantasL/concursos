@@ -16,14 +16,18 @@
         <div class="logo-nome">
             <img src="logo.png" alt="Logo" class="logo">
             <h1>Nome da Empresa</h1>
-                    <button class="menu-hamburguer" id="menu-hamburguer">
-            &#9776;
-        </button>
+            <button class="menu-hamburguer" id="menu-hamburguer">&#9776;</button>
         </div>
     </header>
 
     <!-- Aqui será inserido o menu -->
     <div class="menu" id="menu-placeholder"></div>
+    <!-- Aqui será inserido o menu -->
+<div class="menu-deslizante" id="menu-deslizante">
+    <button id="menu-voltar" class="menu-voltar">&larr; Voltar</button>
+    <div id="menu-placeholder"></div>
+</div>
+<div class="menu-horizontal" id="menu-horizontal"></div>
     
     <main>
         <div class="barra-pesquisa">
@@ -37,38 +41,5 @@
             <!-- Paginação gerada dinamicamente aqui -->
         </div>
     </main>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            fetch('menu.html')
-                .then(response => response.text())
-                .then(data => {
-                    document.getElementById('menu-placeholder').innerHTML = data;
-                })
-                .catch(error => console.error('Erro ao carregar o menu:', error));
-        });
-
-
-document.addEventListener("DOMContentLoaded", function () {
-    fetch('menu.html')
-        .then(response => response.text())
-        .then(data => {
-            document.getElementById('menu-placeholder').innerHTML = data;
-        })
-        .catch(error => console.error('Erro ao carregar o menu:', error));
-
-    const menuHamburguer = document.getElementById('menu-hamburguer');
-    const menuPlaceholder = document.getElementById('menu-placeholder');
-
-    menuHamburguer.addEventListener('click', function () {
-        const menu = menuPlaceholder.querySelector('.menu');
-        if (menu) {
-            menu.classList.toggle('menu-deslizante');
-            menu.classList.toggle('show');
-        }
-    });
-});
-      
-    </script>
 </body>
 </html>
