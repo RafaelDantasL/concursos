@@ -17,7 +17,7 @@ header {
 .logo-nome {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between; /* Espaço entre logo e botão hambúrguer */
 }
 
 .logo {
@@ -56,6 +56,54 @@ header {
 .menu a:hover {
     color: #ffffff; /* Cor do texto ao passar o mouse */
     background-color: #00acee; /* Cor de fundo ao passar o mouse */
+}
+
+/* Estilo do botão hambúrguer */
+.menu-hamburguer {
+    display: none; /* Escondido por padrão */
+    font-size: 30px;
+    color: #e0e0e0;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+/* Estilo do menu deslizante */
+.menu-deslizante {
+    position: fixed;
+    top: 0;
+    left: -250px;
+    width: 250px;
+    height: 100%;
+    background-color: #2b2b44;
+    transition: left 0.3s ease;
+    z-index: 1000;
+    padding-top: 60px;
+}
+
+.menu-deslizante ul {
+    flex-direction: column;
+    align-items: flex-start;
+    padding-left: 20px;
+}
+
+.menu-deslizante li {
+    margin: 15px 0;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .menu ul {
+        display: none; /* Esconder menu padrão em telas pequenas */
+    }
+
+    .menu-hamburguer {
+        display: block; /* Mostrar botão hambúrguer em telas pequenas */
+    }
+
+    .menu-deslizante.show {
+        left: 0; /* Mostrar menu deslizante */
+    }
 }
 
 /* Outros estilos permanecem inalterados... */
