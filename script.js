@@ -132,14 +132,6 @@ document.addEventListener("DOMContentLoaded", function () {
         document.querySelector('header').classList.add('body-desfocado');
     });
 
-    // Fechar o menu deslizante ao clicar no botão "Voltar"
-    menuVoltar.addEventListener('click', function () {
-        menuDeslizante.classList.remove('show');
-        body.classList.remove('menu-aberto');
-        document.querySelector('main').classList.remove('body-desfocado');
-        document.querySelector('header').classList.remove('body-desfocado');
-    });
-
     // Fechar o menu deslizante ao clicar fora dele
     document.addEventListener('click', function (event) {
         if (!menuDeslizante.contains(event.target) && !menuHamburguer.contains(event.target)) {
