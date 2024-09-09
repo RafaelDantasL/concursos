@@ -27,44 +27,52 @@ header {
 }
 
 
-/* Botão "Voltar" */
-.menu-voltar {
-    background-color: transparent;
-    border: none;
-    color: #e0e0e0;
-    font-size: 18px;
-    padding: 10px;
-    text-align: left;
-    cursor: pointer;
-}
-
-
-
 /* Menu Horizontal (Computadores) */
 .menu-horizontal {
-    display: flex;
-    justify-content: center;
+    display: flex; /* Exibir itens em uma linha */
+    justify-content: center; /* Centralizar itens na barra */
+    align-items: center; /* Alinhar verticalmente os itens */
     background-color: #2b2b44; /* Fundo do menu */
-    padding: 10px 0;
+    padding: 10px 0; /* Espaçamento vertical do menu */
     list-style: none; /* Remove os marcadores da lista */
+    margin: 0; /* Remove margens padrão */
+    gap: 15px; /* Espaçamento entre os itens do menu */
+}
+
+.menu-horizontal ul {
+    display: flex; /* Organizar itens em linha */
+    justify-content: center; /* Centralizar o conteúdo do menu */
+    padding: 0; /* Remove padding padrão */
+    margin: 0; /* Remove margens padrão */
+    list-style: none; /* Remove marcadores da lista */
 }
 
 .menu-horizontal li {
-    margin: 0 15px;
+    margin: 0 15px; /* Espaçamento lateral entre os itens do menu */
 }
 
 .menu-horizontal a {
-    color: #e0e0e0;
-    text-decoration: none;
-    font-weight: bold;
-    padding: 10px 15px;
-    border-radius: 5px;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    color: #e0e0e0; /* Cor do texto dos itens do menu */
+    text-decoration: none; /* Remove sublinhado do texto */
+    font-weight: bold; /* Negrito para o texto do menu */
+    padding: 10px 15px; /* Espaçamento interno dos itens do menu */
+    border-radius: 5px; /* Bordas arredondadas dos itens */
+    transition: background-color 0.3s ease, color 0.3s ease; /* Transições suaves para hover */
 }
 
 .menu-horizontal a:hover {
     color: #ffffff; /* Cor do texto ao passar o mouse */
     background-color: #00acee; /* Cor de fundo ao passar o mouse */
+}
+
+/* Estilo do botão hambúrguer */
+.menu-hamburguer {
+    display: none; /* Escondido em telas grandes */
+    font-size: 30px;
+    color: #e0e0e0;
+    background: none;
+    border: none;
+    cursor: pointer;
 }
 
 /* Menu Deslizante (Mobile) */
@@ -141,7 +149,6 @@ header {
         display: none; /* Esconder menu deslizante em telas grandes */
     }
 }
-
 
 /* Outros estilos permanecem inalterados... */
 
