@@ -143,6 +143,28 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
+document.addEventListener("DOMContentLoaded", function () {
+    let lastScrollTop = 0;
+    const header = document.querySelector('header');
+
+    // Detectar rolagem e mostrar/ocultar o cabeçalho em dispositivos móveis
+    window.addEventListener('scroll', function() {
+        // Verificar se está em um dispositivo móvel
+        if (window.innerWidth <= 768) {
+            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            
+            if (scrollTop > lastScrollTop) {
+                // Rolando para baixo - esconder cabeçalho
+                header.style.top = "-100px"; // Esconde o cabeçalho (ajuste o valor se necessário)
+            } else {
+                // Rolando para cima - mostrar cabeçalho
+                header.style.top = "0";
+            }
+            
+            lastScrollTop = scrollTop <= 0 ? 0 : scrollTop; // Previne valores negativos de scroll
+        }
+    });
+});
 
 // Carregar cursos ao carregar a página
 window.onload = () => carregarCursos(paginaAtual);
