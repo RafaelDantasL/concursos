@@ -144,25 +144,35 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 document.addEventListener("DOMContentLoaded", function () {
-    let lastScrollTop = 0;
+    const barraTopo = document.getElementById('barra-topo');
     const header = document.querySelector('header');
+    let lastScrollTop = 0;
 
-    // Detectar rolagem e mostrar/ocultar o cabeçalho em dispositivos móveis
+    // Detectar rolagem e mostrar/ocultar a barra
     window.addEventListener('scroll', function() {
-        // Verificar se está em um dispositivo móvel
-        if (window.innerWidth <= 768) {
-            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-            
-            if (scrollTop > lastScrollTop) {
-                // Rolando para baixo - esconder cabeçalho
-                header.style.top = "-100px"; // Esconde o cabeçalho (ajuste o valor se necessário)
-            } else {
-                // Rolando para cima - mostrar cabeçalho
-                header.style.top = "0";
-            }
-            
-            lastScrollTop = scrollTop <= 0 ? 0 : scrollTop; // Previne valores negativos de scroll
+        let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const headerHeight = header.offsetHeight;
+
+        // Se a página foi rolada para baixo e o cabeçalho saiu de vista
+        if (scrollTop > headerHeight) {
+            barraTopo.style.top = "0"; // Mostrar a barra
+        } else {
+            barraTopo.style.top = "-100px"; // Ocultar a barra quando o cabeçalho está visível
         }
+
+        lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+    });
+
+    // Sincronizar o ícone do menu hambúrguer da barra com o menu deslizante
+    const menuHamburguerBarra = document.getElementById('menu-hamburguer-barra');
+    const menuDeslizante = document.getElementById('menu-deslizante');
+    const body = document.body;
+
+    menuHamburguerBarra.addEventListener('click', function () {
+        menuDeslizante.classList.add('show');
+        body.classList.add('menu-aberto');
+        document.querySelector('main').classList.add('body-desfocado');
+        document.querySelector('header').classList.add('body-desfocado');
     });
 });
 
