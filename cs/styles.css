@@ -1,0 +1,135 @@
+/* Estilos adicionais para a página de vendas */
+      .vendas-page {
+        padding: 20px;
+        max-width: 900px;
+        margin: 0 auto;
+      }
+
+      .course-title {
+        text-align: center;
+        font-size: 2.5em;
+        margin-bottom: 20px;
+        color: #e0e0e0;
+      }
+
+      .course-image {
+        width: 600px;
+        height: 600px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+        display: block;
+        margin-left: auto;
+        margin-right: auto; /* Centraliza a imagem */
+      }
+
+      .course-section-title {
+        text-align: center;
+        font-size: 1.5em;
+        color: #e0e0e0;
+        padding: 10px;
+        width: 600px;
+        margin: 0 auto 20px auto; /* Centralizado */
+      }
+
+      .course-description {
+        text-align: justify;
+        hyphens: auto;
+        margin-bottom: 30px;
+        color: #e0e0e0;
+      }
+
+      /* Vantagens separadas por linhas pontilhadas */
+      .course-advantages {
+        margin-bottom: 20px;
+        font-weight: bold;
+      }
+
+      .course-advantages li {
+        padding: 10px;
+        margin-bottom: 10px;
+        border-bottom: 2px dotted #28a745; /* Linha pontilhada verde */
+        list-style: none; /* Remove marcadores */
+        display: flex;
+        align-items: center;
+      }
+
+      .course-advantages img {
+        width: 30px;
+        height: 30px;
+        margin-right: 10px;
+      }
+
+      /* Informações de pagamento: fundo cinza, com sombra e cores separadas */
+      .payment-info {
+        border-radius: 10px;
+        margin-bottom: 20px;
+        width: 60%; /* Quadrado mais estreito */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); /* Efeito de sombra */
+        display: inline-block; /* Exibir ao lado da imagem */
+        vertical-align: top; /* Alinhar ao topo da imagem */
+      }
+
+      .payment-price-promo {
+        background-color: #2a2a3c; /* Fundo cinza escuro para preço e promoção */
+        padding: 20px;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+        color: #e0e0e0;
+      }
+
+      .payment-installments {
+        background-color: #1f1f32; /* Fundo diferente para parcelamento */
+        padding: 20px;
+        border-bottom-left-radius: 10px;
+        border-bottom-right-radius: 10px;
+        color: #e0e0e0;
+      }
+
+      .course-price, .course-promo {
+        font-size: 1.5em;
+        margin-bottom: 10px;
+      }
+
+      .course-installments {
+        font-size: 1.5em;
+        margin-bottom: 10px;
+      }
+
+      .guarantee-image {
+        width: 200px;
+        height: 200px;
+        display: inline-block;
+        margin-left: 40px; /* Aumenta a distância entre a imagem e o quadrado */
+        vertical-align: top;
+      }
+
+      /* Botão Comprar Agora separado */
+      .buy-button {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #00acee;
+        color: white;
+        text-decoration: none;
+        font-size: 1.2em;
+        border-radius: 8px;
+        transition: background-color 0.3s ease;
+        margin: 20px 0; /* Espaço entre o botão e os elementos acima e abaixo */
+      }
+
+      .buy-button:hover {
+        background-color: #007bb5;
+      }
+
+      /* Quadrado dos métodos de pagamento */
+      .payments-container {
+        background-color: #2a2a3c; /* Cor de fundo cinza */
+        border-radius: 10px;
+        padding: 20px;
+        text-align: center;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); /* Efeito de sombra */
+      }
+
+      .payments-image {
+        width: 400px;
+        height: 100px;
+      }
