@@ -1,32 +1,33 @@
 
 <html>
   <head>
-	<meta charset="UTF-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PMPB 2028</title>
-    	<link rel="stylesheet" href="../styles.css"> <!-- Estilos globais da p?gina -->
-	<link rel="stylesheet" href="styles.css">
-    	<script src="../script.js" defer></script>   
-	<!-- Favicon para navegadores -->
+    <link rel="stylesheet" href="../styles.css"> <!-- Estilos globais da p?gina -->
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js" defer></script>   
+    <!-- Favicon para navegadores -->
     <link rel="icon" href="../favicon.png" type="image/png">
     <!-- Favicon para dispositivos Apple -->
     <link rel="apple-touch-icon" href="../favicon.png">
   </head>
   <body>
     <header>
-        <div class="logo-nome">
-            <img src="../logo.png" alt="Logo" class="logo">
-            <button class="menu-hamburguer" id="menu-hamburguer">&#9776;</button>
-        </div>
+      <div class="logo-nome">
+        <img src="../logo.png" alt="Logo" class="logo">
+        <button class="menu-hamburguer" id="menu-hamburguer">&#9776;</button>
+      </div>
     </header>
     <!-- Aqui ser? inserido o menu -->
     <div class="menu" id="menu-placeholder"></div>
     <!-- Aqui ser? inserido o menu -->
-<div class="menu-deslizante" id="menu-deslizante">
-    <button id="menu-voltar" class="menu-voltar">&larr; Voltar</button>
-    <div id="menu-placeholder"></div>
-</div>
-<div class="menu-horizontal" id="menu-horizontal"></div>
+    <div class="menu-deslizante" id="menu-deslizante">
+      <button id="menu-voltar" class="menu-voltar">&larr; Voltar</button>
+      <div id="menu-placeholder"></div>
+    </div>
+    <div class="menu-horizontal" id="menu-horizontal"></div>
+    
     <main class="vendas-page">
       <div class="container">
         <!-- T?tulo do Curso -->
@@ -51,7 +52,7 @@
         <!-- T?tulo 'Vantagens do Curso' -->
         <div class="course-section-title">Vantagens do Curso</div>
 
-        <!-- Vantagens do Curso com linha pontilhada -->
+        <!-- Vantagens do Curso com ?cones -->
         
           <div class="course-advantages">
             <ul>
@@ -60,32 +61,44 @@
           </div>
         
 
-        <!-- Informa??es de Pagamento com Garantia -->
-        <div class="payment-info">
-          <!-- Pre?o e Promo??o com fundo cinza escuro -->
-          <div class="payment-price-promo">
-            <p class="course-price">De R$ R$ 353,45</p>
-            <p class="course-promo">Por R$ R$ 353,45</p>
-          </div>
-          <!-- Parcelamento com fundo diferente -->
-          <div class="payment-installments">
-            <p class="course-installments">Ou R$ R$ 353,45 em 3xx sem juros!</p>
-          </div>
-        </div>
-        <!-- Imagem de Garantia -->
-        <img class="guarantee-image" src="garantia.png" alt="Garantia">
+        <!-- Informa??es de Pagamento e Imagem de Garantia -->
+        <div class="payment-guarantee-container">
+          <div class="payment-wrapper">
+            <!-- Parte Azul sem conte?do -->
+            <div class="payment-empty"></div>
 
-        <!-- Bot?o 'Comprar Agora' -->
-        <a class="buy-button" href="https://example.com/novo-curso" target="_blank">Comprar Agora</a>
+            <!-- Parte Cinza Claro com informa??es de pre?o, promo??o e parcelamento -->
+            <div class="payment-details">
+              <p class="course-price-left">De <span class="price-strike">R$ R$ 353,45</span></p>
+              <p class="course-promo-center">Por <span class="promo-price">R$ R$ 353,45</span></p>
+              <p class="course-installments-center">Ou <span class="installments-price">R$ R$ 353,45</span></p>
+              <p class="course-installments-right">Em 3xx sem juros!</p>
+            </div>
 
-        <!-- M?todos de Pagamento com sombra -->
-        <div class="payments-container">
-          <img class="payments-image" src="payments.png" alt="M?todos de Pagamento">
+            <!-- Parte Cinza Escuro com bot?o Comprar Agora e m?todos de pagamento -->
+            <div class="payment-action">
+              <a class="buy-button" href="https://example.com/novo-curso" target="_blank">Comprar Agora</a>
+
+              <!-- M?todos de Pagamento -->
+              <div class="payments-container">
+                <img class="payments-image" src="payments.png" alt="M?todos de Pagamento">
+              </div>
+            </div>
+          </div>
+
+          <!-- Imagem de Garantia ao lado do container de pagamento -->
+          <div class="guarantee-images-container">
+            <img class="guarantee-image" src="garantia.png" alt="Garantia">
+            <!-- Adicionando mais duas imagens abaixo da garantia -->
+            <img class="extra-image" src="extra1.png" alt="Imagem Extra 1">
+            <img class="extra-image" src="extra2.png" alt="Imagem Extra 2">
+          </div>
         </div>
       </div>
     </main>
+
     <!-- Cont?iner para o rodap? -->
-<div id="footer-placeholder"></div>
+    <div id="footer-placeholder"></div>
   </body>
 </html>
     
