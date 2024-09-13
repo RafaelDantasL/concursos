@@ -1,50 +1,92 @@
 
       <html>
         <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <title>teste 1111111111111111</title>
-          <style>
-            body { font-family: Arial, sans-serif; }
-            .container { max-width: 800px; margin: auto; padding: 20px; }
-            .course-title { font-size: 2em; margin-bottom: 20px; }
-            .course-image { max-width: 100%; height: auto; margin-bottom: 20px; }
-            .course-description { margin-bottom: 20px; }
-            .course-price { font-size: 1.5em; color: green; margin-bottom: 20px; }
-            .buy-button { padding: 10px 20px; background-color: blue; color: white; text-decoration: none; font-size: 1.2em; }
-            h3 { margin-top: 40px; }
-            table { width: 100%; }
-            td { padding: 10px; }
-          </style>
+          <link rel="stylesheet" href="../styles.css">
+          <link rel="stylesheet" href="styles.css">
+          <script src="script.js" defer></script>
+          <link rel="icon" href="../favicon.png" type="image/png">
+          <link rel="apple-touch-icon" href="../favicon.png">
         </head>
         <body>
-          <div class="container">
-            <div class="course-title">teste 1111111111111111</div>
-            <img class="course-image" src="https://firebasestorage.googleapis.com/v0/b/cursos-preparatorios.appspot.com/o/images%2F1726170450454__77369557-b912-4a24-a0c9-124c7c0209f7.jpg?alt=media&token=0fa73373-990c-49ec-a6b5-9e476818a336" alt="teste 1111111111111111">
-            <div class="course-description">dgklgldjglksjlgksjdl
+          <header>
+            <div class="logo-nome">
+              <img src="../logo.png" alt="Logo" class="logo">
+              <button class="menu-hamburguer" id="menu-hamburguer">&#9776;</button>
+            </div>
+          </header>
+
+          <div class="menu" id="menu-placeholder"></div>
+          <main class="vendas-page">
+            <div class="container course-content">
+              <div class="left-column">
+                <img class="course-image" src="https://firebasestorage.googleapis.com/v0/b/cursos-preparatorios.appspot.com/o/images%2F1726170450454__77369557-b912-4a24-a0c9-124c7c0209f7.jpg?alt=media&token=0fa73373-990c-49ec-a6b5-9e476818a336" alt="teste 1111111111111111">
+                <h2 class="section-title">Descri??o do curso</h2>
+                <div class="course-description">dgklgldjglksjlgksjdl
 KJKLJKJLF
 KKLFKLJLF
 <teste><teste><teste></div>
-            <div class="course-price">R$ R$ 0,04</div>
-            <a class="buy-button" href="https:www.acertosonline.com" target="_blank">Comprar Agora</a>
+                
+                
+        <h2 class="section-title">Tipo de conte?do</h2>
+        <p>curso</p>
+       <!-- Tipo de conte?do abaixo da descri??o do curso -->
+              </div>
+              
+              <div class="right-column">
+                <h1 class="course-title">teste 1111111111111111</h1>
+                <hr class="divider">
 
-            
-        <h3>Destaques</h3>
-        <ul>
-          <li>teste 1</li><li>teste2</li><li>teste 3</li><li>teste 4</li><li>teste 5</li><li></li>
-        </ul>
-      
+                <div class="payment-secure-container">
+                  <div class="payment-details">
+                    <p class="course-price-left">De <span class="price-strike">R$ R$ 0,04</span></p>
+                    <p class="course-installments-center">Por <span class="installments-green">11xx de R$ R$ 3,43</span></p>
+                    <p class="course-promo-center">Ou R$ R$ 3,43 ? vista. <span class="discount">NaN% OFF</span></p>
+                  </div>
+                  <div class="secure-purchase">
+                    <span class="secure-icon">?</span> Compra segura e dados protegidos!
+                  </div>
+                </div>
 
-            
-        <h3>Sum?rio</h3>
-        <table border="1" cellpadding="10">
+                <div class="buy-wrapper">
+                  <a class="buy-button" href="https:www.acertosonline.com" target="_blank">Comprar Agora</a>
+                </div>
+
+                <div class="image-gallery">
+                  <img class="buy-image" src="garantia.png" alt="Produto 1">
+                  <img class="buy-image" src="garantia.png" alt="Produto 2">
+                  <img class="buy-image" src="garantia.png" alt="Produto 3">
+                </div>
+
+                <div class="info-updated">
+                  <img class="info-logo" src="updated.png" alt="Logo">
+                  <div class="info-text">
+                    <strong>Informa??es atualizadas</strong><br>
+                    Este produto possui informa??es atualizadas com o edital vigente.
+                  </div>
+                </div>
+
+                
+        <h2 class="section-title">Destaques</h2>
+        <div class="course-advantages">
+          <ul>
+            <li><img src="vnt.png" alt="?cone Vantagem">teste 1</li><li><img src="vnt.png" alt="?cone Vantagem">teste2</li><li><img src="vnt.png" alt="?cone Vantagem">teste 3</li><li><img src="vnt.png" alt="?cone Vantagem">teste 4</li><li><img src="vnt.png" alt="?cone Vantagem">teste 5</li><li><img src="vnt.png" alt="?cone Vantagem"></li>
+          </ul>
+        </div>
+       <!-- Destaques -->
+
+                
+        <h2 class="section-title">Sum?rio</h2>
+        <table border="1" cellpadding="10" class="course-summary">
           <tr><td>teste 1</td><td> teste 1</td></tr><tr><td>teste 2</td><td> teste2</td></tr><tr><td>teste 3</td><td> teste3</td></tr><tr><td></td><td>undefined</td></tr>
         </table>
-      
-
-            
-        <h3>Tipo de conte?do</h3>
-        <p>curso</p>
-      
-          </div>
+       <!-- Sum?rio abaixo dos destaques -->
+              </div>
+            </div>
+          </main>
+          <div id="footer-placeholder"></div>
         </body>
       </html>
     
