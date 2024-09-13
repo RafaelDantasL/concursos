@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
     // Carregar o menu para computadores (menu horizontal)
-    fetch('../menu.html')
+    fetch('../menu.html') // Caminho ajustado para o diretório acima
         .then(response => response.text())
         .then(data => {
             document.getElementById('menu-horizontal').innerHTML = data;
@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", function () {
         .catch(error => console.error('Erro ao carregar o menu:', error));
 
     // Carregar o menu para dispositivos móveis (menu deslizante)
-    fetch('../menu.html')
+    fetch('../menu.html') // Caminho ajustado para o diretório acima
         .then(response => response.text())
         .then(data => {
             document.getElementById('menu-deslizante').innerHTML = data;
@@ -40,10 +40,9 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 // Carregar o rodapé após todos os outros recursos terem sido carregados
-    fetch('../footer.html')
-        .then(response => response.text())
-        .then(data => {
-            document.getElementById('footer-placeholder').innerHTML = data;
-        })
-        .catch(error => console.error('Erro ao carregar o rodapé:', error));
-};
+fetch('../footer.html') // Caminho ajustado para o diretório acima
+    .then(response => response.text())
+    .then(data => {
+        document.getElementById('footer-placeholder').innerHTML = data;
+    })
+    .catch(error => console.error('Erro ao carregar o rodapé:', error));
