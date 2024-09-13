@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Adicionar/Editar Curso</title>
+    <title>🤳🏼📲Adicionar/Editar Curso</title>
     <style>
         body {
             background-color: #1c1c1e;
@@ -113,21 +113,23 @@
 <body>
     <h1>Adicionar/Editar Curso</h1><br>
     <form id="courseForm">
+        <!-- Form Fields -->
+<br><br>
         <label for="titulo">Nome do curso:</label>
         <input type="text" id="titulo" name="titulo" maxlength="40" required>
-        <br><br>
+<br><br>
         <label for="descricao">Descrição:</label>
         <input type="text" id="descricao" name="descricao" maxlength="100" required>
-        <br><br>
+<br><br>
         <label for="sobre">Sobre:</label>
         <textarea id="sobre" name="sobre" maxlength="500" rows="4"></textarea>
-        <br><br>
+<br><br>
         <label for="destaques">Destaques:</label>
         <textarea id="destaques" name="destaques" maxlength="500" rows="4"></textarea>
-        <br><br>
+<br><br>
         <label for="sumario">Sumário:</label>
         <textarea id="sumario" name="sumario" maxlength="500" rows="4"></textarea>
-        <br><br>
+<br><br>
         <label for="tipo">Tipo de Conteúdo:</label>
         <select id="tipo" name="tipo">
             <option value="curso">Curso</option>
@@ -135,13 +137,13 @@
             <option value="videoaula">Videoaula</option>
             <option value="outro">Outro</option>
         </select>
-        <br><br>
+<br><br>
         <label for="imagemUpload">Imagem do Curso:</label>
         <div id="imagePreview">
             <span>Preview da Imagem</span>
         </div>
         <input type="file" id="imagemUpload" name="imagemUpload" accept="image/*">
-        <br><br>
+<br><br>
         <!-- Campos de Preço, Promoção e Parcelamento em uma linha -->
         <div class="inline-fields">
             <label for="preco">Valor:</label>
@@ -159,19 +161,21 @@
                 </script>
             </select>
             <input type="text" id="valorParcelamento" name="valorParcelamento" placeholder="R$ 0,00" required>
-        </div>
-        <br><br>
+	</div>
+<br><br>
         <label for="checkout">Link do checkout:</label>
         <input type="url" id="checkout" name="checkout" required>
-        <br><br>
+<br><br>
         <label for="widget">Widget do checkout (opcional):</label>
         <textarea id="widget" name="widget" placeholder="<script>...</script>" rows="4"></textarea>
+
         <!-- Link gerado automaticamente -->
         <div id="linkContainer" style="display:none;">
             <label>Link da Página de Vendas:</label>
             <a id="salesLink" href="#" target="_blank"></a>
         </div>
-        <br><br>
+<br><br>
+        <!-- Botões -->
         <input type="submit" id="publishButton" value="Publicar">
         <button type="button" id="cancelButton">Cancelar</button>
         <button type="button" id="backButton">Voltar</button>
@@ -198,6 +202,52 @@
         const googleAppScriptURL = 'https://script.google.com/macros/s/AKfycbw1D00ZwYgamELnCmyF-Xs9uE6qB8O307eUmPnP3aNozM_ZAMNayRPv_hGmVziNzrA/exec';
         let currentImageUrl = null;
 
+        // Mostrar prévia da imagem
+        const imagePreview = document.getElementById('imagePreview');
+        const imageUpload = document.getElementById('imagemUpload');
+        imageUpload.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    imagePreview.innerHTML = `<img src="${event.target.result}" alt="Image Preview">`;
+                }
+                reader.readAsDataURL(file);
+            } else {
+                imagePreview.innerHTML = '<span>Preview da Imagem</span>';
+            }
+        });
+
+        if (courseId) {
+            fetch(`${firebaseConfig.databaseURL}/cursos/${courseId}.json`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data) {
+                        document.getElementById('titulo').value = data.titulo;
+                        document.getElementById('descricao').value = data.descricao;
+                        document.getElementById('sobre').value = data.sobre;
+                        document.getElementById('destaques').value = data.destaques;
+                        document.getElementById('sumario').value = data.sumario;
+                        document.getElementById('tipo').value = data.tipo;
+                        document.getElementById('preco').value = formatCurrency(data.preco);
+                        document.getElementById('promocao').value = formatCurrency(data.promocao);
+                        document.getElementById('parcelamento').value = data.parcelamento;
+                        document.getElementById('valorParcelamento').value = formatCurrency(data.valorParcelamento);
+                        document.getElementById('checkout').value = data.checkout;
+                        document.getElementById('widget').value = data.widget;
+                        imagePreview.innerHTML = `<img src="${data.imagem}" alt="Imagem Atual">`;
+
+                        currentImageUrl = data.imagem;
+
+                        if (data.link) {
+                            document.getElementById('salesLink').textContent = `https://rafaeldantasl.github.io/concursos/cs/${courseId}`;
+                            document.getElementById('salesLink').href = `https://rafaeldantasl.github.io/concursos/cs/${courseId}`;
+                            document.getElementById('linkContainer').style.display = 'block';
+                        }
+                    }
+                });
+        }
+
         function formatCurrency(value) {
             value = value.replace(/\D/g, '');
             value = (value / 100).toFixed(2);
@@ -208,13 +258,17 @@
             event.target.value = formatCurrency(event.target.value);
         }
 
-        function removeCurrencyFormatting(value) {
-            return value.replace('R$ ', '').replace('.', '').replace(',', '.');
-        }
-
         document.getElementById('preco').addEventListener('input', handleCurrencyInput);
         document.getElementById('promocao').addEventListener('input', handleCurrencyInput);
         document.getElementById('valorParcelamento').addEventListener('input', handleCurrencyInput);
+
+        document.getElementById('cancelButton').addEventListener('click', function() {
+            window.location.href = '../ctrl';
+        });
+
+        document.getElementById('backButton').addEventListener('click', function() {
+            window.location.href = '../ctrl';
+        });
 
         document.getElementById('courseForm').addEventListener('submit', async function(event) {
             event.preventDefault();
@@ -222,17 +276,14 @@
             const formData = new FormData(event.target);
             const courseData = Object.fromEntries(formData.entries());
 
-            // Remover a formatação "R$" antes de enviar ao banco de dados
-            courseData.preco = removeCurrencyFormatting(courseData.preco);
-            courseData.promocao = removeCurrencyFormatting(courseData.promocao);
-            courseData.valorParcelamento = removeCurrencyFormatting(courseData.valorParcelamento);
-
             if (imageUpload.files.length > 0) {
+                // Se houver uma nova imagem, deletar a antiga
                 if (currentImageUrl) {
                     const oldImageRef = firebase.storage().refFromURL(currentImageUrl);
                     await oldImageRef.delete();
                 }
 
+                // Upload da nova imagem para o Firebase Storage
                 const file = formData.get('imagemUpload');
                 const storageRef = firebase.storage().ref();
                 const imageRef = storageRef.child(`images/${Date.now()}_${file.name}`);
@@ -240,9 +291,10 @@
                 const imageUrl = await imageRef.getDownloadURL();
                 courseData.imagem = imageUrl;
             } else {
-                courseData.imagem = currentImageUrl;
+                courseData.imagem = currentImageUrl; // Mantém a URL da imagem antiga se não houver nova imagem
             }
 
+            // Salvar no Firebase
             const response = await fetch(`${firebaseConfig.databaseURL}/cursos/${courseId ? courseId : ''}.json`, {
                 method: courseId ? 'PATCH' : 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -253,35 +305,41 @@
                 const courseResponseData = await response.json();
                 const savedCourseId = courseId || courseResponseData.name;
 
+                // Salvar o ID no sessionStorage para fazer a solicitação ao Google Apps Script após o reload
                 sessionStorage.setItem('courseToPublish', savedCourseId);
+
+                // Recarregar a página
                 window.location.reload();
             } else {
                 console.error('Erro ao salvar o curso:', response.statusText);
             }
         });
 
+        // Após o reload, verificar se existe um curso para publicar
         window.onload = async function() {
             const courseToPublish = sessionStorage.getItem('courseToPublish');
             if (courseToPublish) {
                 const scriptResponse = await fetch(`${googleAppScriptURL}?id=${courseToPublish}`, {
                     method: 'GET',
-                    credentials: 'include'
+                    credentials: 'include' // Incluir as credenciais do usuário logado
                 });
 
                 if (scriptResponse.ok) {
                     const salesLink = `https://rafaeldantasl.github.io/concursos/cs/${courseToPublish}`;
 
+                    // Atualizar o link no Firebase
                     await fetch(`${firebaseConfig.databaseURL}/cursos/${courseToPublish}.json`, {
                         method: 'PATCH',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ link: salesLink })
                     });
 
+                    // Exibir o link clicável
                     document.getElementById('salesLink').textContent = salesLink;
                     document.getElementById('salesLink').href = salesLink;
                     document.getElementById('linkContainer').style.display = 'block';
 
-                    sessionStorage.removeItem('courseToPublish');
+                    sessionStorage.removeItem('courseToPublish'); // Limpar a sessionStorage
                 } else {
                     console.error('Erro ao solicitar o Apps Script:', scriptResponse.statusText);
                 }
