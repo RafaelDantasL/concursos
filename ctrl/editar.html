@@ -5,108 +5,108 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🤳🏼📲Adicionar/Editar Curso</title>
     <style>
-body {
-    background-color: #1c1c1e;
-    color: #e5e5e7;
-    font-family: Arial, sans-serif;
-    margin: 40px;
-    padding: 20px;
-}
+        body {
+            background-color: #1c1c1e;
+            color: #e5e5e7;
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            padding: 20px;
+        }
 
-h1 {
-    color: #ffffff;
-    font-size: 24px;
-    margin-bottom: 20px;
-}
+        h1 {
+            color: #ffffff;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
 
-form {
-    margin-top: 20px;
-}
+        form {
+            margin-top: 20px;
+        }
 
-label {
-    display: block;
-    margin-bottom: 8px;
-    color: #e5e5e7;
-}
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #e5e5e7;
+        }
 
-input[type="text"], input[type="url"], textarea, select {
-    width: 800px;
-    margin-bottom: 12px;
-    padding: 10px;
-    background-color: #2c2c2e;
-    color: #e5e5e7;
-    border: 1px solid #3a3a3c;
-    border-radius: 8px;
-}
+        input[type="text"], input[type="url"], textarea, select {
+            width: 800px;
+            margin-bottom: 12px;
+            padding: 10px;
+            background-color: #2c2c2e;
+            color: #e5e5e7;
+            border: 1px solid #3a3a3c;
+            border-radius: 8px;
+        }
 
-.inline-fields {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-}
+        .inline-fields {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
 
-.inline-fields select {
-    width: 80px; /* Defina a largura desejada aqui */
-}
+        .inline-fields select {
+            width: 80px;
+        }
 
-.inline-fields label {
-    margin-bottom: 0;
-}
+        .inline-fields label {
+            margin-bottom: 0;
+        }
 
-.inline-fields input[type="text"] {
-    width: 100px;
-}
+        .inline-fields input[type="text"] {
+            width: 100px;
+        }
 
-input[type="submit"], #cancelButton, #backButton {
-    margin-top: 20px;
-    display: inline-block;
-    background-color: #2c2c2e;
-    color: #e5e5e7;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
+        input[type="submit"], #cancelButton, #backButton {
+            margin-top: 20px;
+            display: inline-block;
+            background-color: #2c2c2e;
+            color: #e5e5e7;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
 
-input[type="submit"]:hover, #cancelButton:hover, #backButton:hover {
-    opacity: 0.8;
-}
+        input[type="submit"]:hover, #cancelButton:hover, #backButton:hover {
+            opacity: 0.8;
+        }
 
-#cancelButton, #backButton {
-    margin-left: 10px;
-}
+        #cancelButton, #backButton {
+            margin-left: 10px;
+        }
 
-#linkContainer {
-    margin-top: 20px;
-}
+        #linkContainer {
+            margin-top: 20px;
+        }
 
-#salesLink {
-    width: 100%;
-    background: none;
-    border: none;
-    color: #1e90ff;
-    text-decoration: underline;
-    cursor: pointer;
-}
+        #salesLink {
+            width: 100%;
+            background: none;
+            border: none;
+            color: #1e90ff;
+            text-decoration: underline;
+            cursor: pointer;
+        }
 
-#imagePreview {
-    width: 150px;
-    height: 150px;
-    border: 2px dashed #3a3a3c;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 12px;
-    overflow: hidden;
-    background-color: #2c2c2e;
-}
+        #imagePreview {
+            width: 150px;
+            height: 150px;
+            border: 2px dashed #3a3a3c;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 12px;
+            overflow: hidden;
+            background-color: #2c2c2e;
+        }
 
-#imagePreview img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
+        #imagePreview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
 
     </style>
 </head>
@@ -123,13 +123,27 @@ input[type="submit"]:hover, #cancelButton:hover, #backButton:hover {
 <br><br>
         <label for="sobre">Sobre:</label>
         <textarea id="sobre" name="sobre" maxlength="500" rows="4"></textarea>
-<br><br><br>
+<br><br>
+        <label for="destaques">Destaques:</label>
+        <textarea id="destaques" name="destaques" maxlength="500" rows="4"></textarea>
+<br><br>
+        <label for="sumario">Sumário:</label>
+        <textarea id="sumario" name="sumario" maxlength="500" rows="4"></textarea>
+<br><br>
+        <label for="tipo">Tipo de Conteúdo:</label>
+        <select id="tipo" name="tipo">
+            <option value="curso">Curso</option>
+            <option value="ebook">Ebook</option>
+            <option value="videoaula">Videoaula</option>
+            <option value="outro">Outro</option>
+        </select>
+<br><br>
         <label for="imagemUpload">Imagem do Curso:</label>
         <div id="imagePreview">
             <span>Preview da Imagem</span>
         </div>
         <input type="file" id="imagemUpload" name="imagemUpload" accept="image/*">
-<br><br><br>
+<br><br>
         <!-- Campos de Preço, Promoção e Parcelamento em uma linha -->
         <div class="inline-fields">
             <label for="preco">Valor:</label>
@@ -212,6 +226,9 @@ input[type="submit"]:hover, #cancelButton:hover, #backButton:hover {
                         document.getElementById('titulo').value = data.titulo;
                         document.getElementById('descricao').value = data.descricao;
                         document.getElementById('sobre').value = data.sobre;
+                        document.getElementById('destaques').value = data.destaques;
+                        document.getElementById('sumario').value = data.sumario;
+                        document.getElementById('tipo').value = data.tipo;
                         document.getElementById('preco').value = formatCurrency(data.preco);
                         document.getElementById('promocao').value = formatCurrency(data.promocao);
                         document.getElementById('parcelamento').value = data.parcelamento;
