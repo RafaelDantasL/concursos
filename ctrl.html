@@ -265,9 +265,10 @@ window.onload = function() {
     </div>
 
     <script>
-        const scriptUrl = 'https://script.google.com/macros/s/AKfycbx0Rr572nndkK2vr9q_Ji5Aje-gyggsfuZFn70vzgo1eevx-sTyM5Lsx-HYFRUl51s/exec'; // Substitua pela URL do seu Google Apps Script
+        // Substitua essa URL pela URL do seu Google Apps Script implantado
+        const scriptUrl = 'URL_DO_SEU_GOOGLE_APPS_SCRIPT'; 
 
-        // Função para verificar o login
+        // Função para verificar se o usuário está logado
         function checkLogin() {
             if (!localStorage.getItem('loggedIn')) {
                 document.getElementById('loginModal').style.display = 'block'; // Exibe o modal de login
@@ -281,25 +282,29 @@ window.onload = function() {
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
 
-            const response = await fetch(scriptUrl, {
-                method: 'POST',
-                body: JSON.stringify({ username, password }),
-                headers: { 'Content-Type': 'application/json' }
-            });
+            try {
+                const response = await fetch(scriptUrl, {
+                    method: 'POST',
+                    body: JSON.stringify({ username, password }),
+                    headers: { 'Content-Type': 'application/json' }
+                });
 
-            const result = await response.json();
-
-            if (result.success) {
-                localStorage.setItem('loggedIn', 'true');
-                document.getElementById('loginModal').style.display = 'none'; // Esconde o modal de login
-                alert('Login bem-sucedido!');
-            } else {
-                alert('Nome ou senha incorretos.');
+                const result = await response.json();
+                if (result.success) {
+                    localStorage.setItem('loggedIn', 'true');
+                    document.getElementById('loginModal').style.display = 'none'; // Esconde o modal de login
+                    alert('Login bem-sucedido!');
+                } else {
+                    alert('Nome ou senha incorretos.');
+                }
+            } catch (error) {
+                console.error('Erro ao fazer login:', error);
             }
         });
 
         // Verifica o login ao carregar a página
         window.onload = checkLogin;
     </script>
+</body>
 </body>
 </html>
