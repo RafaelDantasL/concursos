@@ -74,8 +74,8 @@ function buscarCursos() {
         const cursos = [];
         snapshot.forEach(childSnapshot => {
             const curso = childSnapshot.val();
-            // Filtrar por cursos com 'show' igual a true e título correspondente à pesquisa
-            if (curso.show === true && curso.titulo.toLowerCase().includes(pesquisa)) {
+            // Filtrar por cursos com título correspondente à pesquisa
+            if (curso.titulo.toLowerCase().includes(pesquisa)) {
                 cursos.push(curso);
             }
         });
