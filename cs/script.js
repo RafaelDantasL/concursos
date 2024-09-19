@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
     // Carregar o menu para computadores (menu horizontal)
-    fetch('../menu.html') // Caminho ajustado para o diretório acima
+    fetch('menu.html') // Caminho ajustado para o diretório acima
         .then(response => response.text())
         .then(data => {
             const menuHorizontal = document.getElementById('menu-horizontal');
@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", function () {
         .catch(error => console.error('Erro ao carregar o menu para computadores:', error));
 
     // Carregar o menu para dispositivos móveis (menu deslizante)
-    fetch('../menu.html') // Caminho ajustado para o diretório acima
+    fetch('menu.html') // Caminho ajustado para o diretório acima
         .then(response => response.text())
         .then(data => {
             const menuDeslizante = document.getElementById('menu-deslizante');
