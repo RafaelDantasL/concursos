@@ -107,9 +107,9 @@
             height: 100%;
             object-fit: cover;
         }
-        /* Estilos para o modal */
+/* Estilos para o modal */
         #loginModal {
-            display: none;
+            display: block; /* Mostrar o modal diretamente */
             position: fixed;
             z-index: 1;
             left: 0;
@@ -153,9 +153,51 @@
         button:hover {
             background-color: #1c86ee;
         }
+
+        .error {
+            color: red;
+            margin-top: 10px;
+        }
+
+        /* Esconder o conteúdo até o login ser bem-sucedido */
+        #content {
+            display: none;
+        }
+
+        /* Estilo para o botão de logout */
+        #logoutBtn {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background-color: #ff4c4c;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 10; /* Certifica que o botão aparece por cima */
+        }
+
+        #logoutBtn:hover {
+            background-color: #ff3333;
+        }
     </style>
 </head>
 <body>
+<div id="loginModal">
+  <div id="loginModalContent">
+    <h2>Login</h2>
+    <form id="loginForm">
+      <input type="text" id="username" placeholder="Nome" required>
+      <input type="password" id="password" placeholder="Senha" required>
+      <button type="submit">Entrar</button>
+      <div class="error" id="errorMessage"></div>
+    </form>
+  </div>
+</div>
+
+<!-- Conteúdo principal da página, só será exibido após o login -->
+<div id="content">	
     <h1>Adicionar/Editar Curso</h1><br>
     <form id="courseForm">
         <!-- Form Fields -->
@@ -225,7 +267,8 @@
         <button type="button" id="cancelButton">Cancelar</button>
         <button type="button" id="backButton">Voltar</button>
     </form>
-
+<button id="logoutBtn">Logout</button>
+</div>
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-storage.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
@@ -441,6 +484,58 @@
 
         // Verifica o login ao carregar a página
         window.onload = checkLogin;
+	    
+// Verificar se o usuário já está logado ao carregar a página
+    window.onload = function() {
+        const isLoggedIn = localStorage.getItem('loggedIn');
+        
+        if (isLoggedIn) {
+            // Se estiver logado, exibe o conteúdo e oculta o modal
+            document.getElementById('content').style.display = 'block';
+            document.getElementById('loginModal').style.display = 'none';
+        } else {
+            // Caso contrário, mantém o modal aberto e o conteúdo oculto
+            document.getElementById('content').style.display = 'none';
+            document.getElementById('loginModal').style.display = 'block';
+        }
+    };
+
+    // Função de login com chamada HTTP ao Google App Script
+    document.getElementById('loginForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const errorMessage = document.getElementById('errorMessage');
+
+        // URL do seu Google App Script Web App
+        const url = `https://script.google.com/macros/s/AKfycbx0Rr572nndkK2vr9q_Ji5Aje-gyggsfuZFn70vzgo1eevx-sTyM5Lsx-HYFRUl51s/exec?nome=${encodeURIComponent(username)}&senha=${encodeURIComponent(password)}`;
+
+        // Fazer a requisição HTTP usando fetch
+        fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Se a autenticação for bem-sucedida
+                localStorage.setItem('loggedIn', 'true');  // Armazena o status de login no localStorage
+                document.getElementById('loginModal').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+            } else {
+                // Exibir mensagem de erro
+                errorMessage.textContent = "Nome ou senha incorretos!";
+            }
+        })
+        .catch(error => {
+            console.error("Erro:", error);
+            errorMessage.textContent = "Ocorreu um erro ao tentar fazer login.";
+        });
+    });
+
+    // Função de logout
+    document.getElementById('logoutBtn').addEventListener('click', function() {
+        localStorage.removeItem('loggedIn');  // Remove o status de login do localStorage
+        location.reload();  // Recarrega a página para exibir o modal de login novamente
+    });
     </script>
 </body>
 </html>
