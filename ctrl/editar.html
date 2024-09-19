@@ -183,7 +183,7 @@
         }
     </style>
 </head>
-<body>
+<body>	
 <div id="loginModal">
   <div id="loginModalContent">
     <h2>Login</h2>
@@ -197,7 +197,7 @@
 </div>
 
 <!-- Conteúdo principal da página, só será exibido após o login -->
-<div id="content">	
+<div id="content">
     <h1>Adicionar/Editar Curso</h1><br>
     <form id="courseForm">
         <!-- Form Fields -->
@@ -267,7 +267,7 @@
         <button type="button" id="cancelButton">Cancelar</button>
         <button type="button" id="backButton">Voltar</button>
     </form>
-<button id="logoutBtn">Logout</button>
+    <button id="logoutBtn">Logout</button>
 </div>
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-storage.js"></script>
@@ -433,59 +433,8 @@
                 }
             }
         }
-    </script>
-	<!-- Modal de Login -->
-    <div id="loginModal">
-        <div id="loginModalContent">
-            <h2>Login</h2>
-            <form id="loginForm">
-                <label for="username">Nome:</label><br>
-                <input type="text" id="username" name="username" required><br>
-                <label for="password">Senha:</label><br>
-                <input type="password" id="password" name="password" required><br>
-                <button type="submit">Entrar</button>
-            </form>
-        </div>
-    </div>
 
-    <script>
-        const scriptUrl = 'https://script.google.com/macros/s/AKfycbx0Rr572nndkK2vr9q_Ji5Aje-gyggsfuZFn70vzgo1eevx-sTyM5Lsx-HYFRUl51s/exec'; // Substitua pela URL do seu Google Apps Script
-
-        // Função para verificar o login
-        function checkLogin() {
-            if (!localStorage.getItem('loggedIn')) {
-                document.getElementById('loginModal').style.display = 'block'; // Exibe o modal de login
-            }
-        }
-
-        // Ao enviar o formulário de login
-        document.getElementById('loginForm').addEventListener('submit', async function(event) {
-            event.preventDefault();
-
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-
-            const response = await fetch(scriptUrl, {
-                method: 'POST',
-                body: JSON.stringify({ username, password }),
-                headers: { 'Content-Type': 'application/json' }
-            });
-
-            const result = await response.json();
-
-            if (result.success) {
-                localStorage.setItem('loggedIn', 'true');
-                document.getElementById('loginModal').style.display = 'none'; // Esconde o modal de login
-                alert('Login bem-sucedido!');
-            } else {
-                alert('Nome ou senha incorretos.');
-            }
-        });
-
-        // Verifica o login ao carregar a página
-        window.onload = checkLogin;
-	    
-// Verificar se o usuário já está logado ao carregar a página
+    // Verificar se o usuário já está logado ao carregar a página
     window.onload = function() {
         const isLoggedIn = localStorage.getItem('loggedIn');
         
@@ -535,7 +484,8 @@
     document.getElementById('logoutBtn').addEventListener('click', function() {
         localStorage.removeItem('loggedIn');  // Remove o status de login do localStorage
         location.reload();  // Recarrega a página para exibir o modal de login novamente
-    });
+    });    
     </script>
+
 </body>
 </html>
