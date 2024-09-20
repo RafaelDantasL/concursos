@@ -1,23 +1,28 @@
-document.addEventListener("DOMContentLoaded", function () {
-    // Carregar o menu para computadores (menu horizontal)
-    fetch('menu.html')
-        .then(response => response.text())
-        .then(data => {
-            document.getElementById('menu-horizontal').innerHTML = data;
-        })
-        .catch(error => console.error('Erro ao carregar o menu:', error));
+<script>
+// Verificar se o navegador suporta Service Workers
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/service-worker.js').then(function(registration) {
+      console.log('Service Worker registrado com sucesso:', registration.scope);
+    }).catch(function(error) {
+      console.log('Falha ao registrar o Service Worker:', error);
+    });
+  });
+}
 
-    // Carregar o menu para dispositivos móveis (menu deslizante)
-    fetch('menu.html')
+document.addEventListener("DOMContentLoaded", function () {
+    // Carregar o menu uma única vez e reutilizá-lo
+    fetch('../menu.html')
         .then(response => response.text())
         .then(data => {
+            // Aplicar o menu carregado para os dois elementos (horizontal e deslizante)
+            document.getElementById('menu-horizontal').innerHTML = data;
             document.getElementById('menu-deslizante').innerHTML = data;
         })
         .catch(error => console.error('Erro ao carregar o menu:', error));
 
     const menuHamburguer = document.getElementById('menu-hamburguer');
     const menuDeslizante = document.getElementById('menu-deslizante');
-    const menuVoltar = document.getElementById('menu-voltar');
     const body = document.body;
 
     // Abrir o menu deslizante
@@ -37,14 +42,13 @@ document.addEventListener("DOMContentLoaded", function () {
             document.querySelector('header').classList.remove('body-desfocado');
         }
     });
-});
 
-
-    // Carregar o rodapé após todos os outros recursos terem sido carregados
-    fetch('footer.html')
+    // Carregar o rodapé de forma assíncrona
+    fetch('../footer.html')
         .then(response => response.text())
         .then(data => {
             document.getElementById('footer-placeholder').innerHTML = data;
         })
         .catch(error => console.error('Erro ao carregar o rodapé:', error));
-};
+});
+</script>
