@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // Carregar o rodapé após todos os outros recursos terem sido carregados
-    fetch('../footer.html')
+    fetch('footer.html')
         .then(response => response.text())
         .then(data => {
             document.getElementById('footer-placeholder').innerHTML = data;
