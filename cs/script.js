@@ -12,7 +12,7 @@ if ('serviceWorker' in navigator) {
 
 document.addEventListener("DOMContentLoaded", function () {
     // Carregar o menu uma única vez e reutilizá-lo
-    fetch('../menu.html')
+    fetch('menu.html')
         .then(response => response.text())
         .then(data => {
             // Aplicar o menu carregado para os dois elementos (horizontal e deslizante)
@@ -44,7 +44,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     // Carregar o rodapé de forma assíncrona
-    fetch('../footer.html')
+    fetch('footer.html')
         .then(response => response.text())
         .then(data => {
             document.getElementById('footer-placeholder').innerHTML = data;
