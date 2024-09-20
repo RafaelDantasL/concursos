@@ -3,8 +3,6 @@ const ASSETS = [
   '/menu.html',
   '/footer.html',
   '/styles.css',
-  '/cs/styles.css',
-  '/cs/script.js',
   '/script.js',
 ];
 
