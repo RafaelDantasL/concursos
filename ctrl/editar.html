@@ -305,6 +305,16 @@
                 const courseResponseData = await response.json();
                 const savedCourseId = courseId || courseResponseData.name;
 
+        // Gerar o link da página de vendas
+        const salesLink = `https://rafaeldantasl.github.io/concursos/cs/${savedCourseId}`;
+
+        // Atualizar o link no Firebase
+        await fetch(`${firebaseConfig.databaseURL}/cursos/${savedCourseId}.json`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ link: salesLink })
+        });
+		    
                 // Salvar o ID no sessionStorage para fazer a solicitação ao Google Apps Script após o reload
                 sessionStorage.setItem('courseToPublish', savedCourseId);
 
