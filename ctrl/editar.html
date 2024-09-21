@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editar</title>
+    <title>🤳🏼📲Adicionar/Editar Curso</title>
     <style>
         body {
             background-color: #1c1c1e;
@@ -276,9 +276,6 @@
             const formData = new FormData(event.target);
             const courseData = Object.fromEntries(formData.entries());
 
-            // Adicionar o campo link vazio
-            courseData.link = '';
-
             if (imageUpload.files.length > 0) {
                 // Se houver uma nova imagem, deletar a antiga
                 if (currentImageUrl) {
@@ -305,35 +302,48 @@
             });
 
             if (response.ok) {
-    const courseResponseData = await response.json();
-    const savedCourseId = courseId || courseResponseData.name;
+                const courseResponseData = await response.json();
+                const savedCourseId = courseId || courseResponseData.name;
 
-    // Chamar o Google App Script (sem esperar retorno)
-    const googleAppScriptURL = 'https://script.google.com/macros/s/AKfycbw1D00ZwYgamELnCmyF-Xs9uE6qB8O307eUmPnP3aNozM_ZAMNayRPv_hGmVziNzrA/exec';
-    const scriptUrl = `${googleAppScriptURL}?id=${savedCourseId}`;
-    fetch(scriptUrl, { method: 'GET', mode: 'no-cors' }); // Faz a chamada sem esperar retorno
+                // Salvar o ID no sessionStorage para fazer a solicitação ao Google Apps Script após o reload
+                sessionStorage.setItem('courseToPublish', savedCourseId);
 
-    // Exibir mensagem de sucesso
-    alert('Página publicada com sucesso!');
-
-    // Recarregar a página após 3 segundos
-    setTimeout(() => {
-        window.location.reload();
-    }, 3000); // Atraso de 3 segundos
-
-} else {
-    console.error('Erro ao salvar o curso:', response.statusText);
-}
-
+                // Recarregar a página
+                window.location.reload();
+            } else {
+                console.error('Erro ao salvar o curso:', response.statusText);
+            }
         });
+
+        // Após o reload, verificar se existe um curso para publicar
+        window.onload = async function() {
+            const courseToPublish = sessionStorage.getItem('courseToPublish');
+            if (courseToPublish) {
+                const scriptResponse = await fetch(`${googleAppScriptURL}?id=${courseToPublish}`, {
+                    method: 'GET',
+                    credentials: 'include' // Incluir as credenciais do usuário logado
+                });
 
                 if (scriptResponse.ok) {
                     const salesLink = `https://rafaeldantasl.github.io/concursos/cs/${courseToPublish}`;
+
+                    // Atualizar o link no Firebase
+                    await fetch(`${firebaseConfig.databaseURL}/cursos/${courseToPublish}.json`, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ link: salesLink })
+                    });
 
                     // Exibir o link clicável
                     document.getElementById('salesLink').textContent = salesLink;
                     document.getElementById('salesLink').href = salesLink;
                     document.getElementById('linkContainer').style.display = 'block';
+
+                    sessionStorage.removeItem('courseToPublish'); // Limpar a sessionStorage
+                } else {
+                    console.error('Erro ao solicitar o Apps Script:', scriptResponse.statusText);
+                }
+            }
         }
     </script>
 </body>
