@@ -343,7 +343,8 @@
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ link: salesLink })
                     });
-
+// Exibir alerta de sucesso
+alert('Página publicada com sucesso!');
                     // Exibir o link clicável
                     document.getElementById('salesLink').textContent = salesLink;
                     document.getElementById('salesLink').href = salesLink;
