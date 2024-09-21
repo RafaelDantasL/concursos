@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>⚙️Editar</title>
+    <title>Editar</title>
     <style>
         body {
             background-color: #1c1c1e;
@@ -305,23 +305,26 @@
             });
 
             if (response.ok) {
-                const courseResponseData = await response.json();
-                const savedCourseId = courseId || courseResponseData.name;
+    const courseResponseData = await response.json();
+    const savedCourseId = courseId || courseResponseData.name;
 
-                // Chamar o Google App Script (sem esperar retorno)
-                const googleAppScriptURL = 'https://script.google.com/macros/s/AKfycbw1D00ZwYgamELnCmyF-Xs9uE6qB8O307eUmPnP3aNozM_ZAMNayRPv_hGmVziNzrA/exec';
-                const scriptUrl = `${googleAppScriptURL}?id=${savedCourseId}`;
-                fetch(scriptUrl, { method: 'GET', mode: 'no-cors' }); // Faz a chamada sem esperar retorno
+    // Chamar o Google App Script (sem esperar retorno)
+    const googleAppScriptURL = 'https://script.google.com/macros/s/AKfycbw1D00ZwYgamELnCmyF-Xs9uE6qB8O307eUmPnP3aNozM_ZAMNayRPv_hGmVziNzrA/exec';
+    const scriptUrl = `${googleAppScriptURL}?id=${savedCourseId}`;
+    fetch(scriptUrl, { method: 'GET', mode: 'no-cors' }); // Faz a chamada sem esperar retorno
 
-                // Exibir mensagem de sucesso
-                alert('Página publicada com sucesso!');
+    // Exibir mensagem de sucesso
+    alert('Página publicada com sucesso!');
 
-                // Recarregar a página
-                window.location.reload();
+    // Recarregar a página após 3 segundos
+    setTimeout(() => {
+        window.location.reload();
+    }, 3000); // Atraso de 3 segundos
 
-            } else {
-                console.error('Erro ao salvar o curso:', response.statusText);
-            }
+} else {
+    console.error('Erro ao salvar o curso:', response.statusText);
+}
+
         });
 
                 if (scriptResponse.ok) {
