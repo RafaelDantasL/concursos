@@ -1,0 +1,272 @@
+/* Adiciona marca d'água ao fundo da página */
+body {
+  background-position: center; /* Centraliza a marca d'água */
+  background-repeat: no-repeat; /* Impede repetição da imagem */
+  background-attachment: fixed; /* Faz a marca d'água ficar fixa ao rolar a página */
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url('icons/renitentes.png') center center no-repeat;
+  background-size: 600px 600px;
+  opacity: 0.1; /* Define a transparência da marca d'água */
+  z-index: -1; /* Mantém a marca d'água atrás do conteúdo */
+  pointer-events: none; /* Impede que a marca d'água interfira em cliques */
+}
+
+/* Seção transparente ao redor dos blocos 3 e 4 */
+.transparent-section {
+  background-color: rgba(0, 0, 0, 0.5); /* Fundo preto transparente */
+  padding: 20px; /* Espaçamento interno para o conteúdo */
+  border-radius: 10px; /* Bordas arredondadas para um visual suave */
+  margin-bottom: 20px; /* Espaço inferior para separar dos outros blocos */
+}
+
+
+/* Estilos adicionais para a página de vendas */
+.vendas-page {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.course-content {
+  display: flex;
+  justify-content: space-between;
+  gap: 40px;
+}
+
+.course-image {
+  width: 100%;
+  max-width: 400px;
+  height: auto;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.course-description {
+  text-align: justify;
+  color: #e0e0e0;
+  margin-top: 20px;
+}
+
+.course-price-left {
+  font-size: 1em;
+  text-align: left;
+  color: #ffffff;
+}
+
+.price-strike {
+  text-decoration: line-through;
+  color: #ffcc00;
+}
+
+.installments-green {
+  color: #00ff66;
+  font-size: 1.8em;
+  font-weight: bold;
+}
+
+.course-promo-center {
+  font-size: 1.0em;
+  font-weight: bold;
+  color: #ffffff;
+  margin-top: 5px;
+}
+
+.discount {
+  background-color: #28a745;
+  color: #ffffff;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 1em;
+  font-weight: bold;
+}
+
+
+
+.secure-icon {
+  margin-right: 8px;
+  font-size: 1.3em;
+}
+
+/* Botão de compra */
+.buy-wrapper {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.buy-button {
+  display: inline-block;
+  padding: 15px 100px;
+  background-color: #007bb5;
+  color: white;
+  text-decoration: none;
+  font-size: 1.2em;
+  border: none;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.buy-button:hover {
+  background-color: #005f8c;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+
+
+
+/* Estilo da mensagem de compra segura com bordas */
+.secure-purchase-container {
+  text-align: center;
+  margin-bottom: 10px; /* Espaço entre o botão e a mensagem */
+}
+
+.secure-purchase {
+  font-size: 0.9em;
+  color: #00ff66;
+  border: 1px solid #00ff66;
+  padding: 10px;
+  border-radius: 5px;
+  display: inline-block;
+  margin-bottom: 10px; /* Espaço entre a mensagem e a imagem */
+}
+
+/* Centralização e dimensionamento da imagem 'garantia.png' */
+.buy-image {
+  width: 200px; /* Define largura da imagem */
+  height: 200px; /* Define altura da imagem */
+  object-fit: contain; /* Garante que a imagem não seja cortada */
+  display: block;
+  margin: 0 auto; /* Centraliza a imagem */
+}
+
+
+
+
+
+/* Layout para telas maiores */
+@media (min-width: 769px) {
+  .course-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto auto;
+    grid-gap: 20px;
+  }
+
+  .block-1, .block-2 {
+    grid-row: 1;
+  }
+
+  .block-1 {
+    grid-column: 1;
+  }
+
+  .block-2 {
+    grid-column: 2;
+    display: flex;
+    flex-direction: row;
+  }
+
+  .block-3 {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .block-4 {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .block-5 {
+    grid-column: span 2;
+    text-align: center;
+    grid-row: 3;
+  }
+
+  .block-6 {
+    grid-column: span 2;
+    text-align: center;
+    margin-top: 20px;
+  }
+}
+
+/* Layout para dispositivos móveis */
+@media (max-width: 768px) {
+  .vendas-page {
+    padding: 15px;
+  }
+
+  .course-content {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .course-image {
+    max-width: 100%;
+  }
+
+  .course-title {
+    font-size: 2em;
+    text-align: center;
+  }
+
+  .section-title {
+    font-size: 1.5em;
+    text-align: center;
+  }
+
+  .buy-button {
+    width: 100%; /* Botão ocupa toda a largura em telas menores */
+    padding: 15px 0;
+  }
+
+  .secure-purchase {
+    font-size: 1em;
+    margin-top: 10px;
+  }
+
+  .course-price-left, .installments-green, .course-promo-center, .discount {
+    text-align: center;
+    font-size: 1em;
+  }
+
+  .block {
+    width: 100%;
+    margin-bottom: 20px;
+  }
+}
+
+/* Animação de deslizamento */
+.block-3, .block-4, .block-5, .block-6 {
+  opacity: 0;
+  transform: translateY(50px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.block.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Estilos para a linha horizontal com animação */
+.sliding-line {
+  border: none;
+  height: 2px; /* Altura da linha */
+  background-color: #ffffff; /* Cor da linha */
+  width: 0; /* Largura inicial da linha (oculta) */
+  margin: 20px auto; /* Espaçamento acima e abaixo, centralizada horizontalmente */
+  transition: width 1.5s ease-out; /* Transição suave */
+}
+
+/* Quando a linha se torna visível, ela expande de 0 a 100% */
+.sliding-line.visible {
+  width: 100%; /* Largura final da linha após a animação */
+}
+
