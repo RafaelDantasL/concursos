@@ -16,13 +16,16 @@ const database = firebase.database();
 const cursosPorPagina = 8;
 let paginaAtual = 1;
 let totalCursos = 0;
+let cursosEncontrados = [];
 
 // Função para carregar cursos do Firebase
 function carregarCursos(pagina) {
     const cursosContainer = document.getElementById('cursos-container');
     const paginacaoContainer = document.getElementById('paginacao-container');
+    const totalEncontradosContainer = document.getElementById('total-encontrados');
     cursosContainer.innerHTML = '';
     paginacaoContainer.innerHTML = '';
+    totalEncontradosContainer.innerHTML = '';
 
     firebase.database().ref('cursos').once('value', snapshot => {
         const cursos = [];
@@ -65,28 +68,34 @@ function carregarCursos(pagina) {
 }
 
 // Função para buscar cursos
-function buscarCursos() {
+function buscarCursos(pagina = 1) {
     const pesquisa = document.getElementById('pesquisa').value.toLowerCase();
     const cursosContainer = document.getElementById('cursos-container');
+    const paginacaoContainer = document.getElementById('paginacao-container');
+    const totalEncontradosContainer = document.getElementById('total-encontrados');
     cursosContainer.innerHTML = '';
+    paginacaoContainer.innerHTML = '';
+    totalEncontradosContainer.innerHTML = '';
 
     firebase.database().ref('cursos').once('value', snapshot => {
-        const cursos = [];
+        cursosEncontrados = [];
         snapshot.forEach(childSnapshot => {
             const curso = childSnapshot.val();
             // Filtrar por cursos com título correspondente à pesquisa
             if (curso.titulo.toLowerCase().includes(pesquisa)) {
-                cursos.push(curso);
+                cursosEncontrados.push(curso);
             }
         });
 
-        if (cursos.length > 0) {
-            totalCursos = cursos.length;
+        if (cursosEncontrados.length > 0) {
+            totalCursos = cursosEncontrados.length;
+            totalEncontradosContainer.innerHTML = `<center><p>${totalCursos} curso(s) encontrado(s).</p></center>`;
+
             const totalPaginas = Math.ceil(totalCursos / cursosPorPagina);
-            const start = (paginaAtual - 1) * cursosPorPagina;
+            const start = (pagina - 1) * cursosPorPagina;
             const end = start + cursosPorPagina;
 
-            cursos.slice(start, end).forEach(curso => {
+            cursosEncontrados.slice(start, end).forEach(curso => {
                 cursosContainer.innerHTML += `
                     <div class="curso">
                         <h3>${curso.titulo}</h3>
@@ -96,8 +105,35 @@ function buscarCursos() {
                     </div>
                 `;
             });
+
+            // Criar os botões de paginação se houver mais de uma página
+            if (totalPaginas > 1) {
+                for (let i = 1; i <= totalPaginas; i++) {
+                    const paginaButton = document.createElement('button');
+                    paginaButton.textContent = i;
+                    paginaButton.classList.add('pagina-button');
+                    if (i === pagina) {
+                        paginaButton.classList.add('pagina-ativa');
+                    }
+                    paginaButton.onclick = () => {
+                        paginaAtual = i;
+                        buscarCursos(paginaAtual);
+                    };
+                    paginacaoContainer.appendChild(paginaButton);
+                }
+            }
         } else {
             cursosContainer.innerHTML = `<p>Nenhum resultado encontrado para a sua pesquisa.</p>`;
         }
     });
 }
+
+// Função para verificar se a tecla "Enter" foi pressionada na barra de pesquisa
+document.getElementById('pesquisa').addEventListener('keydown', function (event) {
+    if (event.key === 'Enter') {
+        buscarCursos();
+    }
+});
+
+// Carregar cursos ao carregar a página
+window.onload = () => carregarCursos(paginaAtual);
