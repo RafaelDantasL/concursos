@@ -41,7 +41,6 @@ header {
     margin-right: 15px;
 }
 
-
 /* Menu Horizontal (Computadores) */
 .menu-horizontal {
     display: flex; /* Exibir itens em uma linha */
@@ -165,8 +164,7 @@ header {
     }
 }
 
-/* Outros estilos permanecem inalterados... */
-
+/* Estilo da barra de pesquisa */
 .barra-pesquisa {
     display: flex;
     justify-content: center;
@@ -266,29 +264,158 @@ button:hover {
     color: white; /* Cor do texto no hover */
 }
 
+/* Estilo do rodapé */
 footer {
     background-color: #2a2a3c;
     color: #e0e0e0;
     padding: 20px;
-    text-align: center;
     border-top: 1px solid #444;
 }
 
-footer .footer-nav ul {
-    list-style: none;
-    padding: 0;
-    margin: 10px 0;
+.footer-content {
     display: flex;
-    justify-content: center;
-    gap: 15px;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: left; /* Alinhamento à esquerda */
 }
 
-footer .footer-nav a {
-    color: #00acee;
+.footer-column {
+    flex: 1;
+    margin: 10px;
+    text-align: left; /* Alinhamento à esquerda */
+}
+
+.footer-logo {
+    max-width: 150px;
+    margin-bottom: 20px;
+}
+
+.footer-links,
+.footer-contact {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-links li,
+.footer-contact li {
+    margin-bottom: 10px;
+}
+
+.footer-links a,
+.footer-contact a {
+    color: #e0e0e0; /* Cor branca para links de contato */
     text-decoration: none;
+    font-weight: normal; /* Remover negrito */
     transition: color 0.3s ease;
 }
 
-footer .footer-nav a:hover {
+.footer-links a:hover,
+.footer-contact a:hover {
+    color: #007bb5; /* Hover azul escuro */
+}
+
+/* Estilo dos títulos nas colunas */
+.footer-column h3 {
+    color: #ffffff; /* Cor branca para o título */
+    margin-bottom: 15px;
+    font-size: 18px;
+}
+
+/* Estilo do texto de atendimento na terceira coluna */
+.footer-column .atendimento-descricao {
+    color: #b0b0b0; /* Branco escuro para o horário de atendimento */
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+/* Estilo do ícone do WhatsApp */
+.footer-contact .whatsapp-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+.footer-contact a.whatsapp {
+    display: flex;
+    align-items: center;
+}
+
+.footer-contact a.whatsapp img {
+    margin-right: 10px;
+}
+
+/* Estilo dos ícones das redes sociais */
+.footer-contact img {
+    width: 24px;
+    height: 24px;
+    margin: 0 10px;
+    vertical-align: middle;
+}
+
+/* Rodapé inferior */
+.footer-bottom {
+    border-top: 1px solid #444;
+    margin-top: 20px;
+    padding-top: 20px;
+    display: flex;
+    justify-content: center; /* Centralizar em telas maiores */
+    flex-wrap: wrap;
+    text-align: center;
+}
+
+.footer-bottom p {
+    margin: 0;
+    flex-basis: 100%; /* Forçar a linha a ocupar 100% da largura */
+}
+
+.footer-bottom-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    gap: 15px;
+}
+
+.footer-bottom-links a {
+    color: #00acee;
+    text-decoration: none;
+    font-weight: normal; /* Sem negrito */
+}
+
+.footer-bottom-links a:hover {
     color: #007bb5;
+}
+
+/* Responsividade para rodapé */
+@media (max-width: 768px) {
+    .footer-content {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .footer-column {
+        margin: 20px 0;
+    }
+
+    .footer-bottom {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .footer-bottom-links {
+        flex-direction: column; /* Itens empilhados em telas menores */
+    }
+
+    .footer-bottom p {
+        margin-bottom: 10px; /* Espaçamento entre o texto e os links */
+    }
+}
+
+/* Desativar a rolagem quando o menu deslizante estiver aberto */
+.no-scroll {
+    overflow: hidden;
 }
