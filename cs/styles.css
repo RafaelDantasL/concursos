@@ -122,7 +122,27 @@ body::before {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
+.course-advantages ul {
+  list-style: none; /* Remove os pontos da lista */
+  padding-left: 0;  /* Remove o espaçamento esquerdo da lista */
+}
 
+.course-advantages li {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px; /* Espaço entre os itens */
+}
+
+.course-advantages li img {
+  width: 32px; /* Define a largura da imagem */
+  height: 32px; /* Define a altura da imagem */
+  margin-right: 10px; /* Espaço entre a imagem e o texto */
+}
+
+.course-advantages li h3 {
+  font-size: 18px; /* Tamanho do texto, ajuste conforme necessário */
+  margin: 0; /* Remove a margem padrão do H2 */
+}
 
 
 /* Estilo da mensagem de compra segura com bordas */
