@@ -20,10 +20,16 @@
   
   <div class="ebook-list" id="ebookList"></div>
 
+  <!-- Referência ao arquivo e-books.js -->
   <script src="e-books.js"></script>
   <script>
     // Função para renderizar a lista de e-books
     function renderEbooks() {
+      if (typeof ebooks === 'undefined') {
+        alert('Arquivo e-books.js não carregado corretamente.');
+        return;
+      }
+
       const ebookList = document.getElementById('ebookList');
       ebookList.innerHTML = '';
       
@@ -33,15 +39,10 @@
         div.innerHTML = `
           <strong>${ebook.title}</strong><br>
           <em>${ebook.description}</em><br>
-          <button onclick="downloadEbook('${ebook.downloadLink}', '${ebook.title}')">Download</button>
+          <a href="${ebook.downloadLink}" target="_blank">Download</a>
         `;
         ebookList.appendChild(div);
       });
-    }
-
-    // Função para baixar o e-book
-    function downloadEbook(url, title) {
-      window.open(url, '_blank');
     }
 
     // Carregar a lista de e-books ao carregar a página
