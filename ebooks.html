@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Lista de E-books</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    .ebook-list { margin-top: 20px; }
+    .ebook-item { margin: 10px 0; }
+    .ebook-item button {
+      margin-left: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Lista de E-books</h1>
+  
+  <div class="ebook-list" id="ebookList"></div>
+
+  <script src="e-books.js"></script>
+  <script>
+    // Função para renderizar a lista de e-books
+    function renderEbooks() {
+      const ebookList = document.getElementById('ebookList');
+      ebookList.innerHTML = '';
+      
+      ebooks.forEach(ebook => {
+        const div = document.createElement('div');
+        div.className = 'ebook-item';
+        div.innerHTML = `
+          <strong>${ebook.title}</strong><br>
+          <em>${ebook.description}</em><br>
+          <button onclick="downloadEbook('${ebook.downloadLink}', '${ebook.title}')">Download</button>
+        `;
+        ebookList.appendChild(div);
+      });
+    }
+
+    // Função para baixar o e-book
+    function downloadEbook(url, title) {
+      window.open(url, '_blank');
+    }
+
+    // Carregar a lista de e-books ao carregar a página
+    document.addEventListener('DOMContentLoaded', renderEbooks);
+  </script>
+</body>
+</html>
