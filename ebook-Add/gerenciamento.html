@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gerenciar E-books</title>
+  <script>
+    async function carregarEbooks() {
+      const response = await fetch('https://script.google.com/macros/s/{SCRIPT_ID}/exec?action=listar');
+      const ebooks = await response.json();
+      
+      const lista = document.getElementById("listaEbooks");
+      lista.innerHTML = ''; // Limpar lista
+
+      ebooks.forEach((ebook, index) => {
+        const li = document.createElement('li');
+        li.innerHTML = `${ebook.titulo} <button onclick="apagarEbook(${index})">Apagar</button>`;
+        lista.appendChild(li);
+      });
+    }
+
+    async function apagarEbook(index) {
+      const response = await fetch('https://script.google.com/macros/s/AKfycbwE0YNEPcF9jJtju6Nnqyxq27gZfRGgjQyK0pfJLkvHQlKvvWPWcx1sr3MwjK53Kg/exec', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ action: 'apagar', index })
+      });
+      const result = await response.json();
+      alert(result.message);
+      carregarEbooks(); // Recarregar a lista de e-books
+    }
+
+    function adicionarEbook() {
+      window.location.href = 'formulario.html';
+    }
+
+    window.onload = carregarEbooks;
+  </script>
+</head>
+<body>
+  <h1>Gerenciar E-books</h1>
+  <button onclick="adicionarEbook()">Adicionar</button>
+  <ul id="listaEbooks"></ul>
+</body>
+</html>
