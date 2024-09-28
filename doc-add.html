@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Gerenciador de Ebooks</title>
+    <title>Gerenciador de Ebooks 2</title>
     <style>
         /* Estilos básicos para a página */
         body {
@@ -12,6 +12,9 @@
         #addForm {
             display: none;
             margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
         }
         #ebookList {
             margin-top: 30px;
@@ -59,7 +62,7 @@
     </div>
 
     <script>
-        const appScriptURL = 'https://script.google.com/macros/s/AKfycbwMBkmbaFd0f1hlvXIgvWSKeohtCwaLVRpvXZ-FkDBU63FO0ZTtvonghrpgmdj6ujaw/exec'; // Substitua pelo URL do seu Apps Script
+        const appScriptURL = 'https://script.google.com/macros/s/AKfycbwMBkmbaFd0f1hlvXIgvWSKeohtCwaLVRpvXZ-FkDBU63FO0ZTtvonghrpgmdj6ujaw/exec'; // URL do seu Apps Script
 
         document.addEventListener('DOMContentLoaded', () => {
             const addButton = document.getElementById('addButton');
@@ -78,39 +81,62 @@
             saveButton.addEventListener('click', async () => {
                 const title = document.getElementById('titleInput').value.trim();
                 const description = document.getElementById('descriptionInput').value.trim();
-                const file = document.getElementById('fileInput').files[0];
+                const fileInput = document.getElementById('fileInput');
+                const file = fileInput.files[0];
 
                 if (!title || !description || !file) {
                     alert('Por favor, preencha todos os campos.');
                     return;
                 }
 
-                // Preparar os dados para envio
-                const formData = new FormData();
-                formData.append('type', 'add');
-                formData.append('title', title);
-                formData.append('description', description);
-                formData.append('file', file);
-
-                try {
-                    const response = await fetch(appScriptURL, {
-                        method: 'POST',
-                        body: formData
-                    });
-                    const result = await response.json();
-                    if (result.status === 'success') {
-                        alert('Ebook adicionado com sucesso!');
-                        addForm.reset();
-                        addForm.style.display = 'none';
-                        loadEbooks();
-                        setHasChanges(true);
-                    } else {
-                        alert('Erro ao adicionar ebook: ' + result.message);
-                    }
-                } catch (error) {
-                    console.error('Erro:', error);
-                    alert('Erro ao conectar com o servidor.');
+                // Verificar se o arquivo é PDF
+                if (file.type !== 'application/pdf') {
+                    alert('Por favor, selecione um arquivo PDF.');
+                    return;
                 }
+
+                // Ler o arquivo como base64
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = async () => {
+                    const base64Data = reader.result.split(',')[1]; // Remover a parte 'data:application/pdf;base64,'
+
+                    // Preparar os dados para envio
+                    const payload = {
+                        type: 'add',
+                        title: title,
+                        description: description,
+                        fileName: file.name,
+                        fileData: base64Data
+                    };
+
+                    try {
+                        const response = await fetch(appScriptURL, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(payload)
+                        });
+                        const result = await response.json();
+                        if (result.status === 'success') {
+                            alert('Ebook adicionado com sucesso!');
+                            addForm.reset();
+                            addForm.style.display = 'none';
+                            loadEbooks();
+                            setHasChanges(true);
+                        } else {
+                            alert('Erro ao adicionar ebook: ' + result.message);
+                        }
+                    } catch (error) {
+                        console.error('Erro:', error);
+                        alert('Erro ao conectar com o servidor.');
+                    }
+                };
+
+                reader.onerror = () => {
+                    alert('Erro ao ler o arquivo.');
+                };
             });
 
             // Carregar ebooks na página
@@ -130,12 +156,14 @@
                             const title = document.createElement('span');
                             title.textContent = ebook.title;
                             title.className = 'title';
+                            title.style.marginRight = '10px';
                             item.appendChild(title);
 
                             // Descrição
                             const description = document.createElement('span');
                             description.textContent = ebook.description;
                             description.className = 'description';
+                            description.style.marginRight = '10px';
                             item.appendChild(description);
 
                             // Link de Download
@@ -184,6 +212,7 @@
                 titleInput.type = 'text';
                 titleInput.value = ebook.title;
                 titleInput.className = 'edit-title';
+                titleInput.style.marginRight = '10px';
                 item.insertBefore(titleInput, titleSpan);
                 item.removeChild(titleSpan);
 
@@ -191,6 +220,7 @@
                 descriptionInput.type = 'text';
                 descriptionInput.value = ebook.description;
                 descriptionInput.className = 'edit-description';
+                descriptionInput.style.marginRight = '10px';
                 item.insertBefore(descriptionInput, descriptionSpan);
                 item.removeChild(descriptionSpan);
 
@@ -214,16 +244,20 @@
                 }
 
                 // Preparar os dados para envio
-                const formData = new FormData();
-                formData.append('type', 'edit');
-                formData.append('id', ebookId);
-                formData.append('title', title);
-                formData.append('description', description);
+                const payload = {
+                    type: 'edit',
+                    id: ebookId,
+                    title: title,
+                    description: description
+                };
 
                 try {
                     const response = await fetch(appScriptURL, {
                         method: 'POST',
-                        body: formData
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
                     });
                     const result = await response.json();
                     if (result.status === 'success') {
@@ -243,14 +277,18 @@
             async function deleteEbook(ebookId) {
                 if (!confirm('Tem certeza que deseja excluir este ebook?')) return;
 
-                const formData = new FormData();
-                formData.append('type', 'del');
-                formData.append('id', ebookId);
+                const payload = {
+                    type: 'del',
+                    id: ebookId
+                };
 
                 try {
                     const response = await fetch(appScriptURL, {
                         method: 'POST',
-                        body: formData
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
                     });
                     const result = await response.json();
                     if (result.status === 'success') {
