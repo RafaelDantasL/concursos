@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Gerenciador de Ebooks</title>
+    <style>
+        /* Estilos básicos para a página */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #addForm {
+            display: none;
+            margin-top: 20px;
+        }
+        #ebookList {
+            margin-top: 30px;
+        }
+        .ebook-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .ebook-item input[type="text"] {
+            margin-right: 10px;
+        }
+        .ebook-item a {
+            margin-right: 10px;
+            text-decoration: none;
+            color: blue;
+        }
+        .actions button {
+            margin-right: 5px;
+        }
+        #publishButton {
+            display: none;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Gerenciador de Ebooks</h1>
+    
+    <button id="addButton">Adicionar</button>
+    <button id="publishButton">Publicar alterações</button>
+
+    <!-- Formulário de Adição -->
+    <div id="addForm">
+        <input type="text" id="titleInput" placeholder="Título" required>
+        <input type="text" id="descriptionInput" placeholder="Descrição" required>
+        <input type="file" id="fileInput" accept=".pdf" required>
+        <button id="saveButton">Salvar</button>
+    </div>
+
+    <!-- Lista de Ebooks -->
+    <div id="ebookList">
+        <!-- Itens serão carregados dinamicamente aqui -->
+    </div>
+
+    <script>
+        const appScriptURL = 'https://script.google.com/macros/s/AKfycbwMBkmbaFd0f1hlvXIgvWSKeohtCwaLVRpvXZ-FkDBU63FO0ZTtvonghrpgmdj6ujaw/exec'; // Substitua pelo URL do seu Apps Script
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const addButton = document.getElementById('addButton');
+            const addForm = document.getElementById('addForm');
+            const saveButton = document.getElementById('saveButton');
+            const publishButton = document.getElementById('publishButton');
+
+            let hasChanges = false;
+
+            // Exibir ou ocultar o formulário de adição
+            addButton.addEventListener('click', () => {
+                addForm.style.display = addForm.style.display === 'none' ? 'flex' : 'none';
+            });
+
+            // Salvar novo ebook
+            saveButton.addEventListener('click', async () => {
+                const title = document.getElementById('titleInput').value.trim();
+                const description = document.getElementById('descriptionInput').value.trim();
+                const file = document.getElementById('fileInput').files[0];
+
+                if (!title || !description || !file) {
+                    alert('Por favor, preencha todos os campos.');
+                    return;
+                }
+
+                // Preparar os dados para envio
+                const formData = new FormData();
+                formData.append('type', 'add');
+                formData.append('title', title);
+                formData.append('description', description);
+                formData.append('file', file);
+
+                try {
+                    const response = await fetch(appScriptURL, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const result = await response.json();
+                    if (result.status === 'success') {
+                        alert('Ebook adicionado com sucesso!');
+                        addForm.reset();
+                        addForm.style.display = 'none';
+                        loadEbooks();
+                        setHasChanges(true);
+                    } else {
+                        alert('Erro ao adicionar ebook: ' + result.message);
+                    }
+                } catch (error) {
+                    console.error('Erro:', error);
+                    alert('Erro ao conectar com o servidor.');
+                }
+            });
+
+            // Carregar ebooks na página
+            async function loadEbooks() {
+                try {
+                    const response = await fetch(`${appScriptURL}?type=list`);
+                    const data = await response.json();
+                    if (data.status === 'success') {
+                        const ebookList = document.getElementById('ebookList');
+                        ebookList.innerHTML = '';
+                        data.ebooks.forEach(ebook => {
+                            const item = document.createElement('div');
+                            item.className = 'ebook-item';
+                            item.dataset.id = ebook.id;
+
+                            // Título
+                            const title = document.createElement('span');
+                            title.textContent = ebook.title;
+                            title.className = 'title';
+                            item.appendChild(title);
+
+                            // Descrição
+                            const description = document.createElement('span');
+                            description.textContent = ebook.description;
+                            description.className = 'description';
+                            item.appendChild(description);
+
+                            // Link de Download
+                            const link = document.createElement('a');
+                            link.href = ebook.downloadLink;
+                            link.target = '_blank';
+                            link.textContent = 'Download';
+                            item.appendChild(link);
+
+                            // Botões de Ação
+                            const actions = document.createElement('div');
+                            actions.className = 'actions';
+
+                            const editButton = document.createElement('button');
+                            editButton.textContent = 'Editar';
+                            editButton.addEventListener('click', () => editEbook(item, ebook));
+                            actions.appendChild(editButton);
+
+                            const deleteButton = document.createElement('button');
+                            deleteButton.textContent = 'Excluir';
+                            deleteButton.addEventListener('click', () => deleteEbook(ebook.id));
+                            actions.appendChild(deleteButton);
+
+                            item.appendChild(actions);
+
+                            ebookList.appendChild(item);
+                        });
+                    } else {
+                        alert('Erro ao carregar ebooks: ' + data.message);
+                    }
+                } catch (error) {
+                    console.error('Erro:', error);
+                    alert('Erro ao conectar com o servidor.');
+                }
+            }
+
+            // Editar ebook
+            function editEbook(item, ebook) {
+                const titleSpan = item.querySelector('.title');
+                const descriptionSpan = item.querySelector('.description');
+                const actionsDiv = item.querySelector('.actions');
+                const editButton = actionsDiv.querySelector('button:first-child');
+
+                // Transformar em campos editáveis
+                const titleInput = document.createElement('input');
+                titleInput.type = 'text';
+                titleInput.value = ebook.title;
+                titleInput.className = 'edit-title';
+                item.insertBefore(titleInput, titleSpan);
+                item.removeChild(titleSpan);
+
+                const descriptionInput = document.createElement('input');
+                descriptionInput.type = 'text';
+                descriptionInput.value = ebook.description;
+                descriptionInput.className = 'edit-description';
+                item.insertBefore(descriptionInput, descriptionSpan);
+                item.removeChild(descriptionSpan);
+
+                // Alterar botão de Editar para Salvar
+                editButton.textContent = 'Salvar';
+                editButton.removeEventListener('click', () => editEbook(item, ebook));
+                editButton.addEventListener('click', () => saveEdit(item, ebook.id));
+            }
+
+            // Salvar edição de ebook
+            async function saveEdit(item, ebookId) {
+                const titleInput = item.querySelector('.edit-title');
+                const descriptionInput = item.querySelector('.edit-description');
+
+                const title = titleInput.value.trim();
+                const description = descriptionInput.value.trim();
+
+                if (!title || !description) {
+                    alert('Por favor, preencha todos os campos.');
+                    return;
+                }
+
+                // Preparar os dados para envio
+                const formData = new FormData();
+                formData.append('type', 'edit');
+                formData.append('id', ebookId);
+                formData.append('title', title);
+                formData.append('description', description);
+
+                try {
+                    const response = await fetch(appScriptURL, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const result = await response.json();
+                    if (result.status === 'success') {
+                        alert('Ebook atualizado com sucesso!');
+                        setHasChanges(true);
+                        loadEbooks();
+                    } else {
+                        alert('Erro ao atualizar ebook: ' + result.message);
+                    }
+                } catch (error) {
+                    console.error('Erro:', error);
+                    alert('Erro ao conectar com o servidor.');
+                }
+            }
+
+            // Excluir ebook
+            async function deleteEbook(ebookId) {
+                if (!confirm('Tem certeza que deseja excluir este ebook?')) return;
+
+                const formData = new FormData();
+                formData.append('type', 'del');
+                formData.append('id', ebookId);
+
+                try {
+                    const response = await fetch(appScriptURL, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const result = await response.json();
+                    if (result.status === 'success') {
+                        alert('Ebook excluído com sucesso!');
+                        setHasChanges(true);
+                        loadEbooks();
+                    } else {
+                        alert('Erro ao excluir ebook: ' + result.message);
+                    }
+                } catch (error) {
+                    console.error('Erro:', error);
+                    alert('Erro ao conectar com o servidor.');
+                }
+            }
+
+            // Gerenciar botão de Publicar alterações
+            function setHasChanges(status) {
+                hasChanges = status;
+                publishButton.style.display = hasChanges ? 'inline-block' : 'none';
+            }
+
+            // Publicar alterações no GitHub
+            publishButton.addEventListener('click', async () => {
+                try {
+                    const response = await fetch(`${appScriptURL}?type=publish`);
+                    const data = await response.json();
+                    if (data.status === 'success') {
+                        alert('Alterações publicadas com sucesso no GitHub!');
+                        setHasChanges(false);
+                    } else {
+                        alert('Erro ao publicar alterações: ' + data.message);
+                    }
+                } catch (error) {
+                    console.error('Erro:', error);
+                    alert('Erro ao conectar com o servidor.');
+                }
+            });
+
+            // Carregar ebooks ao iniciar
+            loadEbooks();
+        });
+    </script>
+
+</body>
+</html>
