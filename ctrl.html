@@ -221,21 +221,12 @@ button:hover {
         document.getElementById('addCourseBtn').addEventListener('click', () => {
             window.location.href = 'ctrl/editar';
         });
-
-
-
-
-
-
-
-
-        
+       
         let courses = []; // Armazena todos os cursos carregados
         let filteredCourses = []; // Armazena os cursos filtrados pela barra de pesquisa
         let currentPage = 1; // Página atual da paginação
         const itemsPerPage = 10; // Número de itens por página
-
-      
+ 
 // Carrega os cursos do Firebase
  function loadCourses() {
      fetch(`${firebaseConfig.databaseURL}/cursos.json`)
@@ -316,18 +307,6 @@ document.getElementById('searchBar').addEventListener('input', function () {
     currentPage = 1; // Reseta para a primeira página ao pesquisar
     displayCourses();
 });
-
-
-
-
-
-
-
-
-
-
-
-
         
         function viewCoursePage(link) {
             window.open(link, '_blank');
