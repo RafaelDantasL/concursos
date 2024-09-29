@@ -186,7 +186,8 @@ button:hover {
 <div id="content">
     <button id="logoutBtn">Logout</button>    
     <h1>Controle de infoproduto</h1><br><br>
-    <button id="addCourseBtn">Adicionar Novo Curso</button><br><br>
+    <button id="addCourseBtn">Adicionar Novo Curso</button>
+    <button id="addEbookBtn">Adicionar E-book Grátis</button><br><br>
     <input type="text" id="searchBar" placeholder="Pesquisar cursos..."><br><br>
     <div class="course-list" id="courseList"></div> 
     <div class="pagination">
@@ -450,6 +451,10 @@ window.addEventListener('load', function() {
         localStorage.removeItem('loggedIn');  // Remove o status de login do localStorage
         location.reload();  // Recarrega a página para exibir o modal de login novamente
     });
+
+    document.getElementById('addEbookBtn').addEventListener('click', () => {
+    window.location.href = 'https://script.google.com/macros/s/AKfycbwMBkmbaFd0f1hlvXIgvWSKeohtCwaLVRpvXZ-FkDBU63FO0ZTtvonghrpgmdj6ujaw/exec';
+});
     </script>
 </body>
 </body>
