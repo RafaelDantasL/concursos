@@ -72,6 +72,12 @@ button:hover {
 #addCourseBtn:hover, #addEbookBtn:hover {
     opacity: 0.8;
 }
+
+.button-container {
+    display: flex;
+    justify-content: space-between; /* Alinha os botões nas extremidades do contêiner */
+    margin-bottom: 20px; /* Margem abaixo do contêiner */
+}
         
 /* Estilos para o modal */
         #loginModal {
@@ -186,8 +192,10 @@ button:hover {
 <div id="content">
     <button id="logoutBtn">Logout</button>    
     <h1>Controle de infoproduto</h1><br><br>
+<div class="button-container">
     <button id="addCourseBtn">Adicionar Novo Curso</button>
-    <button id="addEbookBtn">Adicionar E-book Grátis</button><br><br>
+    <button id="addEbookBtn">Adicionar E-book Grátis</button>
+</div>
     <input type="text" id="searchBar" placeholder="Pesquisar cursos..."><br><br>
     <div class="course-list" id="courseList"></div> 
     <div class="pagination">
