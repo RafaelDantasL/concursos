@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Controle de Cursos</title>
+    <title>Controle de Cursos 2</title>
     <style>
         body {
     background-color: #1c1c1e;
@@ -147,22 +147,7 @@ button:hover {
         #logoutBtn:hover {
             background-color: #ff3333;
         }
-
-
-
-
-        .course-item {
-            margin: 10px 0;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-        }
-        .course-item-buttons button {
-            margin-right: 10px;
-        }
-        #paginationControls button {
-            margin-right: 5px;
-        }
+        
     </style>
 </head>
 <body>
@@ -180,14 +165,10 @@ button:hover {
 
 <!-- Conteúdo principal da página, só será exibido após o login -->
 <div id="content">
-    <button id="logoutBtn">Logout</button>
     <h1>Controle de infoproduto</h1><br><br>
     <button id="addCourseBtn">Adicionar Novo Curso</button><br><br>
-        <!-- Barra de pesquisa -->
-    <input type="text" id="searchInput" placeholder="Buscar cursos..." oninput="filterCourses()"><br><br>
     <div class="course-list" id="courseList"></div>
-    <!-- Controles de paginação -->
-    <div id="paginationControls"></div>
+    <button id="logoutBtn">Logout</button>
 </div>   
     <script>
         const firebaseConfig = {
@@ -208,89 +189,31 @@ button:hover {
             window.location.href = 'ctrl/editar';
         });
 
-        // Seu código JavaScript
-        let currentPage = 1;
-        const itemsPerPage = 20;
-        let filteredCourses = [];
-
-        // Função para carregar os cursos
         function loadCourses() {
             fetch(`${firebaseConfig.databaseURL}/cursos.json`)
                 .then(response => response.json())
                 .then(courses => {
-                    filteredCourses = Object.keys(courses).map(courseId => {
-                        return {
-                            id: courseId,
-                            ...courses[courseId]
-                        };
-                    });
+                    const courseList = document.getElementById('courseList');
+                    courseList.innerHTML = '';
 
-                    displayCourses();
-                    setupPagination();
+                    for (const courseId in courses) {
+                        const course = courses[courseId];
+
+                        const courseItem = document.createElement('div');
+                        courseItem.className = 'course-item';
+                        courseItem.innerHTML = `
+                            <div>${course.titulo}</div>
+                            <div class="course-item-buttons">
+                                <button onclick="viewCoursePage('${course.link}')">Ver página publicada</button>
+                                <button onclick="copyLink('${course.link}')">Copiar link</button>
+                                <button onclick="editCourse('${courseId}')">Editar</button>
+                                <button onclick="deleteCourse('${courseId}', '${course.imagem}')">Excluir</button>
+                            </div>
+                        `;
+                        courseList.appendChild(courseItem);
+                    }
                 });
         }
-
-        // Função para exibir os cursos com paginação
-        function displayCourses() {
-            const courseList = document.getElementById('courseList');
-            courseList.innerHTML = '';
-
-            const start = (currentPage - 1) * itemsPerPage;
-            const end = start + itemsPerPage;
-            const paginatedCourses = filteredCourses.slice(start, end);
-
-            for (const course of paginatedCourses) {
-                const courseItem = document.createElement('div');
-                courseItem.className = 'course-item';
-                courseItem.innerHTML = `
-                    <div>${course.titulo}</div>
-                    <div class="course-item-buttons">
-                        <button onclick="viewCoursePage('${course.link}')">Ver página publicada</button>
-                        <button onclick="copyLink('${course.link}')">Copiar link</button>
-                        <button onclick="editCourse('${course.id}')">Editar</button>
-                        <button onclick="deleteCourse('${course.id}', '${course.imagem}')">Excluir</button>
-                    </div>
-                `;
-                courseList.appendChild(courseItem);
-            }
-        }
-
-        // Função para configurar a paginação
-        function setupPagination() {
-            const totalPages = Math.ceil(filteredCourses.length / itemsPerPage);
-            const paginationControls = document.getElementById('paginationControls');
-            paginationControls.innerHTML = '';
-
-            for (let i = 1; i <= totalPages; i++) {
-                const pageButton = document.createElement('button');
-                pageButton.textContent = i;
-                pageButton.onclick = () => {
-                    currentPage = i;
-                    displayCourses();
-                };
-                paginationControls.appendChild(pageButton);
-            }
-        }
-
-        // Função para filtrar os cursos
-        function filterCourses() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            fetch(`${firebaseConfig.databaseURL}/cursos.json`)
-                .then(response => response.json())
-                .then(courses => {
-                    filteredCourses = Object.keys(courses).map(courseId => {
-                        return {
-                            id: courseId,
-                            ...courses[courseId]
-                        };
-                    }).filter(course => course.titulo.toLowerCase().includes(searchTerm));
-
-                    currentPage = 1;  // Reinicia a paginação quando há filtragem
-                    displayCourses();
-                    setupPagination();
-                });
-        }
-
 
         function viewCoursePage(link) {
             window.open(link, '_blank');
