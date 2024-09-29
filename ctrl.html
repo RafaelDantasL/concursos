@@ -167,7 +167,13 @@ button:hover {
 <div id="content">
     <h1>Controle de infoproduto</h1><br><br>
     <button id="addCourseBtn">Adicionar Novo Curso</button><br><br>
+    <!-- Barra de pesquisa -->
+    <input type="text" id="searchBar" placeholder="Pesquisar curso..." />
+    <!-- Lista de cursos com paginação -->
     <div class="course-list" id="courseList"></div>
+    <!-- Controles de paginação -->
+    <div class="pagination" id="pagination"></div>
+
     <button id="logoutBtn">Logout</button>
 </div>   
     <script>
@@ -185,6 +191,10 @@ button:hover {
         const GITHUB_TOKEN = "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";
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwXccK6pL1FJGbBT8ATE-xaBk_c5gQHTRhEsZdBNmiPVAO-cW07D4ifQOt0QOZk4An-/exec";
 
+        let coursesPerPage = 20;  // Define quantos cursos por página
+        let currentPage = 1;
+        let filteredCourses = [];  // Cursos filtrados pela pesquisa
+
         document.getElementById('addCourseBtn').addEventListener('click', () => {
             window.location.href = 'ctrl/editar';
         });
@@ -193,26 +203,58 @@ button:hover {
             fetch(`${firebaseConfig.databaseURL}/cursos.json`)
                 .then(response => response.json())
                 .then(courses => {
-                    const courseList = document.getElementById('courseList');
-                    courseList.innerHTML = '';
-
-                    for (const courseId in courses) {
-                        const course = courses[courseId];
-
-                        const courseItem = document.createElement('div');
-                        courseItem.className = 'course-item';
-                        courseItem.innerHTML = `
-                            <div>${course.titulo}</div>
-                            <div class="course-item-buttons">
-                                <button onclick="viewCoursePage('${course.link}')">Ver página publicada</button>
-                                <button onclick="copyLink('${course.link}')">Copiar link</button>
-                                <button onclick="editCourse('${courseId}')">Editar</button>
-                                <button onclick="deleteCourse('${courseId}', '${course.imagem}')">Excluir</button>
-                            </div>
-                        `;
-                        courseList.appendChild(courseItem);
-                    }
+                    filteredCourses = Object.entries(courses).map(([courseId, course]) => ({ courseId, ...course }));
+                    renderCourses(filteredCourses, currentPage);
+                    setupPagination(filteredCourses.length);
                 });
+        }
+
+        function renderCourses(courses, page) {
+            const courseList = document.getElementById('courseList');
+            courseList.innerHTML = '';
+
+            const start = (page - 1) * coursesPerPage;
+            const end = start + coursesPerPage;
+            const paginatedCourses = courses.slice(start, end);
+
+            for (const course of paginatedCourses) {
+                const courseItem = document.createElement('div');
+                courseItem.className = 'course-item';
+                courseItem.innerHTML = `
+                    <div>${course.titulo}</div>
+                    <div class="course-item-buttons">
+                        <button onclick="viewCoursePage('${course.link}')">Ver página publicada</button>
+                        <button onclick="copyLink('${course.link}')">Copiar link</button>
+                        <button onclick="editCourse('${course.courseId}')">Editar</button>
+                        <button onclick="deleteCourse('${course.courseId}', '${course.imagem}')">Excluir</button>
+                    </div>
+                `;
+                courseList.appendChild(courseItem);
+            }
+        }
+
+        function setupPagination(totalCourses) {
+            const pagination = document.getElementById('pagination');
+            pagination.innerHTML = '';
+            const totalPages = Math.ceil(totalCourses / coursesPerPage);
+
+            for (let i = 1; i <= totalPages; i++) {
+                const pageButton = document.createElement('button');
+                pageButton.innerHTML = i;
+                pageButton.addEventListener('click', () => {
+                    currentPage = i;
+                    renderCourses(filteredCourses, currentPage);
+                });
+                pagination.appendChild(pageButton);
+            }
+        }
+
+        function searchCourses() {
+            const searchInput = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = filteredCourses.filter(course => course.titulo.toLowerCase().includes(searchInput));
+            currentPage = 1;  // Reinicia para a primeira página após uma pesquisa
+            renderCourses(filtered, currentPage);
+            setupPagination(filtered.length);
         }
 
         function viewCoursePage(link) {
@@ -231,55 +273,55 @@ button:hover {
             window.location.href = `ctrl/editar?id=${courseId}`;
         }
 
-async function deleteCourse(courseId) {
-    if (confirm('Tem certeza que deseja excluir este curso?')) {
-        try {
-            // 1. Excluir o curso do banco de dados Firebase
-            const firebaseDeleteResponse = await fetch(`${firebaseConfig.databaseURL}/cursos/${courseId}.json`, {
-                method: 'DELETE'
-            });
+        async function deleteCourse(courseId) {
+            if (confirm('Tem certeza que deseja excluir este curso?')) {
+                try {
+                    // 1. Excluir o curso do banco de dados Firebase
+                    const firebaseDeleteResponse = await fetch(`${firebaseConfig.databaseURL}/cursos/${courseId}.json`, {
+                        method: 'DELETE'
+                    });
 
-            if (!firebaseDeleteResponse.ok) {
-                throw new Error('Erro ao excluir o curso do Firebase.');
+                    if (!firebaseDeleteResponse.ok) {
+                        throw new Error('Erro ao excluir o curso do Firebase.');
+                    }
+
+                    // 2. Salvar o courseId no sessionStorage para realizar a exclusão da página de vendas após o reload
+                    sessionStorage.setItem('courseToDelete', courseId);
+
+                    // 3. Recarregar a página
+                    window.location.reload();
+                } catch (error) {
+                    console.error('Erro ao excluir o curso:', error);
+                    alert('Ocorreu um erro ao excluir o curso.');
+                }
             }
-
-            // 2. Salvar o courseId no sessionStorage para realizar a exclusão da página de vendas após o reload
-            sessionStorage.setItem('courseToDelete', courseId);
-
-            // 3. Recarregar a página
-            window.location.reload();
-        } catch (error) {
-            console.error('Erro ao excluir o curso:', error);
-            alert('Ocorreu um erro ao excluir o curso.');
         }
-    }
-}
 
-// Após o carregamento da página, verificar se existe um courseId salvo
-window.onload = function() {
-    const courseId = sessionStorage.getItem('courseToDelete');
+        // Após o carregamento da página, verificar se existe um courseId salvo
+        window.onload = function() {
+            const courseId = sessionStorage.getItem('courseToDelete');
 
-    if (courseId) {
-        // Fazer a solicitação para excluir a página de vendas
-        const googleAppScriptURL = `https://script.google.com/macros/s/AKfycbwXccK6pL1FJGbBT8ATE-xaBk_c5gQHTRhEsZdBNmiPVAO-cW07D4ifQOt0QOZk4An-/exec?id=${courseId}`;
+            if (courseId) {
+                // Fazer a solicitação para excluir a página de vendas
+                const googleAppScriptURL = `https://script.google.com/macros/s/AKfycbwXccK6pL1FJGbBT8ATE-xaBk_c5gQHTRhEsZdBNmiPVAO-cW07D4ifQOt0QOZk4An-/exec?id=${courseId}`;
 
-        fetch(googleAppScriptURL, {
-            method: 'GET',
-            credentials: 'include'
-        }).then(response => {
-            if (response.ok) {
-                console.log('Página de vendas excluída com sucesso!');
-            } else {
-                console.error('Erro ao excluir a página de vendas:', response.statusText);
+                fetch(googleAppScriptURL, {
+                    method: 'GET',
+                    credentials: 'include'
+                }).then(response => {
+                    if (response.ok) {
+                        console.log('Página de vendas excluída com sucesso!');
+                    } else {
+                        console.error('Erro ao excluir a página de vendas:', response.statusText);
+                    }
+
+                    // Limpar o sessionStorage após a solicitação
+                    sessionStorage.removeItem('courseToDelete');
+                }).catch(error => {
+                    console.error('Erro ao fazer a solicitação ao Google Apps Script:', error);
+                });
             }
-
-            // Limpar o sessionStorage após a solicitação
-            sessionStorage.removeItem('courseToDelete');
-        }).catch(error => {
-            console.error('Erro ao fazer a solicitação ao Google Apps Script:', error);
-        });
-    }
-};
+        };
 
         async function getFileSha(filePath) {
             const response = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${filePath}`, {
@@ -295,57 +337,55 @@ window.onload = function() {
 
         loadCourses();
 
-    // Verificar se o usuário já está logado ao carregar a página
-    window.onload = function() {
-        const isLoggedIn = localStorage.getItem('loggedIn');
-        
-        if (isLoggedIn) {
-            // Se estiver logado, exibe o conteúdo e oculta o modal
-            document.getElementById('content').style.display = 'block';
-            document.getElementById('loginModal').style.display = 'none';
-        } else {
-            // Caso contrário, mantém o modal aberto e o conteúdo oculto
+        // Verificar se o usuário já está logado ao carregar a página
+        window.onload = function() {
+            const isLoggedIn = localStorage.getItem('loggedIn');
+            
+            if (isLoggedIn) {
+                // Se estiver logado, exibe o conteúdo e oculta o modal
+                document.getElementById('content').style.display = 'block';
+                document.getElementById('loginModal').style.display = 'none';
+            } else {
+                // Caso contrário, mantém o modal aberto e o conteúdo oculto
+                document.getElementById('content').style.display = 'none';
+                document.getElementById('loginModal').style.display = 'block';
+            }
+        };
+
+        // Função de login com chamada HTTP ao Google App Script
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorMessage = document.getElementById('errorMessage');
+
+            // URL do seu Google App Script Web App
+            const url = `https://script.google.com/macros/s/AKfycbx0Rr572nndkK2vr9q_Ji5Aje-gyggsfuZFn70vzq6AwNAD1ebE-DlOwqtByfmiXxH2/exec?username=${username}&password=${password}`;
+
+            fetch(url, {
+                method: 'GET',
+                credentials: 'include'
+            }).then(response => response.json()).then(data => {
+                if (data.success) {
+                    localStorage.setItem('loggedIn', 'true');
+                    document.getElementById('content').style.display = 'block';
+                    document.getElementById('loginModal').style.display = 'none';
+                } else {
+                    errorMessage.innerText = 'Credenciais inválidas. Tente novamente.';
+                }
+            }).catch(error => {
+                console.error('Erro ao fazer a solicitação:', error);
+                errorMessage.innerText = 'Erro ao conectar com o servidor. Tente novamente mais tarde.';
+            });
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            localStorage.removeItem('loggedIn');
             document.getElementById('content').style.display = 'none';
             document.getElementById('loginModal').style.display = 'block';
-        }
-    };
-
-    // Função de login com chamada HTTP ao Google App Script
-    document.getElementById('loginForm').addEventListener('submit', function(event) {
-        event.preventDefault();
-
-        const username = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
-        const errorMessage = document.getElementById('errorMessage');
-
-        // URL do seu Google App Script Web App
-        const url = `https://script.google.com/macros/s/AKfycbx0Rr572nndkK2vr9q_Ji5Aje-gyggsfuZFn70vzgo1eevx-sTyM5Lsx-HYFRUl51s/exec?nome=${encodeURIComponent(username)}&senha=${encodeURIComponent(password)}`;
-
-        // Fazer a requisição HTTP usando fetch
-        fetch(url)
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Se a autenticação for bem-sucedida
-                localStorage.setItem('loggedIn', 'true');  // Armazena o status de login no localStorage
-                document.getElementById('loginModal').style.display = 'none';
-                document.getElementById('content').style.display = 'block';
-            } else {
-                // Exibir mensagem de erro
-                errorMessage.textContent = "Nome ou senha incorretos!";
-            }
-        })
-        .catch(error => {
-            console.error("Erro:", error);
-            errorMessage.textContent = "Ocorreu um erro ao tentar fazer login.";
         });
-    });
 
-    // Função de logout
-    document.getElementById('logoutBtn').addEventListener('click', function() {
-        localStorage.removeItem('loggedIn');  // Remove o status de login do localStorage
-        location.reload();  // Recarrega a página para exibir o modal de login novamente
-    });
     </script>
 </body>
 </body>
