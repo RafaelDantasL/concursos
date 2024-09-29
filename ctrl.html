@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Controle de Cursos 2</title>
+    <title>Controle de Cursos</title>
     <style>
         body {
     background-color: #1c1c1e;
@@ -231,10 +231,12 @@ button:hover {
             window.location.href = `ctrl/editar?id=${courseId}`;
         }
 
-async function deleteCourse(courseId) {
+
+        
+async function deleteCourse(courseId, imagem) {
     if (confirm('Tem certeza que deseja excluir este curso?')) {
         try {
-            // 1. Excluir o curso do banco de dados Firebase
+            // Exclui o curso do Firebase
             const firebaseDeleteResponse = await fetch(`${firebaseConfig.databaseURL}/cursos/${courseId}.json`, {
                 method: 'DELETE'
             });
@@ -243,10 +245,11 @@ async function deleteCourse(courseId) {
                 throw new Error('Erro ao excluir o curso do Firebase.');
             }
 
-            // 2. Salvar o courseId no sessionStorage para realizar a exclusão da página de vendas após o reload
+            // Armazena as informações necessárias no sessionStorage
             sessionStorage.setItem('courseToDelete', courseId);
+            sessionStorage.setItem('courseImageToDelete', imagem);
 
-            // 3. Recarregar a página
+            // Recarrega a página para acionar a exclusão via Google Apps Script
             window.location.reload();
         } catch (error) {
             console.error('Erro ao excluir o curso:', error);
@@ -255,32 +258,9 @@ async function deleteCourse(courseId) {
     }
 }
 
-// Após o carregamento da página, verificar se existe um courseId salvo
-window.onload = function() {
-    const courseId = sessionStorage.getItem('courseToDelete');
 
-    if (courseId) {
-        // Fazer a solicitação para excluir a página de vendas
-        const googleAppScriptURL = `https://script.google.com/macros/s/AKfycbwXccK6pL1FJGbBT8ATE-xaBk_c5gQHTRhEsZdBNmiPVAO-cW07D4ifQOt0QOZk4An-/exec?id=${courseId}`;
 
-        fetch(googleAppScriptURL, {
-            method: 'GET',
-            credentials: 'include'
-        }).then(response => {
-            if (response.ok) {
-                console.log('Página de vendas excluída com sucesso!');
-            } else {
-                console.error('Erro ao excluir a página de vendas:', response.statusText);
-            }
-
-            // Limpar o sessionStorage após a solicitação
-            sessionStorage.removeItem('courseToDelete');
-        }).catch(error => {
-            console.error('Erro ao fazer a solicitação ao Google Apps Script:', error);
-        });
-    }
-};
-
+        
         async function getFileSha(filePath) {
             const response = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${filePath}`, {
                 method: 'GET',
@@ -295,21 +275,59 @@ window.onload = function() {
 
         loadCourses();
 
-    // Verificar se o usuário já está logado ao carregar a página
-    window.onload = function() {
-        const isLoggedIn = localStorage.getItem('loggedIn');
-        
-        if (isLoggedIn) {
-            // Se estiver logado, exibe o conteúdo e oculta o modal
-            document.getElementById('content').style.display = 'block';
-            document.getElementById('loginModal').style.display = 'none';
-        } else {
-            // Caso contrário, mantém o modal aberto e o conteúdo oculto
-            document.getElementById('content').style.display = 'none';
-            document.getElementById('loginModal').style.display = 'block';
-        }
-    };
 
+
+
+
+        
+
+
+window.addEventListener('load', function() {
+    // Função para verificar autenticação
+    const isLoggedIn = localStorage.getItem('loggedIn');
+    
+    if (isLoggedIn) {
+        // Mostra o conteúdo quando o usuário está autenticado
+        document.getElementById('content').style.display = 'block';
+        document.getElementById('loginModal').style.display = 'none';
+    } else {
+        // Exibe o modal de login se o usuário não estiver autenticado
+        document.getElementById('content').style.display = 'none';
+        document.getElementById('loginModal').style.display = 'block';
+    }
+
+    // Função para verificar se um curso foi marcado para exclusão
+    const courseId = sessionStorage.getItem('courseToDelete');
+    const courseImage = sessionStorage.getItem('courseImageToDelete');
+
+    if (courseId && courseImage) {
+        const googleAppScriptURL = `https://script.google.com/macros/s/AKfycbwXccK6pL1FJGbBT8ATE-xaBk_c5gQHTRhEsZdBNmiPVAO-cW07D4ifQOt0QOZk4An-/exec?id=${courseId}&imagem=${courseImage}`;
+
+        fetch(googleAppScriptURL, {
+            method: 'GET',
+            credentials: 'include'
+        }).then(response => {
+            if (response.ok) {
+                console.log('Página de vendas excluída com sucesso!');
+            } else {
+                console.error('Erro ao excluir a página de vendas:', response.statusText);
+            }
+
+            sessionStorage.removeItem('courseToDelete');
+            sessionStorage.removeItem('courseImageToDelete');
+        }).catch(error => {
+            console.error('Erro ao fazer a solicitação ao Google Apps Script:', error);
+        });
+    }
+});
+
+
+
+
+        
+
+
+        
     // Função de login com chamada HTTP ao Google App Script
     document.getElementById('loginForm').addEventListener('submit', function(event) {
         event.preventDefault();
