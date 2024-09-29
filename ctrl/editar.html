@@ -240,13 +240,22 @@
             <input type="text" id="promocao" name="promocao" placeholder="R$ 0,00">
 
             <label for="parcelamento">Parcelamento:</label>
-            <select id="parcelamento" name="parcelamento">
-                <script>
-                    for (let i = 1; i <= 12; i++) {
-                        document.write(`<option value="${i}x">${i}x</option>`);
-                    }
-                </script>
-            </select>
+
+		
+<select id="parcelamento" name="parcelamento">
+    <!-- As opções serão adicionadas via JavaScript -->
+</select>
+
+<script>
+    const parcelamentoSelect = document.getElementById('parcelamento');
+    for (let i = 1; i <= 12; i++) {
+        const option = document.createElement('option');
+        option.value = `${i}x`;
+        option.textContent = `${i}x`;
+        parcelamentoSelect.appendChild(option);
+    }
+</script>
+		
             <input type="text" id="valorParcelamento" name="valorParcelamento" placeholder="R$ 0,00" required>
 	</div>
 <br><br>
@@ -412,53 +421,79 @@
             }
         });
 
-        // Após o reload, verificar se existe um curso para publicar
-        window.onload = async function() {
-            const courseToPublish = sessionStorage.getItem('courseToPublish');
-            if (courseToPublish) {
-                const scriptResponse = await fetch(`${googleAppScriptURL}?id=${courseToPublish}`, {
-                    method: 'GET',
-                    credentials: 'include' // Incluir as credenciais do usuário logado
-                });
 
-                if (scriptResponse.ok) {
-                    const salesLink = `https://rafaeldantasl.github.io/concursos/cs/${courseToPublish}`;
 
-                    // Atualizar o link no Firebase
-                    await fetch(`${firebaseConfig.databaseURL}/cursos/${courseToPublish}.json`, {
-                        method: 'PATCH',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ link: salesLink })
-                    });
-// Exibir alerta de sucesso
-alert('Página publicada com sucesso!');
-                    // Exibir o link clicável
-                    document.getElementById('salesLink').textContent = salesLink;
-                    document.getElementById('salesLink').href = salesLink;
-                    document.getElementById('linkContainer').style.display = 'block';
 
-                    sessionStorage.removeItem('courseToPublish'); // Limpar a sessionStorage
-                } else {
-                    console.error('Erro ao solicitar o Apps Script:', scriptResponse.statusText);
-                }
-            }	
-        }
 
-    // Verificar se o usuário já está logado ao carregar a página
-    window.onload = function() {
-        const isLoggedIn = localStorage.getItem('loggedIn');
-        
-        if (isLoggedIn) {
-            // Se estiver logado, exibe o conteúdo e oculta o modal
-            document.getElementById('content').style.display = 'block';
-            document.getElementById('loginModal').style.display = 'none';
+
+
+
+
+
+
+
+
+	    
+// Primeiro ouvinte para sessionStorage
+window.addEventListener('load', async function() {
+    const courseToPublish = sessionStorage.getItem('courseToPublish');
+    if (courseToPublish) {
+        const scriptResponse = await fetch(`${googleAppScriptURL}?id=${courseToPublish}`, {
+            method: 'GET',
+            credentials: 'include'
+        });
+
+        if (scriptResponse.ok) {
+            const salesLink = `https://rafaeldantasl.github.io/concursos/cs/${courseToPublish}`;
+
+            // Atualizar o link no Firebase
+            await fetch(`${firebaseConfig.databaseURL}/cursos/${courseToPublish}.json`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ link: salesLink })
+            });
+
+            // Exibir alerta de sucesso
+            alert('Página publicada com sucesso!');
+
+            // Exibir o link clicável
+            document.getElementById('salesLink').textContent = salesLink;
+            document.getElementById('salesLink').href = salesLink;
+            document.getElementById('linkContainer').style.display = 'block';
+
+            sessionStorage.removeItem('courseToPublish');
         } else {
-            // Caso contrário, mantém o modal aberto e o conteúdo oculto
-            document.getElementById('content').style.display = 'none';
-            document.getElementById('loginModal').style.display = 'block';
+            console.error('Erro ao solicitar o Apps Script:', scriptResponse.statusText);
         }
-    };
+    }
+});
 
+// Segundo ouvinte para verificação de login
+window.addEventListener('load', function() {
+    const isLoggedIn = localStorage.getItem('loggedIn');
+
+    if (isLoggedIn) {
+        // Se estiver logado, exibe o conteúdo e oculta o modal
+        document.getElementById('content').style.display = 'block';
+        document.getElementById('loginModal').style.display = 'none';
+    } else {
+        // Caso contrário, mantém o modal aberto e o conteúdo oculto
+        document.getElementById('content').style.display = 'none';
+        document.getElementById('loginModal').style.display = 'block';
+    }
+});
+
+
+
+
+
+
+
+
+
+
+
+	    
     // Função de login com chamada HTTP ao Google App Script
     document.getElementById('loginForm').addEventListener('submit', function(event) {
         event.preventDefault();
