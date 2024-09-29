@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Controle de Cursos</title>
+    <title>Controle de Cursos 123</title>
     <style>
         body {
     background-color: #1c1c1e;
@@ -304,13 +304,22 @@ button:hover {
             }
         });
 
-        // Função de pesquisa (filtro)
-        document.getElementById('searchBar').addEventListener('input', function () {
-            const searchQuery = this.value.toLowerCase();
-            filteredCourses = courses.filter(course => course.titulo.toLowerCase().includes(searchQuery));
-            currentPage = 1; // Reseta para a primeira página ao pesquisar
-            displayCourses();
-        });
+// Função de pesquisa (filtro)
+document.getElementById('searchBar').addEventListener('input', function () {
+    const searchQuery = this.value.toLowerCase();
+    
+    // Agora filtramos em 'filteredCourses' em vez de 'courses'
+    filteredCourses = Object.keys(courses)
+        .map(courseId => ({
+            ...courses[courseId],
+            id: courseId // Adiciona courseId ao objeto do curso
+        }))
+        .filter(course => course.titulo.toLowerCase().includes(searchQuery));
+
+    currentPage = 1; // Reseta para a primeira página ao pesquisar
+    displayCourses();
+});
+
 
 
 
