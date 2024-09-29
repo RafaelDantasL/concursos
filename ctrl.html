@@ -188,11 +188,11 @@ button:hover {
     <h1>Controle de infoproduto</h1><br><br>
     <button id="addCourseBtn">Adicionar Novo Curso</button><br><br>
     <input type="text" id="searchBar" placeholder="Pesquisar cursos..."><br><br>
-    <div class="course-list" id="courseList"></div>
         <div class="pagination">
             <button id="prevPageBtn">Anterior</button>
             <button id="nextPageBtn">Próximo</button>
-        </div>    
+        </div><br>
+    <div class="course-list" id="courseList"></div>    
 </div>   
     <script>
         const firebaseConfig = {
@@ -254,7 +254,7 @@ button:hover {
                     <div class="course-item-buttons">
                         <button onclick="viewCoursePage('${course.link}')">Ver página publicada</button>
                         <button onclick="copyLink('${course.link}')">Copiar link</button>
-                        <button onclick="editCourse('${course.id}')">Editar</button>
+                        <button onclick="editCourse('${courseId}')">Editar</button>
                         <button onclick="deleteCourse('${course.id}', '${course.imagem}')">Excluir</button>
                     </div>
                 `;
