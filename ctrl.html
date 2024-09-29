@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Controle de Cursos</title>
+    <title>Controle de Cursos 2</title>
     <style>
         body {
     background-color: #1c1c1e;
@@ -254,7 +254,7 @@ button:hover {
                     <div class="course-item-buttons">
                         <button onclick="viewCoursePage('${course.link}')">Ver página publicada</button>
                         <button onclick="copyLink('${course.link}')">Copiar link</button>
-                        <button onclick="editCourse('${courseId}')">Editar</button>
+                        <button onclick="editCourse('${course.id}')">Editar</button>
                         <button onclick="deleteCourse('${course.id}', '${course.imagem}')">Excluir</button>
                     </div>
                 `;
@@ -320,7 +320,7 @@ button:hover {
         }
 
         function editCourse(courseId) {
-            window.location.href = `ctrl/editar?id=${courseId}`;
+            window.location.href = `ctrl/editar?id=${course.id}`;
         }
     
 async function deleteCourse(courseId, imagem) {
