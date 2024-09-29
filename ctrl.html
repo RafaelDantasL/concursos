@@ -185,7 +185,7 @@ button:hover {
 <!-- Conteúdo principal da página, só será exibido após o login -->
 <div id="content">
     <button id="logoutBtn">Logout</button>    
-    <h1>Controle de infoproduto</h1><br><br>
+    <h1>Controle de infoproduto 2</h1><br><br>
     <button id="addCourseBtn">Adicionar Novo Curso</button><br><br>
     <input type="text" id="searchBar" placeholder="Pesquisar cursos..."><br><br>
     <div class="course-list" id="courseList"></div> 
@@ -226,19 +226,32 @@ button:hover {
         let currentPage = 1; // Página atual da paginação
         const itemsPerPage = 10; // Número de itens por página
 
+
+       // Carrega os cursos do Firebase
+        function loadCourses() {
+            fetch(`${firebaseConfig.databaseURL}/cursos.json`)
+                .then(response => response.json())
+                .then(data => {
+                    courses = Object.values(data);
+                    filteredCourses = courses; // Inicialmente, sem filtros
+                    displayCourses();
+                });
+        }
+
+        
 // Carrega os cursos do Firebase
-function loadCourses() {
-    fetch(`${firebaseConfig.databaseURL}/cursos.json`)
-        .then(response => response.json())
-        .then(data => {
-            courses = data;
-            filteredCourses = Object.keys(courses).map(courseId => ({
-                ...courses[courseId],
-                id: courseId // Adiciona courseId ao objeto do curso
-            }));
-            displayCourses();
-        });
-}
+// function loadCourses() {
+//     fetch(`${firebaseConfig.databaseURL}/cursos.json`)
+//         .then(response => response.json())
+//         .then(data => {
+//             courses = data;
+//             filteredCourses = Object.keys(courses).map(courseId => ({
+//                 ...courses[courseId],
+//                 id: courseId // Adiciona courseId ao objeto do curso
+//             }));
+//             displayCourses();
+//         });
+// }
 
         // Exibe os cursos com paginação
         function displayCourses() {
