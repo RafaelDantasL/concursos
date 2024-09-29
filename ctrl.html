@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Controle de Cursos 3</title>
+    <title>Controle de Cursos 232323</title>
     <style>
         body {
     background-color: #1c1c1e;
@@ -319,15 +319,15 @@ button:hover {
             });
         }
 
-        function editCourse(course.id) {
-            window.location.href = `ctrl/editar?id=${course.id}`;
+        function editCourse(id) {
+            window.location.href = `ctrl/editar?id=${id}`;
         }
     
-async function deleteCourse(courseId, imagem) {
+async function deleteCourse(id, imagem) {
     if (confirm('Tem certeza que deseja excluir este curso?')) {
         try {
             // Exclui o curso do Firebase
-            const firebaseDeleteResponse = await fetch(`${firebaseConfig.databaseURL}/cursos/${courseId}.json`, {
+            const firebaseDeleteResponse = await fetch(`${firebaseConfig.databaseURL}/cursos/${id}.json`, {
                 method: 'DELETE'
             });
 
@@ -336,7 +336,7 @@ async function deleteCourse(courseId, imagem) {
             }
 
             // Armazena as informações necessárias no sessionStorage
-            sessionStorage.setItem('courseToDelete', courseId);
+            sessionStorage.setItem('courseToDelete', id);
             sessionStorage.setItem('courseImageToDelete', imagem);
 
             // Recarrega a página para acionar a exclusão via Google Apps Script
@@ -377,11 +377,11 @@ window.addEventListener('load', function() {
     }
 
     // Função para verificar se um curso foi marcado para exclusão
-    const courseId = sessionStorage.getItem('courseToDelete');
+    const id = sessionStorage.getItem('courseToDelete');
     const courseImage = sessionStorage.getItem('courseImageToDelete');
 
-    if (courseId && courseImage) {
-        const googleAppScriptURL = `https://script.google.com/macros/s/AKfycbwXccK6pL1FJGbBT8ATE-xaBk_c5gQHTRhEsZdBNmiPVAO-cW07D4ifQOt0QOZk4An-/exec?id=${courseId}&imagem=${courseImage}`;
+    if (id && courseImage) {
+        const googleAppScriptURL = `https://script.google.com/macros/s/AKfycbwXccK6pL1FJGbBT8ATE-xaBk_c5gQHTRhEsZdBNmiPVAO-cW07D4ifQOt0QOZk4An-/exec?id=${id}&imagem=${courseImage}`;
 
         fetch(googleAppScriptURL, {
             method: 'GET',
