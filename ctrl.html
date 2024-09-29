@@ -147,6 +147,25 @@ button:hover {
         #logoutBtn:hover {
             background-color: #ff3333;
         }
+
+        /* Estilo para a barra de pesquisa */
+        #searchBar {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            background-color: #3a3a3c;
+            color: #e5e5e7;
+            border: none;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        /* Estilo para paginação */
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }        
         
     </style>
 </head>
@@ -165,10 +184,15 @@ button:hover {
 
 <!-- Conteúdo principal da página, só será exibido após o login -->
 <div id="content">
+    <button id="logoutBtn">Logout</button>    
     <h1>Controle de infoproduto</h1><br><br>
     <button id="addCourseBtn">Adicionar Novo Curso</button><br><br>
+    <input type="text" id="searchBar" placeholder="Pesquisar cursos..."><br><br>
     <div class="course-list" id="courseList"></div>
-    <button id="logoutBtn">Logout</button>
+        <div class="pagination">
+            <button id="prevPageBtn">Anterior</button>
+            <button id="nextPageBtn">Próximo</button>
+        </div>    
 </div>   
     <script>
         const firebaseConfig = {
@@ -189,32 +213,100 @@ button:hover {
             window.location.href = 'ctrl/editar';
         });
 
+
+
+
+
+
+
+
+        
+        let courses = []; // Armazena todos os cursos carregados
+        let filteredCourses = []; // Armazena os cursos filtrados pela barra de pesquisa
+        let currentPage = 1; // Página atual da paginação
+        const itemsPerPage = 10; // Número de itens por página
+
+        // Carrega os cursos do Firebase
         function loadCourses() {
             fetch(`${firebaseConfig.databaseURL}/cursos.json`)
                 .then(response => response.json())
-                .then(courses => {
-                    const courseList = document.getElementById('courseList');
-                    courseList.innerHTML = '';
-
-                    for (const courseId in courses) {
-                        const course = courses[courseId];
-
-                        const courseItem = document.createElement('div');
-                        courseItem.className = 'course-item';
-                        courseItem.innerHTML = `
-                            <div>${course.titulo}</div>
-                            <div class="course-item-buttons">
-                                <button onclick="viewCoursePage('${course.link}')">Ver página publicada</button>
-                                <button onclick="copyLink('${course.link}')">Copiar link</button>
-                                <button onclick="editCourse('${courseId}')">Editar</button>
-                                <button onclick="deleteCourse('${courseId}', '${course.imagem}')">Excluir</button>
-                            </div>
-                        `;
-                        courseList.appendChild(courseItem);
-                    }
+                .then(data => {
+                    courses = Object.values(data);
+                    filteredCourses = courses; // Inicialmente, sem filtros
+                    displayCourses();
                 });
         }
 
+        // Exibe os cursos com paginação
+        function displayCourses() {
+            const courseList = document.getElementById('courseList');
+            courseList.innerHTML = '';
+
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const currentCourses = filteredCourses.slice(start, end);
+
+            currentCourses.forEach(course => {
+                const courseItem = document.createElement('div');
+                courseItem.className = 'course-item';
+                courseItem.innerHTML = `
+                    <div>${course.titulo}</div>
+                    <div class="course-item-buttons">
+                        <button onclick="viewCoursePage('${course.link}')">Ver página publicada</button>
+                        <button onclick="copyLink('${course.link}')">Copiar link</button>
+                        <button onclick="editCourse('${course.id}')">Editar</button>
+                        <button onclick="deleteCourse('${course.id}', '${course.imagem}')">Excluir</button>
+                    </div>
+                `;
+                courseList.appendChild(courseItem);
+            });
+
+            updatePaginationButtons();
+        }
+
+        // Atualiza o estado dos botões de paginação
+        function updatePaginationButtons() {
+            const totalPages = Math.ceil(filteredCourses.length / itemsPerPage);
+            document.getElementById('prevPageBtn').disabled = currentPage === 1;
+            document.getElementById('nextPageBtn').disabled = currentPage === totalPages;
+        }
+
+        // Muda para a página anterior
+        document.getElementById('prevPageBtn').addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                displayCourses();
+            }
+        });
+
+        // Muda para a próxima página
+        document.getElementById('nextPageBtn').addEventListener('click', () => {
+            const totalPages = Math.ceil(filteredCourses.length / itemsPerPage);
+            if (currentPage < totalPages) {
+                currentPage++;
+                displayCourses();
+            }
+        });
+
+        // Função de pesquisa (filtro)
+        document.getElementById('searchBar').addEventListener('input', function () {
+            const searchQuery = this.value.toLowerCase();
+            filteredCourses = courses.filter(course => course.titulo.toLowerCase().includes(searchQuery));
+            currentPage = 1; // Reseta para a primeira página ao pesquisar
+            displayCourses();
+        });
+
+
+
+
+
+
+
+
+
+
+
+        
         function viewCoursePage(link) {
             window.open(link, '_blank');
         }
@@ -230,9 +322,7 @@ button:hover {
         function editCourse(courseId) {
             window.location.href = `ctrl/editar?id=${courseId}`;
         }
-
-
-        
+    
 async function deleteCourse(courseId, imagem) {
     if (confirm('Tem certeza que deseja excluir este curso?')) {
         try {
@@ -257,10 +347,7 @@ async function deleteCourse(courseId, imagem) {
         }
     }
 }
-
-
-
-        
+  
         async function getFileSha(filePath) {
             const response = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${filePath}`, {
                 method: 'GET',
@@ -274,13 +361,6 @@ async function deleteCourse(courseId, imagem) {
         }
 
         loadCourses();
-
-
-
-
-
-        
-
 
 window.addEventListener('load', function() {
     // Função para verificar autenticação
@@ -320,14 +400,7 @@ window.addEventListener('load', function() {
         });
     }
 });
-
-
-
-
-        
-
-
-        
+   
     // Função de login com chamada HTTP ao Google App Script
     document.getElementById('loginForm').addEventListener('submit', function(event) {
         event.preventDefault();
