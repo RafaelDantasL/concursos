@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Gerenciador de Ebooks</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+    <!-- Google API Client Library -->
+    <script src="https://apis.google.com/js/api.js"></script>
+</head>
+<body>
+    <h1>Gerenciador de Ebooks</h1>
+    
+    <!-- Botões e Formulários -->
+    <button id="addButton">Adicionar Ebook</button>
+    
+    <div id="addForm" style="display: none;">
+        <input type="text" id="titleInput" placeholder="Título" required>
+        <input type="text" id="descriptionInput" placeholder="Descrição" required>
+        <input type="file" id="fileInput" accept=".pdf" required>
+        <button id="saveButton">Salvar</button>
+        <button id="cancelButton">Cancelar</button>
+    </div>
+    
+    <!-- Barra de Pesquisa -->
+    <div id="searchBar">
+        <input type="text" id="searchInput" placeholder="Pesquisar por título">
+        <button id="searchButton">Pesquisar</button>
+    </div>
+    
+    <!-- Lista de Ebooks -->
+    <div id="ebookList"></div>
+    
+    <!-- Paginação -->
+    <div id="pagination"></div>
+    
+    <!-- Status -->
+    <div id="status"></div>
+    
+    <!-- Scripts -->
+    <script src="app.js"></script>
+</body>
+</html>
