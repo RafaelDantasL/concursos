@@ -2,44 +2,42 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Renitentes Concursos</title>
+    <title>Gerenciador de Ebooks</title>
     <link rel="stylesheet" href="styles.css">
-    <!-- Favicon para navegadores -->
-    <link rel="icon" href="favicon.png" type="image/png">
-    <!-- Favicon para dispositivos Apple -->
-    <link rel="apple-touch-icon" href="favicon.png">
-    <!-- Carregar as bibliotecas Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
-    <!-- Carregar o script JavaScript -->
-    <script src="firebase.js" defer></script>
-    <script src="placeholder.js" defer></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 </head>
 <body>
-    <header>
-        <div class="logo-nome">
-            <img src="logo.png" alt="Logo" class="logo">
-            <button class="menu-hamburguer" id="menu-hamburguer">&#9776;</button>
-        </div>
-    </header>
-
-<div class="menu" id="menu-placeholder"></div>    
-    <main>
-        <div class="barra-pesquisa">
-    <input type="text" id="pesquisa" placeholder="Pesquisar cursos...">
-    <button onclick="buscarCursos()">Buscar</button>
-</div>
-<div id="total-encontrados"></div> <!-- Novo elemento para mostrar a quantidade de cursos -->
-<div id="cursos-container" class="cursos-container">
-    <!-- Cursos carregados dinamicamente aqui -->
-</div>
-<div id="paginacao-container" class="paginacao-container">
-    <!-- Paginação gerada dinamicamente aqui -->
-</div>
-    </main>
-
-    <!-- Contêiner para o rodapé -->
-<div id="footer-placeholder"></div>
+    <h1>Gerenciador de Ebooks</h1>
+    
+    <!-- Botões e Formulários -->
+    <button id="addButton">Adicionar Ebook</button>
+    
+    <div id="addForm" style="display: none;">
+        <input type="text" id="titleInput" placeholder="Título" required>
+        <input type="text" id="descriptionInput" placeholder="Descrição" required>
+        <input type="file" id="fileInput" accept=".pdf" required>
+        <button id="saveButton">Salvar</button>
+        <button id="cancelButton">Cancelar</button>
+    </div>
+    
+    <!-- Barra de Pesquisa -->
+    <div id="searchBar">
+        <input type="text" id="searchInput" placeholder="Pesquisar por título">
+        <button id="searchButton">Pesquisar</button>
+    </div>
+    
+    <!-- Lista de Ebooks -->
+    <div id="ebookList"></div>
+    
+    <!-- Paginação -->
+    <div id="pagination"></div>
+    
+    <!-- Status -->
+    <div id="status"></div>
+    
+    <!-- Scripts -->
+    <script src="app.js"></script>
 </body>
 </html>
