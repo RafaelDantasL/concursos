@@ -1,168 +1,215 @@
-body {
-    background-color: #1c1c1e;
-    color: #e5e5e7;
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 20px;
-}
-
 h1 {
-    color: #ffffff;
-    font-size: 24px;
+    text-align: center;
     margin-bottom: 20px;
+    color: #e0e0e0; /* Cor clara para o texto */
 }
 
-button {
-    background-color: #2c2c2e;
-    color: #e5e5e7;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-button:hover {
-    opacity: 0.8;
-}
-
-/* Estilos para os botões específicos */
-#addButton, #saveButton, #cancelButton, #searchButton {
-    background-color: #2c2c2e;
-    color: #e5e5e7;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-#addButton:hover, #saveButton:hover, #cancelButton:hover, #searchButton:hover {
-    opacity: 0.8;
-}
-
-/* Estilos para os itens da lista de eBooks */
-.course-item {
+/* Campo de Pesquisa */
+.search-container {
+    max-width: 1000px;
+    margin: 0 auto 20px auto;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-    border-radius: 8px;
+    justify-content: center;
+}
+
+.search-container input {
+    width: 100%;
+    max-width: 400px;
+    padding: 10px 15px;
+    border: 1px solid #444; /* Cor de borda mais escura */
+    border-radius: 5px;
+    font-size: 16px;
+    background-color: #1f1f32; /* Fundo escuro */
+    color: #e0e0e0; /* Texto claro */
+}
+
+/* Lista de eBooks */
+.ebook-list {
+    list-style-type: none;
+    padding: 0;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.ebook-item {
+    background-color: #2a2a3c; /* Fundo do card de ebook */
+    padding: 15px;
     margin-bottom: 10px;
-    transition: background-color 0.3s ease;
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Sombra sutil */
 }
 
-.course-item:nth-child(odd) {
-    background-color: #2c2c2e;
+/* Cabeçalho dos eBooks */
+.ebook-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
 }
 
-.course-item:nth-child(even) {
-    background-color: #3a3a3c;
-}
-
-.course-item .title {
+.ebook-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #e0e0e0; /* Cor clara para o título */
+    flex: 1 1 300px;
     margin-right: 10px;
 }
 
-.course-item .actions button, .course-item .actions a {
-    margin-left: 10px;
-    background-color: #1e90ff;
-    color: white;
-    padding: 5px 10px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+.ebook-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1 1 200px;
+    justify-content: flex-end;
+}
+
+/* Reordenar as ações */
+.ebook-actions .ebook-details-link {
+    order: 1;
+}
+
+.ebook-actions .ebook-download {
+    order: 2;
+}
+
+.ebook-download {
     text-decoration: none;
-}
-
-.course-item .actions button:hover, .course-item .actions a:hover {
-    background-color: #1c86ee;
-}
-
-/* Estilos para formulários e inputs */
-#addForm {
-    display: none;
-    margin-top: 20px;
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    flex-wrap: wrap;
-}
-
-#addForm input[type="text"], 
-#addForm input[type="file"] {
-    padding: 10px;
-    margin: 8px 0;
-    box-sizing: border-box;
-    background-color: #3a3a3c;
-    color: #e5e5e7;
-    border: none;
-    border-radius: 5px;
-    flex: 1;
-    min-width: 150px;
-}
-
-/* Estilos para a barra de pesquisa e paginação */
-#searchBar {
-    margin-top: 20px;
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    flex-wrap: wrap;
-}
-
-#searchBar input[type="text"] {
-    padding: 10px;
-    background-color: #3a3a3c;
-    color: #e5e5e7;
-    border: none;
-    border-radius: 5px;
-    flex: 1;
-    min-width: 150px;
-}
-
-#pagination {
-    margin-top: 20px;
-    display: flex;
-    gap: 5px;
-    align-items: center;
-    flex-wrap: wrap;
-}
-
-#pagination button {
-    padding: 5px 10px;
-    background-color: #2c2c2e;
-    color: #e5e5e7;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-#pagination button:hover {
-    opacity: 0.8;
-}
-
-#pagination .current-page {
-    font-weight: bold;
-    text-decoration: underline;
-    background-color: #1e90ff;
+    background-color: #00acee; /* Cor do botão de download */
     color: white;
-}
-
-/* Estilos para o status */
-#status {
-    margin-top: 10px;
+    padding: 8px 12px;
+    border-radius: 5px;
+    transition: background-color 0.3s;
     font-size: 14px;
 }
 
-/* Estilos adicionais para melhor adaptação */
-a {
-    color: #1e90ff;
-    text-decoration: none;
+.ebook-download:hover {
+    background-color: #007bb5; /* Cor ao passar o mouse */
 }
 
-a:hover {
+.ebook-details-link {
+    text-decoration: none;
+    color: #00acee; /* Cor do link de detalhes */
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.ebook-details-link:hover {
     text-decoration: underline;
+    color: #007bb5; /* Cor ao passar o mouse */
+}
+
+/* Descrição do eBook */
+.ebook-description {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #444; /* Linha sutil */
+    color: #b0b0b0; /* Texto claro */
+}
+
+.ebook-description.show {
+    max-height: 500px; /* Valor suficientemente grande */
+}
+
+/* Paginação */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.pagination button {
+    background-color: #00acee; /* Cor do botão de paginação */
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 14px;
+}
+
+.pagination button:hover:not(.active) {
+    background-color: #007bb5; /* Cor ao passar o mouse */
+}
+
+.pagination button.active {
+    background-color: #007bb5;
+    cursor: default;
+}
+
+.pagination button.disabled {
+    background-color: #444; /* Cor do botão desativado */
+    cursor: not-allowed;
+}
+
+/* Responsividade para Dispositivos Móveis */
+@media (max-width: 600px) {
+    .search-container {
+        max-width: 90%; /* Ajustar largura do campo de busca */
+    }
+
+    .ebook-list {
+        max-width: 100%; /* Ocupa toda a tela */
+        padding: 0 10px; /* Adicionar espaçamento nas laterais */
+    }
+
+    .ebook-item {
+        padding: 10px;
+        font-size: 14px;
+        margin-bottom: 8px;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Reduzir sombra */
+    }
+
+    .ebook-header {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .ebook-title {
+        font-size: 16px;
+        flex: none;
+        margin-right: 0;
+        width: 60%;
+    }
+
+    .ebook-actions {
+        justify-content: flex-end;
+        margin-left: auto;
+        margin-top: 0;
+        flex-direction: row;
+        align-items: center;
+        width: 40%;
+    }
+
+    .ebook-download {
+        font-size: 12px;
+        padding: 6px 8px;
+    }
+
+    .ebook-details-link {
+        font-size: 12px;
+        margin-top: 10px; /* Separar do título e botão */
+    }
+
+    .ebook-description {
+        font-size: 12px;
+    }
+
+    .pagination {
+        gap: 3px;
+    }
+
+    .pagination button {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
 }
