@@ -1,5 +1,4 @@
-    <script>
-        // Variáveis de Paginação
+    // Variáveis de Paginação
         const itemsPerPage = 10;
         let currentPage = 1;
         let filteredEbooks = ebooks.slice(); // Cópia dos dados originais
@@ -174,4 +173,3 @@
             setupSearch();
             updateDisplay();
         });
-    </script>
