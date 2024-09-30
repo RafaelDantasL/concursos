@@ -5,16 +5,16 @@ document.addEventListener("DOMContentLoaded", function () {
             this.innerHTML = `
                 <nav id="menu-horizontal" class="menu-horizontal">
                     <ul>
-                        <li><a href="home.html">Home</a></li>
-                        <li><a href="sobre.html">Sobre</a></li>
-                        <li><a href="contato.html">Contato</a></li>
+                        <li><a href="index.html">Cursos preparatórios</a></li>
+                        <li><a href="ebook.html">Apostilas e ebooks grátis</a></li>
+                        <li><a href="contato.html">Blog Renitentes</a></li>
                     </ul>
                 </nav>
                 <nav id="menu-deslizante" class="menu-deslizante">
                     <ul>
-                        <li><a href="home.html">Home</a></li>
-                        <li><a href="sobre.html">Sobre</a></li>
-                        <li><a href="contato.html">Contato</a></li>
+                        <li><a href="index.html">Cursos preparatórios</a></li>
+                        <li><a href="ebook.html">Apostilas e ebooks grátis</a></li>
+                        <li><a href="contato.html">Blog Renitentes</a></li>
                     </ul>
                 </nav>
             `;
