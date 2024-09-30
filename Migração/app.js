@@ -49,24 +49,25 @@ document.addEventListener('DOMContentLoaded', () => {
         const fileInput = document.getElementById('fileInput');
         const file = fileInput.files[0];
 
+        // Verificar se todos os campos estão preenchidos
         if (!title || !description || !file) {
-            alert('Por favor, preencha todos os campos.');
+            setStatus('Por favor, preencha todos os campos.', 'red');
             return;
         }
 
         if (file.type !== 'application/pdf') {
-            alert('Por favor, selecione um arquivo PDF.');
+            setStatus('Por favor, selecione um arquivo PDF.', 'red');
             return;
         }
 
-        // Exibir status
+        // Exibir status de autenticação
         setStatus('Autenticando com o Google...', 'blue');
 
         try {
-            // Verificar e solicitar autorização
+            // Autenticação com Google
             await authenticate();
 
-            // Exibir status
+            // Exibir status de upload
             setStatus('Fazendo upload do arquivo...', 'blue');
 
             // Ler o arquivo como Base64
@@ -75,9 +76,14 @@ document.addEventListener('DOMContentLoaded', () => {
             // Fazer upload para o Google Drive
             const uploadResponse = await uploadFileToDrive(file.name, base64Data);
 
+            console.log('Upload Response:', uploadResponse); // Log detalhado do upload
+
             if (uploadResponse.status === 'success') {
                 const downloadLink = uploadResponse.webViewLink;
                 const fileId = uploadResponse.id;
+
+                // Exibir status de gravação no Firebase
+                setStatus('Adicionando eBook ao banco de dados...', 'blue');
 
                 // Adicionar dados ao Firebase
                 const newEbookRef = database.ref('ebooks').push();
@@ -92,10 +98,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 setStatus('Ebook adicionado com sucesso!', 'green');
                 reloadData();
             } else {
-                throw new Error(uploadResponse.message);
+                throw new Error(uploadResponse.message || 'Falha ao fazer upload para o Google Drive');
             }
         } catch (error) {
-            console.error(error);
+            console.error('Erro:', error.message); // Log detalhado do erro
             setStatus('Erro: ' + error.message, 'red');
         }
     });
@@ -135,211 +141,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function renderEbooks() {
-        const ebookList = document.getElementById('ebookList');
-        ebookList.innerHTML = '';
-
-        const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-        const endIndex = startIndex + ITEMS_PER_PAGE;
-        const ebooksToDisplay = filteredEbooks.slice(startIndex, endIndex);
-
-        if (ebooksToDisplay.length === 0) {
-            ebookList.innerHTML = '<p>Nenhum eBook encontrado.</p>';
-            return;
-        }
-
-        ebooksToDisplay.forEach(ebook => {
-            const item = document.createElement('div');
-            item.className = 'course-item';
-            item.dataset.id = ebook.id;
-
-            const title = document.createElement('span');
-            title.textContent = ebook.title;
-            title.className = 'title';
-            item.appendChild(title);
-
-            const actions = document.createElement('div');
-            actions.className = 'actions';
-
-            const downloadButton = document.createElement('a');
-            downloadButton.textContent = 'Download';
-            downloadButton.href = ebook.downloadLink;
-            downloadButton.target = '_blank';
-            downloadButton.className = 'download-button';
-            actions.appendChild(downloadButton);
-
-            const editButton = document.createElement('button');
-            editButton.textContent = 'Editar';
-            editButton.addEventListener('click', () => editEbook(ebook));
-            actions.appendChild(editButton);
-
-            const deleteButton = document.createElement('button');
-            deleteButton.textContent = 'Excluir';
-            deleteButton.addEventListener('click', () => deleteEbook(ebook.id, ebook.fileId));
-            actions.appendChild(deleteButton);
-
-            item.appendChild(actions);
-            ebookList.appendChild(item);
-        });
-    }
-
-    function renderPagination() {
-        const pagination = document.getElementById('pagination');
-        pagination.innerHTML = '';
-
-        const totalPages = Math.ceil(filteredEbooks.length / ITEMS_PER_PAGE);
-        if (totalPages <= 1) return; // Não exibir paginação se há apenas uma página
-
-        const prevButton = document.createElement('button');
-        prevButton.textContent = 'Anterior';
-        prevButton.disabled = currentPage === 1;
-        prevButton.addEventListener('click', () => {
-            if (currentPage > 1) {
-                currentPage--;
-                renderEbooks();
-                renderPagination();
-                window.scrollTo(0, 0);
-            }
-        });
-        pagination.appendChild(prevButton);
-
-        // Mostrar até 5 páginas próximas à atual
-        let startPage = Math.max(1, currentPage - 2);
-        let endPage = Math.min(totalPages, currentPage + 2);
-
-        if (currentPage <= 3) {
-            endPage = Math.min(5, totalPages);
-        }
-        if (currentPage >= totalPages - 2) {
-            startPage = Math.max(1, totalPages - 4);
-        }
-
-        for (let i = startPage; i <= endPage; i++) {
-            const pageButton = document.createElement('button');
-            pageButton.textContent = i;
-            if (i === currentPage) {
-                pageButton.className = 'current-page';
-                pageButton.disabled = true;
-            }
-            pageButton.addEventListener('click', () => {
-                currentPage = i;
-                renderEbooks();
-                renderPagination();
-                window.scrollTo(0, 0);
-            });
-            pagination.appendChild(pageButton);
-        }
-
-        const nextButton = document.createElement('button');
-        nextButton.textContent = 'Próximo';
-        nextButton.disabled = currentPage === totalPages;
-        nextButton.addEventListener('click', () => {
-            if (currentPage < totalPages) {
-                currentPage++;
-                renderEbooks();
-                renderPagination();
-                window.scrollTo(0, 0);
-            }
-        });
-        pagination.appendChild(nextButton);
-    }
-
-    function editEbook(ebook) {
-        // Preencher o formulário com os dados do eBook
-        document.getElementById('titleInput').value = ebook.title;
-        document.getElementById('descriptionInput').value = ebook.description;
-        // Não é necessário preencher o campo de arquivo
-        addForm.style.display = 'flex';
-        // Alterar o botão de salvar para atualizar
-        saveButton.textContent = 'Atualizar';
-        // Remover event listener anterior para evitar múltiplas chamadas
-        const newSaveButton = saveButton.cloneNode(true);
-        saveButton.parentNode.replaceChild(newSaveButton, saveButton);
-        // Adicionar novo event listener para atualização
-        newSaveButton.addEventListener('click', async () => {
-            const updatedTitle = document.getElementById('titleInput').value.trim();
-            const updatedDescription = document.getElementById('descriptionInput').value.trim();
-            const fileInput = document.getElementById('fileInput');
-            const file = fileInput.files[0];
-
-            if (!updatedTitle || !updatedDescription) {
-                alert('Por favor, preencha todos os campos.');
-                return;
-            }
-
-            // Exibir status
-            setStatus('Autenticando com o Google...', 'blue');
-
-            try {
-                // Verificar e solicitar autorização
-                await authenticate();
-
-                setStatus('Atualizando eBook...', 'blue');
-
-                let downloadLink = ebook.downloadLink;
-                let fileId = ebook.fileId;
-
-                if (file) {
-                    if (file.type !== 'application/pdf') {
-                        alert('Por favor, selecione um arquivo PDF.');
-                        return;
-                    }
-
-                    // Ler o arquivo como Base64
-                    const base64Data = await readFileAsBase64(file);
-
-                    // Fazer upload para o Google Drive
-                    const uploadResponse = await uploadFileToDrive(file.name, base64Data);
-
-                    if (uploadResponse.status === 'success') {
-                        downloadLink = uploadResponse.webViewLink;
-                        fileId = uploadResponse.id;
-
-                        // Excluir o arquivo antigo do Drive
-                        await deleteFileFromDrive(ebook.fileId);
-                    } else {
-                        throw new Error(uploadResponse.message);
-                    }
-                }
-
-                // Atualizar dados no Firebase
-                await database.ref(`ebooks/${ebook.id}`).set({
-                    title: updatedTitle,
-                    description: updatedDescription,
-                    downloadLink: downloadLink,
-                    fileId: fileId,
-                    createdAt: ebook.createdAt // Manter o timestamp original
-                });
-
-                setStatus('Ebook atualizado com sucesso!', 'green');
-                reloadData();
-            } catch (error) {
-                console.error(error);
-                setStatus('Erro: ' + error.message, 'red');
-            }
-        });
-    }
-
-    async function deleteEbook(ebookId, fileId) {
-        if (!confirm('Tem certeza que deseja excluir este ebook?')) return;
-
-        try {
-            // Excluir do Firebase
-            await database.ref(`ebooks/${ebookId}`).remove();
-
-            // Excluir o arquivo do Google Drive via API
-            const deleteResponse = await deleteFileFromDrive(fileId);
-
-            if (deleteResponse.status === 'success') {
-                setStatus('Ebook excluído com sucesso!', 'green');
-                reloadData();
-            } else {
-                throw new Error(deleteResponse.message);
-            }
-        } catch (error) {
-            console.error(error);
-            setStatus('Erro ao excluir ebook: ' + error.message, 'red');
-        }
+    function setStatus(message, color) {
+        const statusDiv = document.getElementById('status');
+        statusDiv.style.color = color;
+        statusDiv.textContent = message;
+        setTimeout(() => { statusDiv.textContent = ''; }, 5000);
     }
 
     function resetForm() {
@@ -353,13 +159,6 @@ document.addEventListener('DOMContentLoaded', () => {
         resetForm();
         addForm.style.display = 'none';
         loadEbooks();
-    }
-
-    function setStatus(message, color) {
-        const statusDiv = document.getElementById('status');
-        statusDiv.style.color = color;
-        statusDiv.textContent = message;
-        setTimeout(() => { statusDiv.textContent = ''; }, 5000);
     }
 
     function readFileAsBase64(file) {
@@ -376,7 +175,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function uploadFileToDrive(fileName, fileData) {
         try {
-            // Fazer upload do arquivo
             const uploadResponse = await fetch(`https://www.googleapis.com/upload/drive/v3/files?uploadType=media&fields=id,webViewLink`, {
                 method: 'POST',
                 headers: {
@@ -392,9 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const uploadResult = await uploadResponse.json();
-
-            // Definir a pasta onde o arquivo será armazenado
-            const folderId = '1A7XUFeiSwVUYY2I8ngtu-EFyx6ildhnt';
+            const folderId = '1A7XUFeiSwVUYY2I8ngtu-EFyx6ildhnt'; // Id da pasta do Google Drive
             await fetch(`https://www.googleapis.com/drive/v3/files/${uploadResult.id}`, {
                 method: 'PATCH',
                 headers: {
@@ -408,7 +204,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 })
             });
 
-            // Compartilhar o arquivo com "Qualquer pessoa com o link"
             await fetch(`https://www.googleapis.com/drive/v3/files/${uploadResult.id}/permissions`, {
                 method: 'POST',
                 headers: {
@@ -421,7 +216,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 })
             });
 
-            // Obter o link de visualização
             const webViewLinkResponse = await fetch(`https://www.googleapis.com/drive/v3/files/${uploadResult.id}?fields=webViewLink`, {
                 method: 'GET',
                 headers: {
@@ -447,27 +241,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    async function deleteFileFromDrive(fileId) {
-        try {
-            const response = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${accessToken}`
-                }
-            });
-
-            if (response.status === 204) {
-                return { status: 'success' };
-            } else {
-                const errorData = await response.json();
-                throw new Error(errorData.error.message);
-            }
-        } catch (error) {
-            console.error('Erro ao excluir arquivo do Drive:', error);
-            return { status: 'error', message: error.message };
-        }
-    }
-
     // Autenticação com Google OAuth2
     function authenticate() {
         return new Promise((resolve, reject) => {
@@ -487,9 +260,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         accessToken = authInstance.currentUser.get().getAuthResponse().access_token;
                     }
 
+                    console.log("Autenticação bem-sucedida, token:", accessToken);
                     resolve();
                 } catch (error) {
                     console.error('Erro na autenticação:', error);
+                    setStatus('Erro na autenticação com Google OAuth: ' + error.message, 'red');
                     reject(error);
                 }
             });
