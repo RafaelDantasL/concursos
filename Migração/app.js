@@ -376,28 +376,44 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function uploadFileToDrive(fileName, fileData) {
         try {
-            const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=media', {
+            // Fazer upload do arquivo
+            const uploadResponse = await fetch(`https://www.googleapis.com/upload/drive/v3/files?uploadType=media&fields=id,webViewLink`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${accessToken}`,
                     'Content-Type': 'application/pdf',
-                    'Content-Length': fileData.length
                 },
-                body: atob(fileData)
+                body: Uint8Array.from(atob(fileData), c => c.charCodeAt(0))
             });
 
-            if (!response.ok) {
-                const errorData = await response.json();
+            if (!uploadResponse.ok) {
+                const errorData = await uploadResponse.json();
                 throw new Error(errorData.error.message);
             }
 
-            const result = await response.json();
-            // Obter o link compartilhável
-            const shareResponse = await fetch(`https://www.googleapis.com/drive/v3/files/${result.id}/permissions`, {
+            const uploadResult = await uploadResponse.json();
+
+            // Definir a pasta onde o arquivo será armazenado
+            const folderId = '1A7XUFeiSwVUYY2I8ngtu-EFyx6ildhnt';
+            await fetch(`https://www.googleapis.com/drive/v3/files/${uploadResult.id}`, {
+                method: 'PATCH',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    "addParents": folderId,
+                    "removeParents": "root",
+                    "fields": "id, parents"
+                })
+            });
+
+            // Compartilhar o arquivo com "Qualquer pessoa com o link"
+            await fetch(`https://www.googleapis.com/drive/v3/files/${uploadResult.id}/permissions`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${accessToken}`,
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
                     role: 'reader',
@@ -405,16 +421,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 })
             });
 
-            if (!shareResponse.ok) {
-                const errorData = await shareResponse.json();
-                throw new Error(errorData.error.message);
-            }
-
             // Obter o link de visualização
-            const webViewLinkResponse = await fetch(`https://www.googleapis.com/drive/v3/files/${result.id}?fields=webViewLink`, {
+            const webViewLinkResponse = await fetch(`https://www.googleapis.com/drive/v3/files/${uploadResult.id}?fields=webViewLink`, {
                 method: 'GET',
                 headers: {
-                    'Authorization': `Bearer ${accessToken}`
+                    'Authorization': `Bearer ${accessToken}`,
                 }
             });
 
@@ -427,7 +438,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             return {
                 status: 'success',
-                id: result.id,
+                id: uploadResult.id,
                 webViewLink: webViewLinkData.webViewLink
             };
         } catch (error) {
