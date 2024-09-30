@@ -77,11 +77,5 @@ const ebooks = [
     "Título": "luciano cuzao 2323",
     "Descrição": "sgsdgsdg",
     "Link de download": "https://drive.google.com/uc?id=1kza-SoUGuLNNzF3k2qv3FIiSHd26lhCW&export=download"
-  },
-  {
-    "ID": "ID-1727734590515",
-    "Título": "teste2 Rafael",
-    "Descrição": "teste Rafael",
-    "Link de download": "https://drive.google.com/uc?id=1UK4dDMprmAMppWZxOUHm9fYiJypmYS0c&export=download"
   }
 ];
