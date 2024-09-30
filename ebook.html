@@ -5,13 +5,229 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Renitentes Concursos</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="ebook.css">
     <link rel="icon" href="favicon.png" type="image/png">
     <link rel="apple-touch-icon" href="favicon.png">
     <!-- Carregar o script JavaScript -->
-    <script src="ebook-list.js" defer></script>
+    <script src="placeholder.js" defer></script>
     <script src="ebook.js" defer></script>
-    <script src="placeholder.js" defer></script>    
+    <style>
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #e0e0e0; /* Cor clara para o texto */
+}
+
+/* Campo de Pesquisa */
+.search-container {
+    max-width: 1000px;
+    margin: 0 auto 20px auto;
+    display: flex;
+    justify-content: center;
+}
+
+.search-container input {
+    width: 100%;
+    max-width: 400px;
+    padding: 10px 15px;
+    border: 1px solid #444; /* Cor de borda mais escura */
+    border-radius: 5px;
+    font-size: 16px;
+    background-color: #1f1f32; /* Fundo escuro */
+    color: #e0e0e0; /* Texto claro */
+}
+
+/* Lista de eBooks */
+.ebook-list {
+    list-style-type: none;
+    padding: 0;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.ebook-item {
+    background-color: #2a2a3c; /* Fundo do card de ebook */
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Sombra sutil */
+}
+
+/* Cabeçalho dos eBooks */
+.ebook-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.ebook-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #e0e0e0; /* Cor clara para o título */
+    flex: 1 1 300px;
+    margin-right: 10px;
+}
+
+.ebook-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1 1 200px;
+    justify-content: flex-end;
+}
+
+/* Reordenar as ações */
+.ebook-actions .ebook-details-link {
+    order: 1;
+}
+
+.ebook-actions .ebook-download {
+    order: 2;
+}
+
+.ebook-download {
+    text-decoration: none;
+    background-color: #00acee; /* Cor do botão de download */
+    color: white;
+    padding: 8px 12px;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+    font-size: 14px;
+}
+
+.ebook-download:hover {
+    background-color: #007bb5; /* Cor ao passar o mouse */
+}
+
+.ebook-details-link {
+    text-decoration: none;
+    color: #00acee; /* Cor do link de detalhes */
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.ebook-details-link:hover {
+    text-decoration: underline;
+    color: #007bb5; /* Cor ao passar o mouse */
+}
+
+/* Descrição do eBook */
+.ebook-description {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #444; /* Linha sutil */
+    color: #b0b0b0; /* Texto claro */
+}
+
+.ebook-description.show {
+    max-height: 500px; /* Valor suficientemente grande */
+}
+
+/* Paginação */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.pagination button {
+    background-color: #00acee; /* Cor do botão de paginação */
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 14px;
+}
+
+.pagination button:hover:not(.active) {
+    background-color: #007bb5; /* Cor ao passar o mouse */
+}
+
+.pagination button.active {
+    background-color: #007bb5;
+    cursor: default;
+}
+
+.pagination button.disabled {
+    background-color: #444; /* Cor do botão desativado */
+    cursor: not-allowed;
+}
+
+/* Responsividade para Dispositivos Móveis */
+@media (max-width: 600px) {
+    .search-container {
+        max-width: 90%; /* Ajustar largura do campo de busca */
+    }
+
+    .ebook-list {
+        max-width: 100%; /* Ocupa toda a tela */
+        padding: 0 10px; /* Adicionar espaçamento nas laterais */
+    }
+
+    .ebook-item {
+        padding: 10px;
+        font-size: 14px;
+        margin-bottom: 8px;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Reduzir sombra */
+    }
+
+    .ebook-header {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .ebook-title {
+        font-size: 16px;
+        flex: none;
+        margin-right: 0;
+        width: 60%;
+    }
+
+    .ebook-actions {
+        justify-content: flex-end;
+        margin-left: auto;
+        margin-top: 0;
+        flex-direction: row;
+        align-items: center;
+        width: 40%;
+    }
+
+    .ebook-download {
+        font-size: 12px;
+        padding: 6px 8px;
+    }
+
+    .ebook-details-link {
+        font-size: 12px;
+        margin-top: 10px; /* Separar do título e botão */
+    }
+
+    .ebook-description {
+        font-size: 12px;
+    }
+
+    .pagination {
+        gap: 3px;
+    }
+
+    .pagination button {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+}
+
+     </style>
 </head>
 <body>
     <header>
@@ -36,6 +252,183 @@
     <!-- Controles de Paginação -->
     <div class="pagination" id="pagination"></div>
 <br><br>
+    <script>
+        // Variáveis de Paginação
+        const itemsPerPage = 10;
+        let currentPage = 1;
+        let filteredEbooks = ebooks.slice(); // Cópia dos dados originais
+
+        // Função para Renderizar a Lista de EBooks
+        function renderEbooksList(ebooksToRender) {
+            const ebookList = document.getElementById('ebook-list');
+            ebookList.innerHTML = ''; // Limpa a lista antes de renderizar
+
+            // Determina os índices de início e fim para a página atual
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const ebooksOnPage = ebooksToRender.slice(startIndex, endIndex);
+
+            ebooksOnPage.forEach((ebook, index) => {
+                const actualIndex = startIndex + index; // Índice global
+
+                const listItem = document.createElement('li');
+                listItem.className = 'ebook-item';
+
+                // Cabeçalho do eBook (Título, Link de Detalhes, Botão de Download)
+                const headerDiv = document.createElement('div');
+                headerDiv.className = 'ebook-header';
+
+                // Título
+                const titleDiv = document.createElement('div');
+                titleDiv.className = 'ebook-title';
+                titleDiv.textContent = ebook["Título"];
+
+                // Ações (Ver Detalhes e Download)
+                const actionsDiv = document.createElement('div');
+                actionsDiv.className = 'ebook-actions';
+
+                // Link de Ver Detalhes
+                const detailsLink = document.createElement('a');
+                detailsLink.className = 'ebook-details-link';
+                detailsLink.href = 'javascript:void(0);'; // Evita recarregar a página
+                detailsLink.textContent = 'Ver detalhes';
+                detailsLink.setAttribute('data-index', actualIndex); // Atributo para identificar o eBook
+
+                // Botão de Download
+                const downloadButton = document.createElement('a');
+                downloadButton.className = 'ebook-download';
+                downloadButton.href = ebook["Link de download"];
+                downloadButton.textContent = 'Baixar arquivo';
+                downloadButton.target = '_blank'; // Abre em nova aba
+
+                // Adiciona Link de Detalhes e Download ao Actions Div
+                actionsDiv.appendChild(detailsLink);
+                actionsDiv.appendChild(downloadButton);
+
+                // Adiciona Título e Ações ao Header Div
+                headerDiv.appendChild(titleDiv);
+                headerDiv.appendChild(actionsDiv);
+
+                // Descrição (Inicialmente escondida)
+                const descriptionDiv = document.createElement('div');
+                descriptionDiv.className = 'ebook-description';
+                descriptionDiv.id = `description-${actualIndex}`;
+                descriptionDiv.textContent = ebook["Descrição"];
+
+                // Adiciona Header e Descrição ao Item de Lista
+                listItem.appendChild(headerDiv);
+                listItem.appendChild(descriptionDiv);
+
+                // Adiciona o Item de Lista à Lista Principal
+                ebookList.appendChild(listItem);
+            });
+
+            // Adiciona o Event Listener para os Links de Detalhes
+            const detailsLinks = document.querySelectorAll('.ebook-details-link');
+            detailsLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    const index = this.getAttribute('data-index');
+                    const description = document.getElementById(`description-${index}`);
+                    
+                    if (description.classList.contains('show')) {
+                        description.classList.remove('show');
+                        this.textContent = 'Ver detalhes';
+                    } else {
+                        description.classList.add('show');
+                        this.textContent = 'Ocultar detalhes';
+                    }
+                });
+            });
+        }
+
+        // Função para Renderizar os Controles de Paginação
+        function renderPagination(totalItems) {
+            const paginationContainer = document.getElementById('pagination');
+            paginationContainer.innerHTML = ''; // Limpa os controles antes de renderizar
+
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+            // Função para criar botões
+            function createButton(label, disabled = false, active = false) {
+                const button = document.createElement('button');
+                button.textContent = label;
+                if (disabled) {
+                    button.classList.add('disabled');
+                    button.disabled = true;
+                }
+                if (active) {
+                    button.classList.add('active');
+                }
+                return button;
+            }
+
+            // Botão de Página Anterior
+            const prevButton = createButton('Anterior', currentPage === 1);
+            prevButton.addEventListener('click', () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    updateDisplay();
+                }
+            });
+            paginationContainer.appendChild(prevButton);
+
+            // Botões de Número de Página
+            for (let i = 1; i <= totalPages; i++) {
+                const pageButton = createButton(i, false, i === currentPage);
+                pageButton.addEventListener('click', () => {
+                    currentPage = i;
+                    updateDisplay();
+                });
+                paginationContainer.appendChild(pageButton);
+            }
+
+            // Botão de Próxima Página
+            const nextButton = createButton('Próxima', currentPage === totalPages || totalPages === 0);
+            nextButton.addEventListener('click', () => {
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    updateDisplay();
+                }
+            });
+            paginationContainer.appendChild(nextButton);
+        }
+
+        // Função para Atualizar a Exibição (Ebooks e Paginação)
+        function updateDisplay() {
+            renderEbooksList(filteredEbooks);
+            renderPagination(filteredEbooks.length);
+        }
+
+        // Função para Filtrar os Ebooks com Base na Pesquisa
+        function filterEbooks(searchTerm) {
+            if (!searchTerm) {
+                filteredEbooks = ebooks.slice(); // Copia os dados originais
+            } else {
+                const lowerCaseTerm = searchTerm.toLowerCase();
+                filteredEbooks = ebooks.filter(ebook => 
+                    ebook["Título"].toLowerCase().includes(lowerCaseTerm) ||
+                    ebook["Descrição"].toLowerCase().includes(lowerCaseTerm)
+                );
+            }
+            currentPage = 1; // Reseta para a primeira página após a filtragem
+            updateDisplay();
+        }
+
+        // Função para Configurar o Campo de Pesquisa
+        function setupSearch() {
+            const searchInput = document.getElementById('search-input');
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.trim();
+                filterEbooks(searchTerm);
+            });
+        }
+
+        // Inicialização da Página
+        window.addEventListener('DOMContentLoaded', () => {
+            setupSearch();
+            updateDisplay();
+        });
+    </script>
     </main>
     <!-- Contêiner para o rodapé -->
 <div id="footer-placeholder"></div>
