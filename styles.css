@@ -1,168 +1,421 @@
+/* Estilo básico */
 body {
-    background-color: #1c1c1e;
-    color: #e5e5e7;
     font-family: Arial, sans-serif;
+    background-color: #1e1e2f; /* Cor de fundo do modo escuro */
+    color: #e0e0e0; /* Cor clara para o texto */
     margin: 0;
-    padding: 20px;
+    padding: 0;
 }
 
-h1 {
-    color: #ffffff;
-    font-size: 24px;
-    margin-bottom: 20px;
+/* Classe que aplica o desfoque ao conteúdo fora do menu */
+.body-desfocado {
+    filter: blur(5px); /* Grau de desfoque */
+    pointer-events: none; /* Desabilita cliques fora do menu */
+}
+
+/* Desabilitar arrastar a imagem */
+.logo {
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    user-drag: none;
+}
+
+header {
+    text-align: center;
+    padding: 20px;
+    background-color: #2a2a40; /* Fundo do cabeçalho */
+    border-bottom: 1px solid #444; /* Linha sutil na parte inferior */
+}
+
+.logo-nome {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Espaço entre logo e botão hambúrguer */
+}
+
+.logo {
+    width: auto;
+    height: 50px;
+    margin-right: 15px;
+}
+
+/* Menu Horizontal (Computadores) */
+.menu-horizontal {
+    display: flex; /* Exibir itens em uma linha */
+    justify-content: center; /* Centralizar itens na barra */
+    align-items: center; /* Alinhar verticalmente os itens */
+    background-color: #2b2b44; /* Fundo do menu */
+    padding: 10px 0; /* Espaçamento vertical do menu */
+    list-style: none; /* Remove os marcadores da lista */
+    margin: 0; /* Remove margens padrão */
+    gap: 15px; /* Espaçamento entre os itens do menu */
+}
+
+.menu-horizontal ul {
+    display: flex; /* Organizar itens em linha */
+    justify-content: center; /* Centralizar o conteúdo do menu */
+    padding: 0; /* Remove padding padrão */
+    margin: 0; /* Remove margens padrão */
+    list-style: none; /* Remove marcadores da lista */
+}
+
+.menu-horizontal li {
+    margin: 0 15px; /* Espaçamento lateral entre os itens do menu */
+}
+
+.menu-horizontal a {
+    color: #e0e0e0; /* Cor do texto dos itens do menu */
+    text-decoration: none; /* Remove sublinhado do texto */
+    font-weight: bold; /* Negrito para o texto do menu */
+    padding: 10px 15px; /* Espaçamento interno dos itens do menu */
+    border-radius: 5px; /* Bordas arredondadas dos itens */
+    transition: background-color 0.3s ease, color 0.3s ease; /* Transições suaves para hover */
+}
+
+.menu-horizontal a:hover {
+    color: #ffffff; /* Cor do texto ao passar o mouse */
+    background-color: #00acee; /* Cor de fundo ao passar o mouse */
+}
+
+/* Estilo do botão hambúrguer */
+.menu-hamburguer {
+    display: none; /* Escondido em telas grandes */
+    font-size: 30px;
+    color: #e0e0e0;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+/* Menu Deslizante (Mobile) */
+.menu-deslizante {
+    position: fixed;
+    top: 0;
+    left: -250px;
+    width: 250px;
+    height: 100%;
+    background-color: #2b2b44;
+    transition: left 0.3s ease;
+    z-index: 1000;
+    padding-top: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.menu-deslizante.show {
+    left: 0; /* Mostrar menu deslizante */
+}
+
+.menu-deslizante ul {
+    flex-direction: column;
+    align-items: flex-start;
+    padding-left: 20px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.menu-deslizante li {
+    margin: 15px 0;
+}
+
+.menu-deslizante a {
+    color: #e0e0e0;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 10px 15px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.menu-deslizante a:hover {
+    color: #ffffff; /* Cor do texto ao passar o mouse */
+    background-color: #00acee; /* Cor de fundo ao passar o mouse */
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .menu-horizontal {
+        display: none; /* Esconder menu horizontal em telas pequenas */
+    }
+
+    .menu-hamburguer {
+        display: block; /* Mostrar botão hambúrguer em telas pequenas */
+    }
+
+    .menu-deslizante {
+        display: flex; /* Mostrar menu deslizante em telas pequenas */
+    }
+}
+
+@media (min-width: 769px) {
+    .menu-hamburguer {
+        display: none; /* Esconder botão hambúrguer em telas grandes */
+    }
+
+    .menu-horizontal {
+        display: flex; /* Mostrar menu horizontal em telas grandes */
+    }
+
+    .menu-deslizante {
+        display: none; /* Esconder menu deslizante em telas grandes */
+    }
+}
+
+/* Estilo da barra de pesquisa */
+.barra-pesquisa {
+    display: flex;
+    justify-content: center;
+    margin: 20px;
+}
+
+#pesquisa {
+    width: 300px;
+    padding: 10px;
+    border: 1px solid #444;
+    background-color: #1f1f32;
+    color: #e0e0e0;
+    border-radius: 5px;
 }
 
 button {
-    background-color: #2c2c2e;
-    color: #e5e5e7;
     padding: 10px 20px;
+    margin-left: 10px;
+    background-color: #00acee;
+    color: #ffffff;
     border: none;
-    border-radius: 8px;
+    border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
 
 button:hover {
-    opacity: 0.8;
+    background-color: #007bb5;
 }
 
-/* Estilos para os botões específicos */
-#addButton, #saveButton, #cancelButton, #searchButton {
-    background-color: #2c2c2e;
-    color: #e5e5e7;
-    padding: 10px 20px;
+.cursos-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    padding: 20px;
+}
+
+.curso {
+    background-color: #2a2a3c; /* Cor de fundo do card de curso */
+    border-radius: 10px;
+    padding: 20px;
+    width: 220px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Sombra sutil */
+    transition: transform 0.3s ease;
+}
+
+.curso:hover {
+    transform: scale(1.05); /* Efeito de zoom ao passar o mouse */
+}
+
+.curso-imagem {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 15px;
+}
+
+.paginacao-container {
+    text-align: center;
+    margin: 20px;
+}
+
+.pagina-button {
+    padding: 10px 15px;
+    margin: 0 5px;
+    background-color: #00acee;
+    color: #ffffff;
     border: none;
-    border-radius: 8px;
+    border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
 
-#addButton:hover, #saveButton:hover, #cancelButton:hover, #searchButton:hover {
-    opacity: 0.8;
+.pagina-button:hover,
+.pagina-ativa {
+    background-color: #007bb5;
 }
 
-/* Estilos para os itens da lista de eBooks */
-.course-item {
+/* Estilo para o botão de ver detalhes do curso */
+.ver-detalhes-button {
+    padding: 10px 20px;
+    margin-top: 15px;
+    background-color: transparent; /* Fundo transparente */
+    color: #00acee; /* Cor inicial da borda e texto */
+    border: 2px solid #00acee; /* Cor da borda */
+    border-radius: 20px; /* Cantos mais arredondados */
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+.ver-detalhes-button:hover {
+    background-color: #007bb5; /* Cor do fundo no hover */
+    border-color: #007bb5; /* Cor da borda no hover */
+    color: white; /* Cor do texto no hover */
+}
+
+/* Estilo do rodapé */
+footer {
+    background-color: #2a2a3c;
+    color: #e0e0e0;
+    padding: 20px;
+    border-top: 1px solid #444;
+}
+
+.footer-content {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-    border-radius: 8px;
+    flex-wrap: wrap;
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: left; /* Alinhamento à esquerda */
+}
+
+.footer-column {
+    flex: 1;
+    margin: 10px;
+    text-align: left; /* Alinhamento à esquerda */
+}
+
+.footer-logo {
+    max-width: 150px;
+    margin-bottom: 20px;
+}
+
+.footer-links,
+.footer-contact {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-links li,
+.footer-contact li {
     margin-bottom: 10px;
-    transition: background-color 0.3s ease;
 }
 
-.course-item:nth-child(odd) {
-    background-color: #2c2c2e;
+.footer-links a,
+.footer-contact a {
+    color: #e0e0e0; /* Cor branca para links de contato */
+    text-decoration: none;
+    font-weight: normal; /* Remover negrito */
+    transition: color 0.3s ease;
 }
 
-.course-item:nth-child(even) {
-    background-color: #3a3a3c;
+.footer-links a:hover,
+.footer-contact a:hover {
+    color: #007bb5; /* Hover azul escuro */
 }
 
-.course-item .title {
+/* Estilo dos títulos nas colunas */
+.footer-column h3 {
+    color: #ffffff; /* Cor branca para o título */
+    margin-bottom: 15px;
+    font-size: 18px;
+}
+
+/* Estilo do texto de atendimento na terceira coluna */
+.footer-column .atendimento-descricao {
+    color: #b0b0b0; /* Branco escuro para o horário de atendimento */
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+/* Estilo do ícone do WhatsApp */
+.footer-contact .whatsapp-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+.footer-contact a.whatsapp {
+    display: flex;
+    align-items: center;
+}
+
+.footer-contact a.whatsapp img {
     margin-right: 10px;
 }
 
-.course-item .actions button, .course-item .actions a {
-    margin-left: 10px;
-    background-color: #1e90ff;
-    color: white;
-    padding: 5px 10px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+/* Estilo dos ícones das redes sociais */
+.footer-contact img {
+    width: 24px;
+    height: 24px;
+    margin: 0 10px;
+    vertical-align: middle;
+}
+
+/* Rodapé inferior */
+.footer-bottom {
+    border-top: 1px solid #444;
+    margin-top: 20px;
+    padding-top: 20px;
+    display: flex;
+    justify-content: center; /* Centralizar em telas maiores */
+    flex-wrap: wrap;
+    text-align: center;
+}
+
+.footer-bottom p {
+    margin: 0;
+    flex-basis: 100%; /* Forçar a linha a ocupar 100% da largura */
+}
+
+.footer-bottom-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    gap: 15px;
+}
+
+.footer-bottom-links a {
+    color: #00acee;
     text-decoration: none;
+    font-weight: normal; /* Sem negrito */
 }
 
-.course-item .actions button:hover, .course-item .actions a:hover {
-    background-color: #1c86ee;
+.footer-bottom-links a:hover {
+    color: #007bb5;
 }
 
-/* Estilos para formulários e inputs */
-#addForm {
-    display: none;
-    margin-top: 20px;
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    flex-wrap: wrap;
+/* Responsividade para rodapé */
+@media (max-width: 768px) {
+    .footer-content {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .footer-column {
+        margin: 20px 0;
+    }
+
+    .footer-bottom {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .footer-bottom-links {
+        flex-direction: column; /* Itens empilhados em telas menores */
+    }
+
+    .footer-bottom p {
+        margin-bottom: 10px; /* Espaçamento entre o texto e os links */
+    }
 }
 
-#addForm input[type="text"], 
-#addForm input[type="file"] {
-    padding: 10px;
-    margin: 8px 0;
-    box-sizing: border-box;
-    background-color: #3a3a3c;
-    color: #e5e5e7;
-    border: none;
-    border-radius: 5px;
-    flex: 1;
-    min-width: 150px;
-}
-
-/* Estilos para a barra de pesquisa e paginação */
-#searchBar {
-    margin-top: 20px;
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    flex-wrap: wrap;
-}
-
-#searchBar input[type="text"] {
-    padding: 10px;
-    background-color: #3a3a3c;
-    color: #e5e5e7;
-    border: none;
-    border-radius: 5px;
-    flex: 1;
-    min-width: 150px;
-}
-
-#pagination {
-    margin-top: 20px;
-    display: flex;
-    gap: 5px;
-    align-items: center;
-    flex-wrap: wrap;
-}
-
-#pagination button {
-    padding: 5px 10px;
-    background-color: #2c2c2e;
-    color: #e5e5e7;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-#pagination button:hover {
-    opacity: 0.8;
-}
-
-#pagination .current-page {
-    font-weight: bold;
-    text-decoration: underline;
-    background-color: #1e90ff;
-    color: white;
-}
-
-/* Estilos para o status */
-#status {
-    margin-top: 10px;
-    font-size: 14px;
-}
-
-/* Estilos adicionais para melhor adaptação */
-a {
-    color: #1e90ff;
-    text-decoration: none;
-}
-
-a:hover {
-    text-decoration: underline;
+/* Desativar a rolagem quando o menu deslizante estiver aberto */
+.no-scroll {
+    overflow: hidden;
 }
