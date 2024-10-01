@@ -419,3 +419,26 @@ footer {
 .no-scroll {
     overflow: hidden;
 }
+
+.filtro-tipos {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 20px;
+    flex-wrap: wrap;
+}
+
+.filtro-tipos a {
+    text-decoration: none;
+    color: #e0e0e0;
+    background-color: #444;
+    padding: 10px 15px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    font-weight: bold;
+}
+
+.filtro-tipos a:hover {
+    background-color: black;
+    color: white;
+}
