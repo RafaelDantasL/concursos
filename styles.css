@@ -148,6 +148,18 @@ header {
     .menu-deslizante {
         display: flex; /* Mostrar menu deslizante em telas pequenas */
     }
+
+    /* Ajuste do campo de pesquisa em telas pequenas */
+    #pesquisa {
+        width: 100%; /* Ocupar toda a largura da tela */
+        max-width: 400px; /* Limitar largura máxima */
+    }
+
+    /* Ajuste dos cards de curso em telas pequenas */
+    .curso {
+        width: 100%; /* Ocupar a largura total em telas pequenas */
+        max-width: 300px; /* Limitar a largura máxima */
+    }
 }
 
 @media (min-width: 769px) {
@@ -441,4 +453,15 @@ footer {
 .filtro-tipos a:hover {
     background-color: black;
     color: white;
+}
+
+/* Ajuste adicional para telas médias, como tablets */
+@media (min-width: 600px) and (max-width: 1024px) {
+    .cursos-container {
+        justify-content: space-around; /* Melhor distribuição dos cards */
+    }
+
+    .curso {
+        width: 45%; /* Cards ocupando 45% da largura em tablets */
+    }
 }
