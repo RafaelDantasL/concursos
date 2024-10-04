@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formulário de Captura 2</title>
+    <title>Formulário de Captura 3</title>
 </head>
 <body>
     <h1>Inscreva-se</h1>
@@ -24,7 +24,55 @@
             const name = document.getElementById('name').value;
             const email = document.getElementById('email').value;
 
-            fetch('https://script.google.com/macros/s/AKfycbyaNWUWUqY6bMWKxLDsR78s7yJThP86QzrDPUY0QNDM0LQd1xBNkJoJBJ5x7PJCT_w/exec', {
+            fetch('<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulário de Captura</title>
+</head>
+<body>
+    <h1>Inscreva-se</h1>
+    <form id="captureForm">
+        <label for="name">Nome:</label>
+        <input type="text" id="name" name="name" required><br><br>
+
+        <label for="email">E-mail:</label>
+        <input type="email" id="email" name="email" required><br><br>
+
+        <button type="submit">Enviar</button>
+    </form>
+
+    <script>
+        document.getElementById('captureForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+
+            fetch('https://script.google.com/macros/s/AKfycbyaNWUWUqY6bMWKxLDsR78s7yJThP86QzrDPUY0QNDM0LQd1xBNkJoJBJ5x7PJCT_w/exec', { // Substitua YOUR_SCRIPT_ID pelo correto
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name, email })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert('Inscrição realizada com sucesso! Verifique seu e-mail.');
+                } else {
+                    alert('Erro ao enviar dados: ' + data.message);
+                }
+            })
+            .catch(error => {
+                alert('Erro ao conectar: ' + error.message);
+            });
+        });
+    </script>
+</body>
+</html>
+', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
