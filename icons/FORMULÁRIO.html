@@ -69,26 +69,19 @@
         button:hover {
             background-color: #45a049;
         }
-        /* ReCAPTCHA */
-        .g-recaptcha {
-            margin-top: 20px;
-            text-align: center;
-        }
-        /* Animação de carregamento */
         #loading::after {
             content: '🔄';
             display: inline-block;
             margin-left: 10px;
             animation: spin 1s linear infinite;
         }
-
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
     </style>
-    <!-- Carregar a API do reCAPTCHA -->
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <!-- Carregar a API do reCAPTCHA v3 -->
+    <script src="https://www.google.com/recaptcha/api.js?render=6Ldw6FcqAAAAAHzMKml9T3-MX6tIobSgTbhTRV-L" async defer></script>
 </head>
 <body>
     <div class="form-container">
@@ -99,9 +92,6 @@
 
             <label for="email">E-mail:</label>
             <input type="email" id="email" name="email" required />
-
-            <!-- Google reCAPTCHA -->
-            <div class="g-recaptcha" data-sitekey="6Ldw6FcqAAAAAGM4rdX7L7tGL57CURKYtp_KUl9d"></div>
 
             <div id="loading">Enviando...</div>
             <div id="response" class="feedback"></div>
@@ -121,7 +111,6 @@
 
             const name = document.getElementById('name').value.trim();
             const email = document.getElementById('email').value.trim();
-            const recaptchaResponse = grecaptcha.getResponse();
 
             if (!validateForm(name, email)) {
                 responseElem.innerHTML = '<span class="error">Erro: Dados inválidos. Por favor, verifique seu nome e e-mail.</span>';
@@ -129,42 +118,36 @@
                 return;
             }
 
-            if (recaptchaResponse.length === 0) {
-                responseElem.innerHTML = '<span class="error">Por favor, complete o reCAPTCHA.</span>';
-                loadingElem.style.display = "none";
-                return;
-            }
-
-            // Enviar dados para o Google Apps Script
-            fetch('https://script.google.com/macros/s/AKfycbyaNWUWUqY6bMWKxLDsR78s7yJThP86QzrDPUY0QNDM0LQd1xBNkJoJBJ5x7PJCT_w/exec', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ 
-                    name: name, 
-                    email: email, 
-                    recaptcha: recaptchaResponse 
+            // Executar o reCAPTCHA v3 para obter o token
+            grecaptcha.execute('6Ldw6FcqAAAAAHzMKml9T3-MX6tIobSgTbhTRV-L', { action: 'submit' }).then(function(token) {
+                // Enviar dados para o Google Apps Script
+                fetch('https://script.google.com/macros/s/AKfycbyaNWUWUqY6bMWKxLDsR78s7yJThP86QzrDPUY0QNDM0LQd1xBNkJoJBJ5x7PJCT_w/exec', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        name: name, 
+                        email: email, 
+                        recaptcha: token // Use o token do reCAPTCHA v3 aqui
+                    })
                 })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    responseElem.innerHTML = '<span class="success">Cadastro realizado com sucesso! Verifique seu e-mail.</span>';
-                    form.reset();
-                    grecaptcha.reset();
-                } else {
-                    responseElem.innerHTML = `<span class="error">Erro: ${data.message}</span>`;
-                    grecaptcha.reset();
-                }
-            })
-            .catch(error => {
-                console.error('Erro:', error);
-                responseElem.innerHTML = '<span class="error">Erro ao enviar os dados. Tente novamente mais tarde.</span>';
-                grecaptcha.reset();
-            })
-            .finally(() => {
-                loadingElem.style.display = "none";
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        responseElem.innerHTML = '<span class="success">Cadastro realizado com sucesso! Verifique seu e-mail.</span>';
+                        form.reset();
+                    } else {
+                        responseElem.innerHTML = `<span class="error">Erro: ${data.message}</span>`;
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro:', error);
+                    responseElem.innerHTML = '<span class="error">Erro ao enviar os dados. Tente novamente mais tarde.</span>';
+                })
+                .finally(() => {
+                    loadingElem.style.display = "none";
+                });
             });
         });
 
